@@ -1,0 +1,14 @@
+server {
+	listen 80;
+ 
+	server_name example.com www.example.com;
+ 
+	root /usr/local/www/example.com;
+ 
+	access_log /var/log/nginx/example.access.log;
+	error_log /var/log/nginx/example.error.log;
+ 
+	location / { 
+		try_files $uri $uri/ /index.php; 
+	}
+}
