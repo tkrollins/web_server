@@ -28,7 +28,10 @@ int main(int argc, char* argv[])
     boost::asio::io_service io_service;
 
     using namespace std; // For atoi.
-    server s(io_service, atoi(argv[1]));
+
+    // create a server object, s, initialized with io_serice, 
+    // and the port number entered in the command line
+    server s(io_service, atoi(argv[1])); 
 
     io_service.run();
   }

@@ -20,9 +20,12 @@ class server
 {
 public:
   server(boost::asio::io_service& io_service, short port)
-    : io_service_(io_service),
-	  acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
+    : io_service_(io_service), 
+	  acceptor_(io_service, tcp::endpoint(tcp::v4(), port)) // establishes server endpoint
 	  {
+      // this function creates a new session object which in turn initializes a socket 
+      // object. It then calls async_accept which allows server to accept
+      // data streams over its socket connection after a socket connection is established
 	  	start_accept();
 	  }
 

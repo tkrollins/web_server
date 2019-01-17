@@ -17,14 +17,18 @@
 
 using boost::asio::ip::tcp;
 
+// this function creates a new session object which in turn initializes a socket 
+// object. It then calls async_accept which allows server to accept
+// data streams over its socket connection after a socket connection is established
 void server::start_accept()
 {
-  session* new_session = new session(io_service_);
-  acceptor_.async_accept(new_session->socket(),
-      boost::bind(&server::handle_accept, this, new_session,
+  session* new_session = new session(io_service_); // create new session + initialize socket object
+  acceptor_.async_accept(new_session->socket(), // wait for a socket connection in a thread
+      boost::bind(&server::handle_accept, this, new_session, // call handle_accept once a socket connection is established
         boost::asio::placeholders::error));
 }
 
+// handle_accept calls new_session->start() if a socket connection is established
 void server::handle_accept(session* new_session,
     const boost::system::error_code& error)
 {
