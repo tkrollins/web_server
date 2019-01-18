@@ -1,0 +1,23 @@
+// This is an example of how to use the NginxConfigParser API to
+// parse a configuration file and return the relevant values.
+
+// This is for use with the server code.
+
+// EXAMPLE:
+
+
+
+#include "config_parser.h"
+
+NginxConfigParser parser;
+std::string listenPort;
+
+if(parser.Parse("file_to_be_parsed"))
+{
+    listenPort = parser.config->parameters[configParameters::LISTEN_PORT];
+}
+
+
+
+
+//  listenPort will now hold the port number in a string

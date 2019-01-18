@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(bigbear)
 
+set(CMAKE_CXX_STANDARD 14)
+
 # Make sure developers do not run cmake in the main project directory, to keep
 # build artifacts from becoming clutter
 if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
@@ -39,7 +41,6 @@ add_library(config_parser_lib src/config_parser/config_parser.cc)
 add_library(server_lib src/server.cc src/session.cc)
 
 # TODO(!): Update executable name, srcs, and deps
-add_executable(config_parser src/config_parser/config_parser.cc src/config_parser/config_parser_main.cc)
 add_executable(server src/server_main.cc src/server.cc src/session.cc)
 target_link_libraries(server server_lib Boost::system)
 
