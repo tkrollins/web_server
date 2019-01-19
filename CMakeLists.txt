@@ -42,7 +42,7 @@ add_library(server_lib src/server.cc src/session.cc)
 
 # TODO(!): Update executable name, srcs, and deps
 add_executable(server src/server_main.cc src/server.cc src/session.cc)
-target_link_libraries(server server_lib Boost::system)
+target_link_libraries(server server_lib config_parser_lib Boost::system)
 
 # TODO(!): Update tests executable name, srcs, and deps
 add_executable(config_parser_test src/config_parser/tests/config_parser_test.cc)

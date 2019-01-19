@@ -12,8 +12,8 @@
 #include <iostream>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
-
 #include "session.h"
+#include <string>
 
 using boost::asio::ip::tcp;
 
@@ -44,7 +44,7 @@ void session::handle_read(const boost::system::error_code& error,
 
     // print statements for debugging purposes
     printf("Data: ");
-    printf(socketReadBuffer); // yields a warning message, but will still compile
+    printf("%s", socketReadBuffer);
     printf("\n");
 
     // The following loop detects the end of an HTTP message by using a naive blocking implementation: 
@@ -77,9 +77,21 @@ void session::handle_read(const boost::system::error_code& error,
     // TODO: instead of writing the entire buffer -- boost::asio::buffer(data_, bytes_transferred) -- to
     // the socket, send an HTTP 200 response + the request in the buffer if the buffer indeed contains a
     // request. This is based on how I understand the assignment directions, but I might be wrong.
+    
     printf("Socket data read. Writing response data to socket...\n");
+
+
+    char res[1024];
+    char reqBody[1024];
+    bool result = session::parse_http_request(data_, reqBody);
+    if (!result){ // parsing http result error
+      return;
+    }
+
+    session::render_response(reqBody, res);
+
     boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
-        boost::asio::buffer(data_, bytes_transferred), // the read data that will be written to socket_
+        boost::asio::buffer(res, strlen(res)), // the read data that will be written to socket_
         boost::bind(&session::handle_write, this, // call session::handle_write() once done writing
           boost::asio::placeholders::error));
   }
@@ -87,6 +99,27 @@ void session::handle_read(const boost::system::error_code& error,
   {
     delete this;
   }
+}
+
+bool session::parse_http_request(char* inputStr, char* requestBody) // TODO: Maybe we would need other part of the request?
+{
+  std::string str(inputStr);
+  std::string str2 = str.substr(str.find("\r\n\r\n"));
+  strcpy(requestBody, str2.c_str());
+
+  return true;
+}
+
+void session::render_response(char* inputStr, char* outStr)
+{
+  std::string res = "";
+  std::string h = "HTTP/1.1 200 OK\r\n";                                                                              
+  std::string type = "Content-Type: text/plain"; // did't put \r\n here, since the parse_http_request offers
+  // input with leading \r\n
+  std::string content = inputStr;
+  res = h + type + content;
+
+  strcpy(outStr, res.c_str());
 }
 
 void session::handle_write(const boost::system::error_code& error)
