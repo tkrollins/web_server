@@ -117,7 +117,7 @@ void session::render_response(char* inputStr, char* outStr)
   std::string type = "Content-Type: text/plain"; // did't put \r\n here, since the parse_http_request offers
   // input with leading \r\n
   std::string content = inputStr;
-  res = h + type + content;
+  res = h + type + content + "\r\n";
 
   strcpy(outStr, res.c_str());
 }
@@ -130,6 +130,7 @@ void session::handle_write(const boost::system::error_code& error)
         boost::bind(&session::handle_read, this, // call handle_read again once you are done reading
           boost::asio::placeholders::error,
           boost::asio::placeholders::bytes_transferred));
+    socket_.close();
   }
   else
   {
