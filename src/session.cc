@@ -83,13 +83,13 @@ void session::handle_read(const boost::system::error_code& error,
 
     char res[1024];
     char reqBody[1024];
-    bool result = session::parse_http_request(data_, reqBody);
+    /*bool result = session::parse_http_request(data_, reqBody);
     if (!result){ // parsing http result error
       return;
-    }
+    }*/
 
-    session::render_response(reqBody, res);
-
+    session::render_response(data_, res);
+    std::cout << "buffer: " << strlen(res) << std::endl;
     boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
         boost::asio::buffer(res, strlen(res)), // the read data that will be written to socket_
         boost::bind(&session::handle_write, this, // call session::handle_write() once done writing
@@ -114,11 +114,13 @@ void session::render_response(char* inputStr, char* outStr)
 {
   std::string res = "";
   std::string h = "HTTP/1.1 200 OK\r\n";                                                                              
-  std::string type = "Content-Type: text/plain"; // did't put \r\n here, since the parse_http_request offers
-  // input with leading \r\n
+  std::string type = "Content-Type: text/plain\r\n"; // did't put \r\n here, since the parse_http_request offers
   std::string content = inputStr;
-  res = h + type + content + "\r\n";
-
+  std::string contentLength = "Content-Length: " + std::to_string(content.length()) + "\r\n\r\n";
+  // input with leading \r\n
+  res = h + type + contentLength + content;
+  std::cout << res << std::endl;
+  std::cout << "reslen: " << res.length() << std::endl;
   strcpy(outStr, res.c_str());
 }
 

@@ -18,13 +18,13 @@ There might be a better way of doing this, but this is all I know so far
 
 How to access the service on Google cloud:
 
-After modifying the code, run the following command to rebuild::
+After modifying the code, run the following command to rebuild:
 $ gcloud builds submit --config docker/cloudbuild.yaml .
+*** In order to deploy the new build, you need to reset the VM instance on Google Cloud UI ***
+Google Cloud Home > Computing Engine > VM instances > web-server > Reset
 
 To access the server:
 IP: 35.247.92.66
 Port: 80
-
-
-
+Ex: curl -X GET "http://35.247.92.66" -d "Hello World"
 

@@ -51,9 +51,9 @@ target_link_libraries(config_parser_test config_parser_lib gtest_main)
 # TODO(!): Update with tests binary
 gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/config_parser/tests)
 
-add_test(NAME echo_server_test
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/test_echo_server.sh "./test_config"
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
+#add_test(NAME echo_server_test
+#        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/test_echo_server.sh "./test_config"
+#        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
 
 # TODO(!): Update with target/tests targets
 include(cmake/CodeCoverageReportConfig.cmake)
