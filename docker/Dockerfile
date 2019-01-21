@@ -17,7 +17,7 @@ RUN ctest --output-on_failure
 FROM ubuntu:latest as deploy
 
 # TODO(!): Copy server output binary to "."
-COPY --from=builder /usr/src/project/build/bin/example_server .
+COPY --from=builder /usr/src/project/build/bin/server .
 COPY --from=builder /usr/src/project/sample_server_config .
 # TODO(!): Expose some port(s)
 EXPOSE 80
