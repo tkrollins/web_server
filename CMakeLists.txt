@@ -56,5 +56,7 @@ gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE
 #        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
 
 # TODO(!): Update with target/tests targets
-include(cmake/CodeCoverageReportConfig.cmake)
-# generate_coverage_report(TARGETS example_server example_lib TESTS example_lib_test)
+if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
+    include(cmake/CodeCoverageReportConfig.cmake)
+    generate_coverage_report(TARGETS server server_lib config_parser_lib TESTS config_parser_test)
+endif()
