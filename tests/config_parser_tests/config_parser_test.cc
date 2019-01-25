@@ -18,7 +18,7 @@ TEST_F(NginxConfigParserTest, SimpleConfig) {
 TEST_F(NginxConfigParserTest, ParseListenPort) {
 
     bool success = parser.Parse("example_config");
-    std::string port = parser.config->parameters[configParameters::LISTEN_PORT];
+    std::string port = parser.config->parameters[configParameter::LISTEN_PORT];
 
     EXPECT_TRUE(success);
     EXPECT_TRUE(port == "80");

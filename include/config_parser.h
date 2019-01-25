@@ -8,10 +8,11 @@
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
+#include <deque>
 
 // This is a public enum that will be used to access
 // values with in the config parameters object
-enum class configParameters
+enum class configParameter
 {
     LISTEN_PORT
 };
@@ -20,7 +21,7 @@ enum class configParameters
 // To be passed to the server for configuration.
 class NginxConfig {
 public:
-    std::unordered_map<configParameters, std::string> parameters;
+    std::unordered_map<configParameter, std::string> parameters;
 };
 
 // The driver that parses a config file and generates an NginxConfig.
@@ -65,12 +66,9 @@ private:
         TOKEN_STATE_TOKEN_TYPE_NORMAL = 4
     };
 
-    // Parameter types to be saved from config file.
-    // This will be extended as more parameters are needed.
-//    enum configParameters
-//    {
-//        LISTEN_PORT = 0
-//    };
+    void setParameterNameAndValue(std::string& parameterName, std::string& parameterValue, std::deque<std::string> tokens);
+    bool findParameterToSet(std::string context, std::string parameterName,
+            std::string parameterValue, configParameter& parameterToSet);
 
     // Holds key words that open new context (new {}).
     // Key=context token, value=vector of parameters within that context.
@@ -78,11 +76,11 @@ private:
 
     // Parameters that are to be stored in the returned config.
     // Key=parameter token, value=enum corresponding to parameter
-    std::unordered_map<std::string, configParameters> parametersMap;
+    std::unordered_map<std::string, configParameter> parametersMap;
 
     // This parses the current set of tokens, and sets any corresponding
     // parameters in NGinxConfig* config.
-    void setConfig(std::string token, std::string last_token, std::string context);
+    void setConfig(std::deque<std::string> tokens, std::string context);
 
 
     TokenType ParseToken(std::istream* input, std::string* value);

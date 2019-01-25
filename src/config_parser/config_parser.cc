@@ -2,11 +2,12 @@
 #include "config_parser.h"
 
 
+
 // Constructor for NGginxConfigParser.  Inits the member variables
 // With hard-coded values.
 NginxConfigParser::NginxConfigParser()
 {
-    config = NULL;
+    config = nullptr;
 
     // Each context key word will have a vector of parameters
     std::vector<std::string> serverVector = {"listen"};
@@ -15,7 +16,7 @@ NginxConfigParser::NginxConfigParser()
     contextsMap.insert(std::make_pair("server", serverVector));
 
     // Key=parameter token, Value=Parameter enum
-    parametersMap.insert(std::make_pair("listen", configParameters::LISTEN_PORT));
+    parametersMap.insert(std::make_pair("listen", configParameter::LISTEN_PORT));
 }
 
 NginxConfigParser::~NginxConfigParser()
@@ -23,38 +24,61 @@ NginxConfigParser::~NginxConfigParser()
     delete config;
 }
 
-
-// TODO: make this work for nested contexts
-void NginxConfigParser::setConfig(std::string token, std::string last_token, std::string context)
+void NginxConfigParser::setParameterNameAndValue(std::string &parameterName, std::string &parameterValue,
+        std::deque<std::string> tokens)
 {
-    configParameters parameterToSet;
-    bool setParameter = false; // Only set parameter if new one is found
+    parameterName = tokens.back();
+    tokens.pop_back();
+    parameterValue = "";
+    while (!tokens.empty())
+    {
+        parameterValue += tokens.back();
+        parameterValue += " ";
+        tokens.pop_back();
+    }
+    parameterValue.pop_back();
+}
 
+bool NginxConfigParser::findParameterToSet(std::string context, std::string parameterName,
+                        std::string parameterValue, configParameter& parameterToSet)
+{
     // If currently within a context
-    if(contextsMap.count(context))
+    if (contextsMap.count(context))
     {
         // Loops through all parameters within that context
-        for(std::string prmt : contextsMap.at(context))
+        for (std::string prmt : contextsMap.at(context))
         {
             // If the prev token seen is a known parameter
-            if(prmt == last_token)
+            if (prmt == parameterName)
             {
-                parameterToSet = parametersMap.at(last_token);
-                setParameter = true;
-                break;
+                parameterToSet = parametersMap.at(parameterName);
+                return true;
             }
         }
     }
-    else if(parametersMap.count(last_token))
+    else if (parametersMap.count(parameterName))
     {
-        parameterToSet = parametersMap.at(last_token);
-        setParameter = true;
+        parameterToSet = parametersMap.at(parameterName);
+        return true;
     }
+    return false;
+}
 
-    // If a paramter to set was found
-    if(setParameter)
+// TODO: make this work for nested contexts
+void NginxConfigParser::setConfig(std::deque<std::string> tokens, std::string context)
+{
+    if (tokens.size() >= 2)
     {
-        config->parameters.insert(std::make_pair(parameterToSet, token));
+        std::string parameterName, parameterValue;
+        configParameter parameterToSet;
+
+        setParameterNameAndValue(parameterName, parameterValue, tokens);
+        bool setParameter = findParameterToSet(context, parameterName, parameterValue, parameterToSet);
+
+        if (setParameter)
+        {
+            config->parameters.insert(std::make_pair(parameterToSet, parameterValue));
+        }
     }
 }
 
@@ -147,6 +171,7 @@ bool NginxConfigParser::Parse(std::istream* config_file) {
     delete config;
     config = new NginxConfig;
 
+    std::deque<std::string> tokens;
     TokenType last_token_type = TOKEN_TYPE_START;
     TokenType token_type;
     std::string last_token_str = "";
@@ -175,6 +200,7 @@ bool NginxConfigParser::Parse(std::istream* config_file) {
         }
         else if (token_type == TOKEN_TYPE_NORMAL)
         {
+            tokens.push_front(token);
             if (!(last_token_type == TOKEN_TYPE_START ||
                   last_token_type == TOKEN_TYPE_STATEMENT_END ||
                   last_token_type == TOKEN_TYPE_START_BLOCK ||
@@ -187,6 +213,7 @@ bool NginxConfigParser::Parse(std::istream* config_file) {
         }
         else if (token_type == TOKEN_TYPE_STATEMENT_END)
         {
+            tokens.clear();
             if (last_token_type != TOKEN_TYPE_NORMAL)
             {
                 // Error.
@@ -197,7 +224,8 @@ bool NginxConfigParser::Parse(std::istream* config_file) {
         {
             // If a start block is seen then the last token will
             // be the context token.
-            context.push(last_token_str);
+            context.push(tokens.back());
+            tokens.clear();
             if (last_token_type != TOKEN_TYPE_NORMAL)
             {
                 // Error.
@@ -241,7 +269,7 @@ bool NginxConfigParser::Parse(std::istream* config_file) {
             break;
         }
         last_token_type = token_type;
-        setConfig(token, last_token_str, context.top());
+        setConfig(tokens, context.top());
         last_token_str = token;
     }
 
@@ -278,10 +306,4 @@ const char* NginxConfigParser::TokenTypeAsString(TokenType type) {
         case TOKEN_TYPE_ERROR:         return "TOKEN_TYPE_ERROR";
         default:                       return "Unknown token type";
     }
-}
-
-// Must be run after a successful Parse().
-NginxConfig* NginxConfigParser::getConfig()
-{
-    return config;
 }

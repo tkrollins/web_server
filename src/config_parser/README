@@ -14,7 +14,7 @@ std::string listenPort;
 
 if(parser.Parse("file_to_be_parsed"))
 {
-    listenPort = parser.config->parameters[configParameters::LISTEN_PORT];
+    listenPort = parser.config->parameters[configParameter::LISTEN_PORT];
 }
 
 
