@@ -80,17 +80,17 @@ void session::handle_read(const boost::system::error_code& error,
     
     printf("Socket data read. Writing response data to socket...\n");
 
-    char res[1024];
+    std::string res;
     char reqBody[1024];
     /*bool result = session::parse_http_request(data_, reqBody);
     if (!result){ // parsing http result error
       return;
     }*/
 
-    session::render_response(socketReadBuffer, res);
-    std::cout << "buffer: " << strlen(res) << std::endl;
+    res = session::render_response(std::string(socketReadBuffer));
+
     boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
-        boost::asio::buffer(res, strlen(res)), // the read data that will be written to socket_
+        boost::asio::buffer(res, res.length()), // the read data that will be written to socket_
         boost::bind(&session::handle_write, this, // call session::handle_write() once done writing
           boost::asio::placeholders::error));
   }
@@ -109,18 +109,16 @@ bool session::parse_http_request(char* inputStr, char* requestBody) // TODO: May
   return true;
 }
 
-void session::render_response(char* inputStr, char* outStr)
+std::string session::render_response(std::string inputStr)
 {
   std::string res = "";
   std::string h = "HTTP/1.1 200 OK\r\n";                                                                              
   std::string type = "Content-Type: text/plain\r\n"; // did't put \r\n here, since the parse_http_request offers
-  std::string content = std::string(inputStr);
-  std::string contentLength = "Content-Length: " + std::to_string(content.length()) + "\r\n\r\n";
+  std::string contentLength = "Content-Length: " + std::to_string(inputStr.length()) + "\r\n\r\n";
   // input with leading \r\n
-  res = h + type + contentLength + content;
+  res = h + type + contentLength + inputStr;
   std::cout << res << std::endl;
-  std::cout << "reslen: " << res.length() << std::endl;
-  strcpy(outStr, res.c_str());
+  return res;
 }
 
 void session::handle_write(const boost::system::error_code& error)

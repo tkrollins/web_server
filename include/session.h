@@ -24,7 +24,8 @@ public:
   tcp::socket& socket();
 
   void start();
-
+  std::string render_response(std::string inputStr);
+  
 private:
   void handle_read(const boost::system::error_code& error,
       size_t bytes_transferred);
@@ -35,5 +36,4 @@ private:
   enum { max_length = 1024 };
   char data_[max_length];
   bool parse_http_request(char* inputStr, char* requestBody);
-  void render_response(char* inputStr, char* outStr);
 };
