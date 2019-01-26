@@ -1,5 +1,6 @@
 #include <stack>
 #include "config_parser.h"
+#include "nginx_config_tokens.h"
 
 
 
@@ -16,7 +17,7 @@ NginxConfigParser::NginxConfigParser()
     contextsMap.insert(std::make_pair("server", serverVector));
 
     // Key=parameter token, Value=Parameter enum
-    parametersMap.insert(std::make_pair("listen", configParameter::LISTEN_PORT));
+    parametersMap.insert(std::make_pair("listen", ConfigParameter::LISTEN_PORT));
 }
 
 NginxConfigParser::~NginxConfigParser()
@@ -25,11 +26,12 @@ NginxConfigParser::~NginxConfigParser()
 }
 
 void NginxConfigParser::setParameterNameAndValue(std::string &parameterName, std::string &parameterValue,
-        std::deque<std::string> tokens)
+                                                 std::deque<std::string> tokens)
 {
     parameterName = tokens.back();
     tokens.pop_back();
     parameterValue = "";
+    // For if a parameter value is multi-word
     while (!tokens.empty())
     {
         parameterValue += tokens.back();
@@ -40,16 +42,16 @@ void NginxConfigParser::setParameterNameAndValue(std::string &parameterName, std
 }
 
 bool NginxConfigParser::findParameterToSet(std::string context, std::string parameterName,
-                        std::string parameterValue, configParameter& parameterToSet)
+                                           std::string parameterValue, ConfigParameter& parameterToSet)
 {
     // If currently within a context
     if (contextsMap.count(context))
     {
         // Loops through all parameters within that context
-        for (std::string prmt : contextsMap.at(context))
+        for (std::string prmtr : contextsMap.at(context))
         {
             // If the prev token seen is a known parameter
-            if (prmt == parameterName)
+            if (prmtr == parameterName)
             {
                 parameterToSet = parametersMap.at(parameterName);
                 return true;
@@ -70,7 +72,7 @@ void NginxConfigParser::setConfig(std::deque<std::string> tokens, std::string co
     if (tokens.size() >= 2)
     {
         std::string parameterName, parameterValue;
-        configParameter parameterToSet;
+        ConfigParameter parameterToSet;
 
         setParameterNameAndValue(parameterName, parameterValue, tokens);
         bool setParameter = findParameterToSet(context, parameterName, parameterValue, parameterToSet);
@@ -82,145 +84,71 @@ void NginxConfigParser::setConfig(std::deque<std::string> tokens, std::string co
     }
 }
 
-
-NginxConfigParser::TokenType NginxConfigParser::ParseToken(std::istream* input,
-                                                           std::string* value) {
-    TokenParserState state = TOKEN_STATE_INITIAL_WHITESPACE;
-    while (input->good()) {
-        const char c = input->get();
-        if (!input->good()) {
-            break;
-        }
-        switch (state) {
-            case TOKEN_STATE_INITIAL_WHITESPACE:
-                switch (c) {
-                    case '{':
-                        *value = c;
-                        return TOKEN_TYPE_START_BLOCK;
-                    case '}':
-                        *value = c;
-                        return TOKEN_TYPE_END_BLOCK;
-                    case '#':
-                        *value = c;
-                        state = TOKEN_STATE_TOKEN_TYPE_COMMENT;
-                        continue;
-                    case '"':
-                        *value = c;
-                        state = TOKEN_STATE_DOUBLE_QUOTE;
-                        continue;
-                    case '\'':
-                        *value = c;
-                        state = TOKEN_STATE_SINGLE_QUOTE;
-                        continue;
-                    case ';':
-                        *value = c;
-                        return TOKEN_TYPE_STATEMENT_END;
-                    case ' ':
-                    case '\t':
-                    case '\n':
-                    case '\r':
-                        continue;
-                    default:
-                        *value += c;
-                        state = TOKEN_STATE_TOKEN_TYPE_NORMAL;
-                        continue;
-                }
-            case TOKEN_STATE_SINGLE_QUOTE:
-                // TODO: the end of a quoted token should be followed by whitespace.
-                // TODO: Maybe also define a QUOTED_STRING token type.
-                // TODO: Allow for backslash-escaping within strings.
-                *value += c;
-                if (c == '\'') {
-                    return TOKEN_TYPE_NORMAL;
-                }
-                continue;
-            case TOKEN_STATE_DOUBLE_QUOTE:
-                *value += c;
-                if (c == '"') {
-                    return TOKEN_TYPE_NORMAL;
-                }
-                continue;
-            case TOKEN_STATE_TOKEN_TYPE_COMMENT:
-                if (c == '\n' || c == '\r') {
-                    return TOKEN_TYPE_COMMENT;
-                }
-                *value += c;
-                continue;
-            case TOKEN_STATE_TOKEN_TYPE_NORMAL:
-                if (c == ' ' || c == '\t' || c == '\n' ||
-                    c == ';' || c == '{' || c == '}') {
-                    input->unget();
-                    return TOKEN_TYPE_NORMAL;
-                }
-                *value += c;
-                continue;
-        }
+// TODO: refactor this into a more manageable state
+bool NginxConfigParser::Parse(std::istream* config_file)
+{
+    NginxConfigTokens* tokenList = NginxConfigTokens::makeNginxConfigTokens(config_file);
+    if(tokenList == nullptr)
+    {
+        return false;
     }
-
-    // If we get here, we reached the end of the file.
-    if (state == TOKEN_STATE_SINGLE_QUOTE ||
-        state == TOKEN_STATE_DOUBLE_QUOTE) {
-        return TOKEN_TYPE_ERROR;
-    }
-
-    return TOKEN_TYPE_EOF;
-}
-
-bool NginxConfigParser::Parse(std::istream* config_file) {
-
     delete config;
     config = new NginxConfig;
 
+    bool isError = false;
     std::deque<std::string> tokens;
     TokenType last_token_type = TOKEN_TYPE_START;
-    TokenType token_type;
+    TokenType tokenType;
     std::string last_token_str = "";
     std::stack<std::string> context;  // Keeps track of context level
     context.push("");
-    while (true)
+
+    for (Token* token : tokenList->tokens)
     {
-        std::string token;
-        token_type = ParseToken(config_file, &token);
-        printf ("%s: %s\n", TokenTypeAsString(token_type), token.c_str());
-        if (token_type == TOKEN_TYPE_ERROR)
+        std::string tokenValue = token->value;
+        tokenType = token->type;
+
+        printf ("%s: %s\n", TokenTypeAsString(tokenType), tokenValue.c_str());
+        if (tokenType == TOKEN_TYPE_ERROR)
         {
+            isError = true;
             break;
         }
 
-        if (token_type == TOKEN_TYPE_COMMENT)
+        if (tokenType == TOKEN_TYPE_COMMENT)
         {
             // Skip comments.
             continue;
         }
 
-        if (token_type == TOKEN_TYPE_START)
+        if (tokenType == TOKEN_TYPE_START)
         {
-            // Error.
+            isError = true;
             break;
         }
-        else if (token_type == TOKEN_TYPE_NORMAL)
+        else if (tokenType == TOKEN_TYPE_NORMAL)
         {
-            tokens.push_front(token);
+            tokens.push_front(tokenValue);
             if (!(last_token_type == TOKEN_TYPE_START ||
                   last_token_type == TOKEN_TYPE_STATEMENT_END ||
                   last_token_type == TOKEN_TYPE_START_BLOCK ||
                   last_token_type == TOKEN_TYPE_END_BLOCK ||
                   last_token_type == TOKEN_TYPE_NORMAL))
             {
-                //Error
+                isError = true;
                 break;
             }
         }
-        else if (token_type == TOKEN_TYPE_STATEMENT_END)
+        else if (tokenType == TOKEN_TYPE_STATEMENT_END)
         {
             tokens.clear();
             if (last_token_type != TOKEN_TYPE_NORMAL)
             {
-                // Error.
+                isError = true;
                 break;
             }
         }
-        else if (token_type == TOKEN_TYPE_START_BLOCK)
+        else if (tokenType == TOKEN_TYPE_START_BLOCK)
         {
             // If a start block is seen then the last token will
             // be the context token.
@@ -228,11 +156,11 @@ bool NginxConfigParser::Parse(std::istream* config_file) {
             tokens.clear();
             if (last_token_type != TOKEN_TYPE_NORMAL)
             {
-                // Error.
+                isError = true;
                 break;
             }
         }
-        else if (token_type == TOKEN_TYPE_END_BLOCK)
+        else if (tokenType == TOKEN_TYPE_END_BLOCK)
         {
             // If an end block is seen, we are exiting
             context.pop();
@@ -241,43 +169,40 @@ bool NginxConfigParser::Parse(std::istream* config_file) {
             {
                 // This means that the end block can follow a ';'
                 // or a '}' and be legal.
-                // Error.
+                isError = true;
                 break;
             }
-        }
-        else if (token_type == TOKEN_TYPE_EOF)
-        {
-            if (context.top() != "")
-            {
-                // This means that there is an unequal number of
-                // opening and closing brackets
-                // Error
-                printf("Bracket Count: %u", (unsigned)context.size());
-                break;
-            }
-            if (last_token_type != TOKEN_TYPE_STATEMENT_END &&
-                last_token_type != TOKEN_TYPE_END_BLOCK)
-            {
-                // Error.
-                break;
-            }
-            return true;
         }
         else
         {
-            // Error. Unknown token.
+            isError = true;
             break;
         }
-        last_token_type = token_type;
+        last_token_type = tokenType;
         setConfig(tokens, context.top());
-        last_token_str = token;
+        last_token_str = tokenValue;
     }
-
-    printf ("Bad transition from %s to %s\n",
-            TokenTypeAsString(last_token_type),
-            TokenTypeAsString(token_type));
-    delete config;
-    return false;
+    if (context.top() != "")
+    {
+        // This means that there is an unequal number of
+        // opening and closing brackets
+        // Error
+        printf("Bracket Count: %u", (unsigned)context.size());
+        isError = true;
+    }
+    else if (last_token_type != TOKEN_TYPE_STATEMENT_END && last_token_type != TOKEN_TYPE_END_BLOCK)
+    {
+        isError = true;
+    }
+    if(isError)
+    {
+        // TODO: need to get rid of this after refactor
+        printf("Bad transition from %s to %s\n",
+               TokenTypeAsString(last_token_type),
+               TokenTypeAsString(tokenType));
+        delete config;
+    }
+    return !isError;
 }
 
 bool NginxConfigParser::Parse(const char* file_name) {

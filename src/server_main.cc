@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     std::string listenPort;
     if(parser.Parse(argv[1]))
     {
-      listenPort = parser.config->parameters[configParameter::LISTEN_PORT];
+      listenPort = parser.config->parameters[ConfigParameter::LISTEN_PORT];
     }
     cout << "Listening Port: " << listenPort << endl;
 
