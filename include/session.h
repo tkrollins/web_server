@@ -24,8 +24,8 @@ public:
   tcp::socket& socket();
 
   void start();
-  std::string render_response(std::string inputStr);
-  
+
+  void render_response(char* inputStr, char* outStr);
 private:
   void handle_read(const boost::system::error_code& error,
       size_t bytes_transferred);

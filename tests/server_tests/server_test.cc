@@ -15,10 +15,11 @@ TEST_F(ServerTest, RenderResponse200)
 {
   	// take an example HTTP request and compare the expected response with render_response's return
   	std::string s = "GET /index.html HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n";
+  	char* sptr = &s[0];
 
     // call render_response
-  	std::string outStr;
-  	outStr = new_session.render_response(s);
+  	char outStr[1024];
+  	new_session.render_response(sptr, outStr);
 
   	std::string res = "";
   	std::string h = "HTTP/1.1 200 OK\r\n";                                                                              
@@ -30,7 +31,7 @@ TEST_F(ServerTest, RenderResponse200)
   	
 	// used STREQ instead of EQ because we want to compare the strings, not the memory locations of 
 	// pointers
-  	EXPECT_STREQ(res.c_str(), outStr.c_str()); 
+  	EXPECT_STREQ(res.c_str(), outStr); 
 }
 
 // The method, render_response, should write an error message back to client upon receiving a bad
@@ -39,13 +40,14 @@ TEST_F(ServerTest, RenderResponse400Error)
 {
     // create the malformed HTTP request
     std::string badRequest = "1234asdf";
+    char* badRequestPtr = &badRequest[0];
 
     // This is the error message that the server should return
     std::string errorMessage = "HTTP Error 400 - Bad Request\r\n\r\n";
 
     // call render_response
-    std::string outStr;
-    outStr = new_session.render_response(badRequest);
+    char outStr[1024];
+    new_session.render_response(badRequestPtr, outStr);
 
-    EXPECT_STREQ(errorMessage.c_str(), outStr.c_str()); 
+    EXPECT_STREQ(errorMessage.c_str(), outStr); 
 }
