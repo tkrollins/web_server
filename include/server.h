@@ -29,12 +29,26 @@ public:
 	  	start_accept();
 	  }
 
-private:
-  void start_accept();
+  bool getConnectionWaitingStatus()
+  {
+    return waitingForConnection_;
+  }
 
-  void handle_accept(session* new_session,
+  bool getConnectionStatus()
+  {
+    return clientConnectionEstablished_;
+  }
+
+private:
+  bool start_accept();
+
+  bool handle_accept(session* new_session,
       const boost::system::error_code& error);
   
   boost::asio::io_service& io_service_;
   tcp::acceptor acceptor_;
+
+  // boolean attributes for the state of the server's TCP connection(s)
+  bool waitingForConnection_ = false;
+  bool clientConnectionEstablished_ = false;
 };
