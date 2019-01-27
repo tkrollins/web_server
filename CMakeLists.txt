@@ -44,10 +44,8 @@ add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http
 add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
 target_link_libraries(server server_lib config_parser_lib Boost::system)
 
-add_executable(server_test tests/server_tests/server_test.cc src/http_request.cc src/http_response.cc)
-
 # build and link server_test
-add_executable(server_test tests/server_tests/server_test.cc)
+add_executable(server_test tests/server_tests/server_test.cc src/http_request.cc src/http_response.cc)
 target_link_libraries(server_test server_lib Boost::system gtest_main)
 
 # TODO(!): Update tests executable name, srcs, and deps
