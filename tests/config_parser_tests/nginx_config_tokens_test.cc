@@ -70,3 +70,11 @@ TEST_F(NginxConfigTokensTest, ValidConfig)
         delete tkn;
     }
 };
+
+TEST_F(NginxConfigTokensTest, InValidConfig)
+{
+    input.open("unclosed_quotes");
+    tokenList = NginxConfigTokens::makeNginxConfigTokens(&input);
+
+    EXPECT_TRUE(tokenList == nullptr);
+}

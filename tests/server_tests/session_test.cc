@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "server.h"
 #include <boost/asio.hpp>
+#include <iostream>
 
 class SessionTest : public ::testing::Test 
 {
@@ -20,13 +21,18 @@ TEST_F(SessionTest, RenderResponse200)
   	std::string outStr;
   	outStr = new_session.renderResponse(s);
 
+    std::string content = s;
   	std::string res = "";
-  	std::string h = "HTTP/1.1 200 OK\r\n";                                                                              
-  	std::string type = "Content-Type: text/plain\r\n"; // did't put \r\n here, since the parse_http_request offers
-  	std::string content = std::string(s);
-  	std::string contentLength = "Content-Length: " + std::to_string(content.length()) + "\r\n\r\n";
+  	std::string h = "HTTP/1.1 200 OK\r\n";
+    std::string contentLength = "Content-Length: " + std::to_string(content.length()) + "\r\n";
+    std::string type = "Content-Type: text/plain\r\n\r\n"; // did't put \r\n here, since the parse_http_request offers
+
   	// input with leading \r\n
-  	res = h + type + contentLength + content;
+  	res = h + contentLength + type + content;
+
+  	std::cout << res << std::endl;
+    std::cout << outStr << std::endl;
+
   	
 	// used STREQ instead of EQ because we want to compare the strings, not the memory locations of 
 	// pointers

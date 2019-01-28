@@ -5,6 +5,7 @@ using ::testing::AtLeast;
 using ::testing::Return;
 using ::testing::_;
 
+
 TEST(SessionTest, CheckResponse) 
 {
     boost::asio::io_service io_service_;
@@ -12,8 +13,8 @@ TEST(SessionTest, CheckResponse)
 	std::string input("Hello");
 	std::string output(
 		"HTTP/1.1 200 OK\r\n"
-		"Content-Type: text/plain\r\n"
-		"Content-Length: 5\r\n"
+        "Content-Length: 5\r\n"
+        "Content-Type: text/plain\r\n"
 		"\r\n"
 		"Hello"
 	);
@@ -27,3 +28,4 @@ int main(int argc, char** argv)
 	::testing::InitGoogleMock(&argc, argv);
 	return RUN_ALL_TESTS();
 }
+
