@@ -44,6 +44,13 @@ add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http
 add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
 target_link_libraries(server server_lib config_parser_lib Boost::system)
 
+# REVIEW LINE 48 AND 55 -- what did i break?
+# add_executable(server_test tests/server_tests/server_test.cc src/http_request.cc src/http_response.cc)
+
+# build and link session_test
+add_executable(session_test tests/server_tests/session_test.cc)
+target_link_libraries(session_test server_lib Boost::system gtest_main)
+
 # build and link server_test
 add_executable(server_test tests/server_tests/server_test.cc tests/server_tests/mock_test.cc)
 target_link_libraries(server_test server_lib Boost::system gmock_main)
@@ -54,6 +61,7 @@ target_link_libraries(config_parser_test config_parser_lib gtest_main)
 
 # TODO(!): Update with tests binary
 gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/config_parser_tests)
+gtest_discover_tests(session_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/server_tests)
 gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/server_tests)
 
 #add_test(NAME echo_server_test
@@ -63,5 +71,5 @@ gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/t
 # TODO(!): Update with target/tests targets
 if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
     include(cmake/CodeCoverageReportConfig.cmake)
-    generate_coverage_report(TARGETS server server_lib config_parser_lib TESTS config_parser_test server_test)
+    generate_coverage_report(TARGETS server server_lib config_parser_lib TESTS config_parser_test session_test server_test)
 endif()
