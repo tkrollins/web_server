@@ -4,7 +4,7 @@ function test_echo
 {
     response="actual_response"
     expected_response="expected_response"
-    curl -s localhost:81 > $response
+    curl -s localhost:5566 > $response
     if cmp -s $response $expected_response; then
         echo "Response body is correct"
         rm -f $response
