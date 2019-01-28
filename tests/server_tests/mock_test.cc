@@ -17,9 +17,9 @@ TEST(SessionTest, CheckResponse)
 		"\r\n"
 		"Hello"
 	);
-	EXPECT_CALL(mockSess, render_response(input)).Times(1);
-	std::string myOutput = mockSess.render_response(input);
-    EXPECT_TRUE(myOutput == output) << "Output: " << mockSess.render_response(input);
+	EXPECT_CALL(mockSess, renderResponse(input)).Times(1);
+	std::string myOutput = mockSess.renderResponse(input);
+    EXPECT_TRUE(myOutput == output) << "Output: " << mockSess.renderResponse(input);
 }
 int main(int argc, char** argv)
 {

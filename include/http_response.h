@@ -3,6 +3,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <iostream>
 
 class HttpResponse
 {
@@ -16,7 +17,7 @@ public:
 private:
     // Helper functions to build the response within buildHttpResponse()
     std::string buildStatus(std::string);
-    std::string buildHeaders(std::string);
+    std::string buildHeaders(std::string, std::string);
     std::string buildBody(std::string);
 };
 

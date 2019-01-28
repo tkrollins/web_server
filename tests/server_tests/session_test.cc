@@ -9,16 +9,16 @@ class SessionTest : public ::testing::Test
     		session new_session = session(io_service_);
 };
 
-// The method, render_response, should return a properly-formatted HTTP 200 response to the client
+// The method, renderResponse, should return a properly-formatted HTTP 200 response to the client
 // upon receiving a valid HTTP request
 TEST_F(SessionTest, RenderResponse200) 
 {
-  	// take an example HTTP request and compare the expected response with render_response's return
+  	// take an example HTTP request and compare the expected response with renderResponse's return
   	std::string s = "GET /index.html HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n";
 
-    // call render_response
+    // call renderResponse
   	std::string outStr;
-  	outStr = new_session.render_response(s);
+  	outStr = new_session.renderResponse(s);
 
   	std::string res = "";
   	std::string h = "HTTP/1.1 200 OK\r\n";                                                                              
@@ -43,9 +43,9 @@ TEST_F(SessionTest, RenderResponse400Error)
     // This is the error message that the server should return
     std::string errorMessage = "HTTP Error 400 - Bad Request\r\n\r\n";
 
-    // call render_response
+    // call renderResponse
     std::string outStr;
-    outStr = new_session.render_response(badRequest);
+    outStr = new_session.renderResponse(badRequest);
 
     EXPECT_STREQ(errorMessage.c_str(), outStr.c_str()); 
 }

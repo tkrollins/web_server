@@ -1,10 +1,10 @@
-Terminal commands for testing out HTTP request parsing:
+Build and Run our project:
 
 Buliding command (execute at /build):
-$ cmake .. && make && bin/server ../sample_server_config
+$ cmake .. && make && sudo bin/server ../sample_server_config
 
 In another terminal, I used nc to send an example GET request:
-$ printf "GET /index.html HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n" | nc localhost 8080
+$ printf "GET /index.html HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n" | nc localhost 80
 
 Sending a POST request with request body:
 $ printf "POST /cgi-bin/process.cgi HTTP/1.1\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\nHost: www.tutorialspoint.com\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: length\r\nAccept-Language: en-us\r\nAccept-Encoding: gzip, deflate\r\nConnection: Keep-Alive\r\n\r\nlicenseID=string&content=string&/paramsXML=string" | nc localhost 8080
@@ -13,6 +13,15 @@ Test other mmessages by doing:
 $ printf "whatever message here" | nc localhost 8080
 
 There might be a better way of doing this, but this is all I know so far
+
+*******************************************************************
+
+Run existing tests
+
+under /build, run
+$ make test
+or
+$ cd ../tests && ../build/bin/config_parser_test; cd ../build
 
 *******************************************************************
 

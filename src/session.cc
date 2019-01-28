@@ -13,39 +13,63 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include "session.h"
+#include "http_response.h"
+#include "http_request.h"
 #include <string>
 
 using boost::asio::ip::tcp;
 
 tcp::socket& session::socket()
 {
-  return socket_;
+    return socket_;
 }
 
 void session::start()
 {
-  printf("Accepting data over socket:\n");
+    printf("Accepting data over socket:\n");
 
-  socket_.async_read_some(boost::asio::buffer(data_, max_length), // read incoming data in a new thread (data_ contains this information)
-      boost::bind(&session::handle_read, this, // once done, call session::handle_read
-        boost::asio::placeholders::error,
-        boost::asio::placeholders::bytes_transferred));
+    socket_.async_read_some(boost::asio::buffer(data_, max_length), // read incoming data in a new thread (data_ contains this information)
+                            boost::bind(&session::handleRead, this, // once done, call session::handleRead
+                                        boost::asio::placeholders::error,
+                                        boost::asio::placeholders::bytes_transferred));
 }
 
-void session::handle_read(const boost::system::error_code& error,
+void session::handleRead(const boost::system::error_code& error,
     size_t bytes_transferred)
 {
-  if (!error)
-  {
-    assert (data_!=NULL);
+    if (!error)
+    {
+        assert (data_!=NULL);
+        // cast the data read from the socket to a pointer to the first char in the char sequence
+        char* socketReadBuffer  = static_cast<char*> (data_);
 
-    // cast the data read from the socket to a pointer to the first char in the char sequence
-    char* socketReadBuffer  = static_cast<char*> (data_);
+        // print statements for debugging purposes
+        printf("Data: %s\n", socketReadBuffer);
 
-    // print statements for debugging purposes
-    printf("Data: ");
-    printf("%s", socketReadBuffer);
-    printf("\n");
+        std::string tmp = "";
+        session::parseRequest(std::string(socketReadBuffer));
+      
+        printf("Socket data read. Writing response data to socket...\n");
+
+        std::string res;
+        char reqBody[1024];
+
+        res = session::renderResponse(std::string(socketReadBuffer));
+
+        boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
+                                 boost::asio::buffer(res, res.length()), // the read data that will be written to socket_
+                                 boost::bind(&session::handleWrite, this, // call session::handleWrite() once done writing
+                                             boost::asio::placeholders::error));
+        }
+        else
+        {
+            delete this;
+        }
+}
+
+bool session::parseRequest(std::string socketReadBuffer)
+{
+    HttpRequest requestMaker; // TODO: rewrite below function to httprequest
 
     // The following loop detects the end of an HTTP message by using a naive blocking implementation: 
     // iterates through the received message until you find \n\n or \r\n\r\n. The loop stores the pointer 
@@ -55,84 +79,57 @@ void session::handle_read(const boost::system::error_code& error,
     // attributes should be added to the class accordingly, such as requestEndPtr and perhaps 
     // HTTP request type 
     char* requestEndPtr;
-    for (char* it = socketReadBuffer; *it; it++)
+    char* iterativeBuffer = new char[socketReadBuffer.length() + 1];
+    strcpy(iterativeBuffer, socketReadBuffer.c_str());
+    for (char* it = iterativeBuffer; *it; it++)
     {
         if (*it == '\n' && (*it+1) == '\n') // Linux HTTP request
         {
-          printf("end of HTTP request detected \n");
-          requestEndPtr = it;
-          break;
+            printf("end of HTTP request detected \n");
+            requestEndPtr = it;
+            break;
         }
         else if (*it == '\r' && // Windows HTTP request
                 (*(it+1)) == '\n' && 
                 (*(it+2)) == '\r' && 
                 (*(it+3)) == '\n')
         {
-          printf("end of HTTP request detected \n");
-          requestEndPtr = it;
-          break;
+            printf("end of HTTP request detected \n");
+            requestEndPtr = it;
+            break;
         }
     }
+}
 
-    // TODO: instead of writing the entire buffer -- boost::asio::buffer(data_, bytes_transferred) -- to
-    // the socket, send an HTTP 200 response + the request in the buffer if the buffer indeed contains a
-    // request. This is based on how I understand the assignment directions, but I might be wrong.
-    
-    printf("Socket data read. Writing response data to socket...\n");
-
+std::string session::renderResponse(std::string inputStr)
+{
     std::string res;
-    char reqBody[1024];
-    /*bool result = session::parse_http_request(data_, reqBody);
-    if (!result){ // parsing http result error
-      return;
-    }*/
-
-    res = session::render_response(std::string(socketReadBuffer));
-
-    boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
-        boost::asio::buffer(res, res.length()), // the read data that will be written to socket_
-        boost::bind(&session::handle_write, this, // call session::handle_write() once done writing
-          boost::asio::placeholders::error));
-  }
-  else
-  {
-    delete this;
-  }
+    HttpResponse responseMaker;
+    std::string status = "200";
+    // Using unordered map for header is acceptable, since accouding to RFC 2616 the order of headerr fields doesn't matter
+    // However, it is good practice to send general-header first
+    // So someday when we're going above and beyond we fix it then
+    
+    std::unordered_map<std::string,std::string> headers;
+    headers["Content-Type"] = "text/plain";
+    headers["Content-Length"] = std::to_string(inputStr.length());
+    
+    res = responseMaker.buildHttpResponse(status, headers, inputStr);
+    return res;
 }
 
-bool session::parse_http_request(char* inputStr, char* requestBody) // TODO: Maybe we would need other part of the request?
+void session::handleWrite(const boost::system::error_code& error)
 {
-  std::string str(inputStr);
-  std::string str2 = str.substr(str.find("\r\n\r\n"));
-  strcpy(requestBody, str2.c_str());
-
-  return true;
-}
-
-std::string session::render_response(std::string inputStr)
-{
-  std::string res = "";
-  std::string h = "HTTP/1.1 200 OK\r\n";                                                                              
-  std::string type = "Content-Type: text/plain\r\n"; // did't put \r\n here, since the parse_http_request offers
-  std::string contentLength = "Content-Length: " + std::to_string(inputStr.length()) + "\r\n\r\n";
-  // input with leading \r\n
-  res = h + type + contentLength + inputStr;
-  std::cout << res << std::endl;
-  return res;
-}
-
-void session::handle_write(const boost::system::error_code& error)
-{
-  if (!error)
-  {
-    socket_.async_read_some(boost::asio::buffer(data_, max_length), // read more data out of the buffer
-        boost::bind(&session::handle_read, this, // call handle_read again once you are done reading
-          boost::asio::placeholders::error,
-          boost::asio::placeholders::bytes_transferred));
-    socket_.close();
-  }
-  else
-  {
-    delete this;
-  }
+    if (!error)
+    {
+        socket_.async_read_some(boost::asio::buffer(data_, max_length), // read more data out of the buffer
+                          boost::bind(&session::handleRead, this, // call handleRead again once you are done reading
+                                      boost::asio::placeholders::error,
+                                      boost::asio::placeholders::bytes_transferred));
+        socket_.close();
+    }
+    else
+    {
+        delete this;
+    }
 }

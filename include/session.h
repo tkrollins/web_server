@@ -26,13 +26,13 @@ class session
 		tcp::socket& socket();
 
 		void start();
-		virtual std::string render_response(std::string inputStr);
+		virtual std::string renderResponse(std::string inputStr);
 	private:
-		void handle_read(const boost::system::error_code& error,
-			size_t bytes_transferred);
+		void handleRead(const boost::system::error_code& error,
+			            size_t bytes_transferred);
 
-		void handle_write(const boost::system::error_code& error);
-
+		void handleWrite(const boost::system::error_code& error);
+		bool parseRequest(std::string inputStr);
 		tcp::socket socket_;
 		enum { max_length = 1024 };
 		char data_[max_length];
@@ -44,10 +44,10 @@ class MockSession : public session
 	public:
 		MockSession(boost::asio::io_service& io_service) : session(io_service), real_(trueIOS)
 		{
-			ON_CALL(*this, render_response(_))
-				.WillByDefault(Invoke(&real_, &session::render_response));
+			ON_CALL(*this, renderResponse(_))
+				.WillByDefault(Invoke(&real_, &session::renderResponse));
 		}
-		MOCK_METHOD1(render_response, std::string(std::string inputStr));
+		MOCK_METHOD1(renderResponse, std::string(std::string inputStr));
 	private:
 		boost::asio::io_service trueIOS;
 		session real_;
