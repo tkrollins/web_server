@@ -5,6 +5,7 @@ FROM bigbear:base as builder
 # Share work directory
 COPY . /usr/src/project
 WORKDIR /usr/src/project/build_coverage
+COPY --from=builder /usr/src/project/build/bin/server .
 
 # Build and test
 RUN cmake -DCMAKE_BUILD_TYPE=Coverage ..

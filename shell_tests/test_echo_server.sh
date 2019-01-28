@@ -13,7 +13,7 @@ function test_echo
     fi
 }
 
-../build/bin/server ./test_config > /dev/null &
+../build_coverage/server ./test_config > /dev/null &
 SERVER_PID=$!
 test_echo $SERVER_PID
 echo "Response body is NOT correct"
