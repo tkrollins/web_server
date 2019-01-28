@@ -19,7 +19,6 @@ FROM ubuntu:latest as deploy
 # TODO(!): Copy server output binary to "."
 COPY --from=builder /usr/src/project/build/bin/server .
 COPY --from=builder /usr/src/project/sample_server_config .
-COPY --from=builder /usr/src/project/shell_tests .
 # TODO(!): Expose some port(s)
 EXPOSE 80
 EXPOSE 81
