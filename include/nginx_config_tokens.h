@@ -9,6 +9,7 @@ using namespace NginxEnum;
 
 struct Token {
 public:
+    Token(std::string v, TokenType t) { value = v;  type = t; }
     std::string value;
     TokenType type;
 };

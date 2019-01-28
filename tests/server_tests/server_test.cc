@@ -20,16 +20,5 @@ TEST_F(ServerTest, startedAccept)
 // The server should not be connected to any client upon initialization of the server object
 TEST_F(ServerTest, initiallyNoSocket)
 {
-    // create the malformed HTTP request
-    std::string badRequest = "1234asdf";
-
-    // This is the error message that the server should return
-    std::string errorMessage = "HTTP Error 400 - Bad Request\r\n\r\n";
-
-    // call render_response
-	session new_session(io_service);
-    std::string outStr;
-    outStr = new_session.render_response(badRequest);
-
-    EXPECT_STREQ(errorMessage.c_str(), outStr.c_str()); 
+EXPECT_FALSE(testServer.getConnectionStatus());
 }

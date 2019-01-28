@@ -27,9 +27,7 @@ NginxConfigTokens* NginxConfigTokens::makeNginxConfigTokens(std::istream* input)
 // Adds Token* to the list, resets the token state and the token type
 void NginxConfigTokens::addToken(std::string& value, TokenType& type, TokenParserState& state)
 {
-    Token* tokenToAdd = new Token;
-    tokenToAdd->value = value;
-    tokenToAdd->type = type;
+    Token* tokenToAdd = new Token(value, type);
     tokens.push_back(tokenToAdd);
     value.clear();
     type = TOKEN_TYPE_UNFINISHED;

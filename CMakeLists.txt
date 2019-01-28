@@ -56,7 +56,7 @@ add_executable(server_test tests/server_tests/server_test.cc tests/server_tests/
 target_link_libraries(server_test server_lib Boost::system gmock_main)
 
 # TODO(!): Update tests executable name, srcs, and deps
-add_executable(config_parser_test tests/config_parser_tests/config_parser_test.cc)
+add_executable(config_parser_test tests/config_parser_tests/config_parser_test.cc tests/config_parser_tests/nginx_config_tokens_test.cc)
 target_link_libraries(config_parser_test config_parser_lib gtest_main)
 
 # TODO(!): Update with tests binary

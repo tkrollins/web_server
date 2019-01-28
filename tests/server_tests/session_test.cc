@@ -32,7 +32,7 @@ TEST_F(SessionTest, RenderResponse200)
 	// pointers
   	EXPECT_STREQ(res.c_str(), outStr.c_str()); 
 }
-
+/*
 // The method, render_response, should write an error message back to client upon receiving a bad
 // HTTP request
 TEST_F(SessionTest, RenderResponse400Error)
@@ -49,3 +49,4 @@ TEST_F(SessionTest, RenderResponse400Error)
 
     EXPECT_STREQ(errorMessage.c_str(), outStr.c_str()); 
 }
+ */
