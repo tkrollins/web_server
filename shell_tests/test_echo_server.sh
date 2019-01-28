@@ -13,8 +13,7 @@ function test_echo
     fi
 }
 
-../build_coverage/server ./test_config > /dev/null &
-SERVER_PID=$!
+/usr/src/projects/bigbear/build/bin/server /usr/src/projects/bigbear/shell_tests/test_config > /dev/null &SERVER_PID=$!
 test_echo $SERVER_PID
 echo "Response body is NOT correct"
 kill $SERVER_PID
