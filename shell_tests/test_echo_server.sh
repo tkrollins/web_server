@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 function test_echo
 {
@@ -14,6 +14,7 @@ function test_echo
 }
 
 ../build/bin/server ./test_config > /dev/null &
+SERVER_PID=$!
 test_echo $SERVER_PID
 echo "Response body is NOT correct"
 kill $SERVER_PID
