@@ -14,6 +14,7 @@
 #include <boost/asio.hpp>
 #include "server.h"
 #include "config_parser.h"
+#include <boost/log/trivial.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -28,13 +29,7 @@ int main(int argc, char* argv[])
     }
 
     boost::asio::io_service io_service;
-
-    using namespace std; // For atoi.
-
-    // create a server object, s, initialized with io_serice, 
-    // and the port number entered in the command line
-    // server s(io_service, atoi(argv[1])); // this line can specify port directly from command line
-    
+  
     NginxConfigParser parser;
 
     std::string listenPort;
@@ -42,7 +37,7 @@ int main(int argc, char* argv[])
     {
       listenPort = parser.config->parameters[ConfigParameter::LISTEN_PORT];
     }
-    cout << "Listening Port: " << listenPort << endl;
+    std::cout << "Listening Port: " << listenPort << std::endl;
 
     for (int i = 0; i < listenPort.length(); i++)
     {
@@ -51,9 +46,11 @@ int main(int argc, char* argv[])
     int intListenPort = stoi(listenPort);
     if (intListenPort >= 65536 || intListenPort < 0)
     {
-      throw 10; // probably should return a exceptions class......
+      throw 10; // TODO: probably should return a exceptions class......
     }
 
+    // Enable Boost Logs
+    BOOST_LOG_TRIVIAL(info) << "server_main is on";
     server s(io_service, intListenPort);
     io_service.run();
   }
