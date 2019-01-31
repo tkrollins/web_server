@@ -12,9 +12,10 @@
 #include <iostream>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
+#include <boost/log/trivial.hpp>
 
 #include "server.h"
-
+#define BOOST_LOG_DYN_LINK 1
 using boost::asio::ip::tcp;
 
 // this function creates a new session object which in turn initializes a socket 
@@ -26,6 +27,7 @@ bool server::start_accept()
     acceptor_.async_accept(new_session->socket(), // wait for a socket connection in a thread
                            boost::bind(&server::handle_accept, this, new_session, // call handle_accept once a socket connection is established
                            boost::asio::placeholders::error));
+    BOOST_LOG_TRIVIAL(info) << "wait for connection";
 
     waitingForConnection_ = true;
     printf("Accepting TCP socket connections\n");

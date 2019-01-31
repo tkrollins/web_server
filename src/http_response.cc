@@ -1,6 +1,8 @@
 #include "http_response.h"
 #include <iostream>
 #include <cstring>
+#include <boost/log/trivial.hpp>
+
 
 std::string HttpResponse::buildStatus(std::string status)
 {
@@ -31,6 +33,7 @@ std::string HttpResponse::buildHttpResponse(std::string status, std::unordered_m
     res += HttpResponse::buildStatus(status);
     for (auto x : headers) res += HttpResponse::buildHeaders(x.first, x.second);
     res += HttpResponse::buildBody(body);
+    BOOST_LOG_TRIVIAL(trace) << "built http response" << res;
 
     // cout << "\n\n*******\n" << res << "********\n\n";
     return res;
