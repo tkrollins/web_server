@@ -31,9 +31,8 @@ add_subdirectory(/usr/src/googletest googletest)
 # Enable Boost
 # Use static libraries so binaries can be deployed without a full boost install
 set(Boost_USE_STATIC_LIBS ON)
-# ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 
-find_package(Boost 1.50 REQUIRED COMPONENTS system log)
+find_package(Boost 1.50 REQUIRED COMPONENTS system log regex)
 message(STATUS "Boost version: ${Boost_VERSION}")
 message("Boost VERSION: ${Boost_VERSION}")
 message("Boost INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
@@ -49,20 +48,15 @@ add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http
 add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
 target_link_libraries(server server_lib config_parser_lib Boost::system)
 
-# include_directories(${Boost_INCLUDE_DIRS})
-target_link_libraries(server ${Boost_LIBRARIES})
-# We should probably be using the following two lines instead of the above two lines, which includes the whole directories
-# However the folloing two lines just doesn't work properly.... Maybe somebody smart will figure out why
-# target_link_libraries(server Boost::log_setup Boost::log Boost::regex)
-# target_link_libraries(server Boost::log)
+target_link_libraries(server Boost::log_setup Boost::log Boost::regex)
 
 # build and link session_test
 add_executable(session_test tests/server_tests/session_test.cc)
-target_link_libraries(session_test server_lib Boost::system gtest_main ${Boost_LIBRARIES})
+target_link_libraries(session_test server_lib gtest_main Boost::log_setup Boost::log Boost::regex)
 
 # build and link server_test
 add_executable(server_test tests/server_tests/server_test.cc tests/server_tests/mock_test.cc tests/server_tests/mock_test.cc)
-target_link_libraries(server_test server_lib Boost::system gmock_main ${Boost_LIBRARIES})
+target_link_libraries(server_test server_lib Boost::system gmock_main Boost::log_setup Boost::log Boost::regex)
 
 # TODO(!): Update tests executable name, srcs, and deps
 add_executable(config_parser_test tests/config_parser_tests/config_parser_test.cc tests/config_parser_tests/nginx_config_tokens_test.cc)
