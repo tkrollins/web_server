@@ -2,22 +2,26 @@
 #include "config_parser.h"
 #include "nginx_config_tokens.h"
 
-
+bool isPath(std::string path)
+{
+    return (path.front() == '/');
+}
 
 // Constructor for NGginxConfigParser.  Inits the member variables
 // With hard-coded values.
 NginxConfigParser::NginxConfigParser()
 {
     config = nullptr;
+    serverURI = "";
 
     // Each context key word will have a vector of parameters
-    std::vector<std::string> serverVector = {"listen"};
+    std::vector<std::string> serverParam = {"listen"};
 
     // Key=context token, Value=vector of parameter tokens
-    contextsMap.insert(std::make_pair("server", serverVector));
+    contextsMap.insert(std::make_pair("server", serverParam));
 
     // Key=parameter token, Value=Parameter enum
-    parametersMap.insert(std::make_pair("listen", ConfigParameter::LISTEN_PORT));
+    parametersMap.insert({"listen", ConfigParameter::LISTEN_PORT});
 }
 
 NginxConfigParser::~NginxConfigParser()
@@ -66,20 +70,52 @@ bool NginxConfigParser::findParameterToSet(std::string context, std::string para
     return false;
 }
 
+void NginxConfigParser::setServerPath(std:: deque<std::string> tokens)
+{
+    std::unordered_map<std::string,int > actions { {"echo", (int)ServerAction::ACTION_ECHO} };
+
+    if(tokens.size() == 2)
+    {
+        if(tokens.back() == "root" && isPath(tokens.front()))
+        {
+            std::string staticFileURI = tokens.front();
+            config->staticPathMap.insert( {serverURI, staticFileURI} );
+            serverURI = "";
+        }
+        else if(tokens.back() == "action")
+        {
+            std::string action = tokens.front();
+            if(actions.count(tokens.front()))
+            {
+                ServerAction actionToSet = (ServerAction)actions.at(action);
+                config->serverActionMap.insert( {actionToSet, serverURI} );
+                serverURI = "";
+            }
+        }
+    }
+}
+
 // TODO: make this work for nested contexts
 void NginxConfigParser::setConfig(std::deque<std::string> tokens, std::string context)
 {
     if (tokens.size() >= 2)
     {
-        std::string parameterName, parameterValue;
-        ConfigParameter parameterToSet;
-
-        setParameterNameAndValue(parameterName, parameterValue, tokens);
-        bool setParameter = findParameterToSet(context, parameterName, parameterValue, parameterToSet);
-
-        if (setParameter)
+        if(context == "location")
         {
-            config->parameters.insert(std::make_pair(parameterToSet, parameterValue));
+            setServerPath(tokens);
+        }
+        else
+        {
+            std::string parameterName, parameterValue;
+            ConfigParameter parameterToSet;
+
+            setParameterNameAndValue(parameterName, parameterValue, tokens);
+            bool setParameter = findParameterToSet(context, parameterName, parameterValue, parameterToSet);
+
+            if (setParameter)
+            {
+                config->parameters.insert(std::make_pair(parameterToSet, parameterValue));
+            }
         }
     }
 }
@@ -152,7 +188,20 @@ bool NginxConfigParser::Parse(std::istream* config_file)
         {
             // If a start block is seen then the last token will
             // be the context token.
-            context.push(tokens.back());
+            if(isPath(tokens.front()))
+            {
+                context.push("location");
+                if(serverURI != "")
+                {
+                    isError = true;
+                    break;
+                }
+                serverURI = tokens.front();
+            }
+            else
+            {
+                context.push(tokens.back());
+            }
             tokens.clear();
             if (last_token_type != TOKEN_TYPE_NORMAL)
             {
@@ -201,6 +250,7 @@ bool NginxConfigParser::Parse(std::istream* config_file)
                TokenTypeAsString(last_token_type),
                TokenTypeAsString(tokenType));
         delete config;
+        config = nullptr;
     }
     return !isError;
 }

@@ -79,3 +79,15 @@ TEST_F(NginxConfigParserTest, BracketsUnequal) {
 
   EXPECT_FALSE(success);
 }
+
+// Tests parsing of static and action paths
+TEST_F(NginxConfigParserTest, StaticPaths) {
+
+    bool success = parser.Parse("server_locations");
+
+    std::string rootPath = parser.config->staticPathMap["/static"];
+    std::string echoPath = parser.config->serverActionMap[ServerAction::ACTION_ECHO];
+
+    EXPECT_TRUE(rootPath == "/bigbear/static_files");
+    EXPECT_TRUE(echoPath == "/echo");
+}

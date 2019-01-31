@@ -4,9 +4,15 @@
 
 namespace NginxEnum {
 
+    enum ServerAction
+    {
+        ACTION_ECHO = 0
+    };
+
     enum ConfigParameter
     {
-        LISTEN_PORT = 0
+        LISTEN_PORT = 0,
+        LOCATION = 1
     };
 
     enum TokenType {

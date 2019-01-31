@@ -18,6 +18,8 @@ using namespace NginxEnum;
 class NginxConfig {
 public:
     std::unordered_map<ConfigParameter, std::string> parameters;
+    std::unordered_map<std::string, std::string> staticPathMap;
+    std::unordered_map<ServerAction, std::string> serverActionMap;
 };
 
 // The driver that parses a config file and generates an NginxConfig.
@@ -40,8 +42,11 @@ public:
 
 private:
 
+    std::string serverURI;
+
     void setParameterNameAndValue(std::string& parameterName, std::string& parameterValue, std::deque<std::string> tokens);
     bool findParameterToSet(std::string context, std::string parameterName, std::string parameterValue, ConfigParameter& parameterToSet);
+    void setServerPath(std:: deque<std::string> tokens);
 
     // Holds key words that open new context (new {}).
     // Key=context token, value=vector of parameters within that context.
