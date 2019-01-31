@@ -13,10 +13,16 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/log/trivial.hpp>
-
+#include <boost/log/utility/setup/file.hpp>
+#include <boost/log/sinks/text_file_backend.hpp>
+#include <boost/log/utility/setup/console.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
 #include "server.h"
 #define BOOST_LOG_DYN_LINK 1
 using boost::asio::ip::tcp;
+namespace logging = boost::log;
+namespace keywords = boost::log::keywords;
+namespace sinks = boost::log::sinks;
 
 // this function creates a new session object which in turn initializes a socket 
 // object. It then calls async_accept which allows server to accept
@@ -52,4 +58,18 @@ bool server::handle_accept(session* new_session,
 
     start_accept();
     return clientConnectionEstablished_;
+}
+
+void initLogging()
+{
+    logging::register_simple_formatter_factory<logging::trivial::severity_level, char>("Severity");
+    std::string format = "[%TimeStamp%] [%ThreadID%] [%Severity%] %Message%";
+    logging::add_file_log(keywords::file_name="%N.log",
+                          keywords::auto_flush = true,
+                          keywords::rotation_size = 10 * 1024 * 1024,
+                          keywords::time_based_rotation = sinks::file::rotation_at_time_point(0, 0, 0),
+                          keywords::format = format);
+    logging::add_console_log(std::clog, keywords::format = format);
+    logging::add_common_attributes();
+    
 }

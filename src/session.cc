@@ -27,7 +27,7 @@ tcp::socket& session::socket()
 void session::start()
 {
     printf("Accepting data over socket:\n");
-
+    
     socket_.async_read_some(boost::asio::buffer(data_, max_length), // read incoming data in a new thread (data_ contains this information)
                             boost::bind(&session::handleRead, this, // once done, call session::handleRead
                                         boost::asio::placeholders::error,

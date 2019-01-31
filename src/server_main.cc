@@ -50,6 +50,7 @@ int main(int argc, char* argv[])
     }
 
     // Enable Boost Logs
+    initLogging();
     BOOST_LOG_TRIVIAL(info) << "server_main is on";
     server s(io_service, intListenPort);
     io_service.run();
