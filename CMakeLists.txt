@@ -42,20 +42,20 @@ include_directories(include)
 
 # TODO(!): Update name and srcs
 add_library(config_parser_lib src/config_parser/config_parser.cc src/config_parser/nginx_config_tokens.cc)
-add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
+add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/request_handler.cc src/static_file_request_handler.cc)
 
 # TODO(!): Update executable name, srcs, and deps
-add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
+add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/request_handler.cc src/static_file_request_handler.cc)
 target_link_libraries(server server_lib config_parser_lib Boost::system)
 
 target_link_libraries(server Boost::log_setup Boost::log Boost::regex)
 
 # build and link session_test
-add_executable(session_test tests/server_tests/session_test.cc)
+add_executable(session_test tests/server_tests/session_test.cc src/request_handler.cc src/static_file_request_handler.cc)
 target_link_libraries(session_test server_lib gtest_main Boost::log_setup Boost::log Boost::regex)
 
 # build and link server_test
-add_executable(server_test tests/server_tests/server_test.cc tests/server_tests/mock_test.cc tests/server_tests/mock_test.cc)
+add_executable(server_test tests/server_tests/server_test.cc tests/server_tests/mock_test.cc tests/server_tests/mock_test.cc src/request_handler.cc src/static_file_request_handler.cc)
 target_link_libraries(server_test server_lib Boost::system gmock_main Boost::log_setup Boost::log Boost::regex)
 
 # TODO(!): Update tests executable name, srcs, and deps
