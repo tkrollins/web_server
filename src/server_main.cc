@@ -18,6 +18,12 @@
 
 using boost::asio::ip::tcp;
 
+void termination_handler(int param)
+{
+    BOOST_LOG_TRIVIAL(fatal) << "Received the termination signal, shutting down the server...";
+    exit(0);
+}
+
 int main(int argc, char* argv[])
 {
   try
@@ -32,12 +38,14 @@ int main(int argc, char* argv[])
   
     NginxConfigParser parser;
 
+    // Enable Boost Logs
+    initLogging();
+
     std::string listenPort;
     if(parser.Parse(argv[1]))
     {
       listenPort = parser.config->parameters[ConfigParameter::LISTEN_PORT];
     }
-    std::cout << "Listening Port: " << listenPort << std::endl;
 
     for (int i = 0; i < listenPort.length(); i++)
     {
@@ -46,18 +54,19 @@ int main(int argc, char* argv[])
     int intListenPort = stoi(listenPort);
     if (intListenPort >= 65536 || intListenPort < 0)
     {
-      throw 10; // TODO: probably should return a exceptions class......
+        BOOST_LOG_TRIVIAL(fatal) << "Bad port number!";
+        throw 10; // TODO: probably should return a exceptions class......
     }
-
-    // Enable Boost Logs
-    initLogging();
-    BOOST_LOG_TRIVIAL(info) << "server_main is on";
+      
+    BOOST_LOG_TRIVIAL(info) << "Listening port:" << listenPort;
+    signal(SIGINT, termination_handler);
+    BOOST_LOG_TRIVIAL(info) << "Server is running";
     server s(io_service, intListenPort);
     io_service.run();
   }
   catch (std::exception& e)
   {
-    std::cerr << "Exception: " << e.what() << "\n";
+    BOOST_LOG_TRIVIAL(fatal) << "Exception: " << e.what() << "\n";
   }
 
   return 0;

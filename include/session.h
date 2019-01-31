@@ -37,6 +37,7 @@ class session
 		enum { max_length = 1024 };
 		char data_[max_length];
 		bool parse_http_request(char* inputStr, char* requestBody);
+        bool isValidRequest(std::string inputStr);
 };
 
 class MockSession : public session

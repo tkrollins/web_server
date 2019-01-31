@@ -24,7 +24,7 @@ namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
 namespace sinks = boost::log::sinks;
 
-// this function creates a new session object which in turn initializes a socket 
+// this function creates a new session object which in turn initializes a socket
 // object. It then calls async_accept which allows server to accept
 // data streams over its socket connection after a socket connection is established
 bool server::start_accept()
@@ -32,21 +32,18 @@ bool server::start_accept()
     session* new_session = new session(io_service_); // create new session + initialize socket object
     acceptor_.async_accept(new_session->socket(), // wait for a socket connection in a thread
                            boost::bind(&server::handle_accept, this, new_session, // call handle_accept once a socket connection is established
-                           boost::asio::placeholders::error));
-    BOOST_LOG_TRIVIAL(info) << "wait for connection";
-
+                                       boost::asio::placeholders::error));
     waitingForConnection_ = true;
-    printf("Accepting TCP socket connections\n");
     return waitingForConnection_;
 }
 
 // handle_accept calls new_session->start() if a socket connection is established
 bool server::handle_accept(session* new_session,
-    const boost::system::error_code& error)
+                           const boost::system::error_code& error)
 {
     if (!error)
     {
-        printf("TCP socket connection established\n");
+        BOOST_LOG_TRIVIAL(info) << "TCP socket connection established";
         new_session->start();
         clientConnectionEstablished_ = true;
     }
@@ -55,7 +52,7 @@ bool server::handle_accept(session* new_session,
         delete new_session;
         clientConnectionEstablished_ = false;
     }
-
+    
     start_accept();
     return clientConnectionEstablished_;
 }

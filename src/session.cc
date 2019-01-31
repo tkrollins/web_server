@@ -16,6 +16,7 @@
 #include "http_response.h"
 #include "http_request.h"
 #include <string>
+#include <boost/log/trivial.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -26,8 +27,6 @@ tcp::socket& session::socket()
 
 void session::start()
 {
-    printf("Accepting data over socket:\n");
-    
     socket_.async_read_some(boost::asio::buffer(data_, max_length), // read incoming data in a new thread (data_ contains this information)
                             boost::bind(&session::handleRead, this, // once done, call session::handleRead
                                         boost::asio::placeholders::error,
@@ -40,22 +39,12 @@ void session::handleRead(const boost::system::error_code& error,
     if (!error)
     {
         assert (data_!=NULL);
-        // cast the data read from the socket to a pointer to the first char in the char sequence
-        char* socketReadBuffer  = static_cast<char*> (data_);
-
-        // print statements for debugging purposes
-        printf("Data: %s\n", socketReadBuffer);
-
-        std::string tmp = "";
+        
+        std::string socketReadBuffer  = std::string(data_);
         session::parseRequest(std::string(socketReadBuffer));
-      
-        printf("Socket data read. Writing response data to socket...\n");
-
-        std::string res;
-        char reqBody[1024];
-
-        res = session::renderResponse(std::string(socketReadBuffer));
-
+        BOOST_LOG_TRIVIAL(info) << "Client IP: " << socket_.remote_endpoint().address().to_string();
+        
+        std::string res = session::isValidRequest(socketReadBuffer)? session::renderResponse(socketReadBuffer) : "Bad Request!";
         boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
                                  boost::asio::buffer(res, res.length()), // the read data that will be written to socket_
                                  boost::bind(&session::handleWrite, this, // call session::handleWrite() once done writing
@@ -65,6 +54,14 @@ void session::handleRead(const boost::system::error_code& error,
         {
             delete this;
         }
+}
+
+// define the valid http request to have "GET" as first word
+bool session::isValidRequest(std::string inputStr)
+{
+    if(inputStr.length() < 3)
+        return false;
+    return inputStr.substr(0, 3).compare("GET") == 0;
 }
 
 bool session::parseRequest(std::string socketReadBuffer)
@@ -85,7 +82,7 @@ bool session::parseRequest(std::string socketReadBuffer)
     {
         if (*it == '\n' && (*it+1) == '\n') // Linux HTTP request
         {
-            printf("end of HTTP request detected \n");
+            BOOST_LOG_TRIVIAL(info) << "end of HTTP request detected";
             requestEndPtr = it;
             break;
         }
@@ -94,7 +91,7 @@ bool session::parseRequest(std::string socketReadBuffer)
                 (*(it+2)) == '\r' && 
                 (*(it+3)) == '\n')
         {
-            printf("end of HTTP request detected \n");
+            BOOST_LOG_TRIVIAL(info) << "end of HTTP request detected";
             requestEndPtr = it;
             break;
         }
@@ -109,11 +106,9 @@ std::string session::renderResponse(std::string inputStr)
     // Using unordered map for header is acceptable, since accouding to RFC 2616 the order of headerr fields doesn't matter
     // However, it is good practice to send general-header first
     // So someday when we're going above and beyond we fix it then
-    
     std::unordered_map<std::string,std::string> headers;
     headers["Content-Type"] = "text/plain";
     headers["Content-Length"] = std::to_string(inputStr.length());
-    
     res = responseMaker.buildHttpResponse(status, headers, inputStr);
     return res;
 }

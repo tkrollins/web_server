@@ -34,7 +34,5 @@ std::string HttpResponse::buildHttpResponse(std::string status, std::unordered_m
     for (auto x : headers) res += HttpResponse::buildHeaders(x.first, x.second);
     res += HttpResponse::buildBody(body);
     BOOST_LOG_TRIVIAL(trace) << "built http response";
-    
-    // cout << "\n\n*******\n" << res << "********\n\n";
     return res;
 }
