@@ -4,12 +4,16 @@
 #include <unordered_map>
 #include <string>
 
+#include "http_request_enums.h"
+
+using namespace httpRequestEnum;
+
 class HttpRequest
 {
 public:
 
     // These are the components of the request
-    std::string requestMethod;
+    httpMethod requestMethod;
     std::string requestURI;
     std::string requestBody;
 
@@ -17,7 +21,7 @@ public:
     std::unordered_map<std::string, std::string> headerFields;
 
     // Parses the request, sets components, and return true if valid
-    bool parseHttpRequest(std::string);
+    bool parseHttpRequest(std::string requestString);
 
 private:
 

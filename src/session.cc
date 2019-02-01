@@ -41,7 +41,10 @@ void session::handleRead(const boost::system::error_code& error,
         assert (data_!=NULL);
         
         std::string socketReadBuffer  = std::string(data_);
-        session::parseRequest(std::string(socketReadBuffer));
+        HttpRequest receivedRequest;
+        receivedRequest.parseHttpRequest(socketReadBuffer);
+
+        // session::parseRequest(std::string(socketReadBuffer));
         BOOST_LOG_TRIVIAL(info) << "Client IP: " << socket_.remote_endpoint().address().to_string();
         
         std::string res = session::isValidRequest(socketReadBuffer)? session::renderResponse(socketReadBuffer) : "Bad Request!";
