@@ -5,7 +5,7 @@
 
 bool HttpRequest::setMethod(std::string method)
 {
-    if (httpMethod.empty())
+    if (method.empty())
     {
       // handle null pointer exception
     }
@@ -140,10 +140,7 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
     bool targetFound = false;
     bool versionFound = false;
     bool headersFound = false;
-    // loop through each line
-    bool methodFound = false;
-    bool targetFound = false;
-    bool versionFound = false;
+
     for (int lineNumber = 0; lineNumber < requestLines.size(); ++lineNumber)
     {
         // first line is parsed out for the http method and version
