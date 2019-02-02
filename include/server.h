@@ -12,14 +12,17 @@
 #include <iostream>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
-
+#include <vector>
 #include "session.h"
+#include "static_file_request_handler.h"
+#include "config_parser.h"
 using boost::asio::ip::tcp;
+
 
 class server
 {
 public:
-    server(boost::asio::io_service& io_service, short port)
+    server(boost::asio::io_service& io_service, short port, NginxConfig* config)
         : io_service_(io_service),
         acceptor_(io_service, tcp::endpoint(tcp::v4(), port)) // establishes server endpoint
 	    {
@@ -27,6 +30,7 @@ public:
             // object. It then calls async_accept which allows server to accept
             // data streams over its socket connection after a socket connection is established
             //initLogging();
+            initRequestHandlers(config);
             start_accept();
 	    }
 
@@ -40,8 +44,13 @@ public:
         return clientConnectionEstablished_;
     }
 
+    StaticFileRequestHandler* fileHandler;
+
 private:
     bool start_accept();
+//    std::vector<RequestHandler*>* requestHandlers;
+    void initRequestHandlers(NginxConfig* config);
+
 
     bool handle_accept(session* new_session,
         const boost::system::error_code& error);

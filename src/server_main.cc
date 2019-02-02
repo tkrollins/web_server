@@ -24,6 +24,8 @@ void termination_handler(int param)
     exit(0);
 }
 
+
+// TODO: THis code definitely needs to be refactored
 int main(int argc, char* argv[])
 {
   try
@@ -61,7 +63,7 @@ int main(int argc, char* argv[])
     BOOST_LOG_TRIVIAL(info) << "Listening port:" << listenPort;
     signal(SIGINT, termination_handler);
     BOOST_LOG_TRIVIAL(info) << "Server is running";
-    server s(io_service, intListenPort);
+    server s(io_service, intListenPort, parser.config);
     io_service.run();
   }
   catch (std::exception& e)

@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "server.h"
 #include <boost/asio.hpp>
-
+/*
 class ServerTest : public ::testing::Test 
 {
   	protected:
@@ -22,3 +22,4 @@ TEST_F(ServerTest, initiallyNoSocket)
 {
 EXPECT_FALSE(testServer.getConnectionStatus());
 }
+ */

@@ -44,7 +44,7 @@ bool server::handle_accept(session* new_session,
     if (!error)
     {
         BOOST_LOG_TRIVIAL(info) << "TCP socket connection established";
-        new_session->start();
+        new_session->start(fileHandler);
         clientConnectionEstablished_ = true;
     }
     else
@@ -55,6 +55,22 @@ bool server::handle_accept(session* new_session,
     
     start_accept();
     return clientConnectionEstablished_;
+}
+
+// Sets up request handler objects
+// TODO: Add echo/error handler here
+void server::initRequestHandlers(NginxConfig* config)
+{
+    if(!config->staticPathMap.empty())
+    {
+        fileHandler = new StaticFileRequestHandler(config->staticPathMap, "/usr/src/projects/bigbear");
+    }
+    else
+    {
+        fileHandler = nullptr;
+    }
+
+
 }
 
 void initLogging()

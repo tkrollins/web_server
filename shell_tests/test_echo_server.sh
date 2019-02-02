@@ -15,6 +15,7 @@ function test_echo
 
 ../build/bin/server ./test_config > /dev/null &
 SERVER_PID=$!
+sleep .5
 test_echo $SERVER_PID
 echo "Response body is NOT correct"
 kill $SERVER_PID

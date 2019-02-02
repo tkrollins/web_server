@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
+#include <map>
 
 class HttpResponse
 {
@@ -11,7 +12,7 @@ public:
     // Builds a valid HTTP response of the status, headers, and body
     // Only the status is required the headers and body are optional and have empty default values
     // Returns the response as a string.  Returns empty string if invalid inputs
-    std::string buildHttpResponse(std::string status, std::unordered_map<std::string,std::string> headers = {{}},
+    std::string buildHttpResponse(std::string status, std::map<std::string,std::string> headers = {{}},
                                   std::string body = "");
 
 private:
