@@ -1,3 +1,9 @@
 server {
-	listen 8081;
+    listen 8081;
+    location /static {
+        root /static_files/some_files;
+    }
+    location /echo {
+    	action echo;
+    }
 }

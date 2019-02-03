@@ -91,10 +91,12 @@ bool HttpRequest::setHeaderFields(std::string headerField, std::string headerVal
 // The input should only be the string representation of ONE single request
 bool HttpRequest::parseHttpRequest(std::string requestString)
 {
-    if(!requestString.empty())
+    if(requestString.empty())
     {
         // TODO: handle null ptr exception
     }    
+
+    unparsedRequestString = requestString;
 
     printf("Parsing HTTP request \n");
 
@@ -156,7 +158,7 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
             {
                 // white space delimits the method, target and version. TODO: There's definitely a cleaner
                 // way to do this via the string's member functions
-                if (*characterPtr == ' ')
+                if (*characterPtr == ' ' || *characterPtr == '\n')
                 {
                     if (!methodFound)
                     {
@@ -170,15 +172,17 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
                         int nCharsInRequestTarget = characterPtr - targetBegin - requestLines[lineNumber].begin();
 
                         targetFound = setURI(requestLines[lineNumber].substr(targetBegin, nCharsInRequestTarget));
-                        std::string::iterator versionBegin = characterPtr + 1;
+                        versionBegin = targetBegin + nCharsInRequestTarget + 1;
                     }
-                    else if (!versionFound)
-                    {
-                        int nCharsInVersion = characterPtr - versionBegin - requestLines[lineNumber].begin();
-                        versionFound = setVersion(requestLines[lineNumber].substr(versionBegin, nCharsInVersion));
-                    }
+                    // else if (!versionFound)
+                    // {
+                    //     int nCharsInVersion = characterPtr - versionBegin - requestLines[lineNumber].begin();
+                    //     versionFound = setVersion(requestLines[lineNumber].substr(versionBegin, nCharsInVersion));
+                    // }
                 }
             }
+            int nCharsInVersion = requestLines[lineNumber].end() - versionBegin - requestLines[lineNumber].begin();
+            versionFound = setVersion(requestLines[lineNumber].substr(versionBegin, nCharsInVersion));
         }
         // if we are not on the first line, each subsequent line contains a header field
         else

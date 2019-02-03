@@ -15,6 +15,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "static_file_request_handler.h"
+#include "action_request_handler.h"
 
 using boost::asio::ip::tcp;
 using ::testing::_;
@@ -26,19 +27,19 @@ public:
     session(boost::asio::io_service& io_service) : socket_(io_service) {};
     tcp::socket& socket();
 
-    void start(StaticFileRequestHandler* handler);
+    void start(StaticFileRequestHandler* staticFileHandler, ActionRequestHandler* actionRequestHandler);
     virtual std::string renderResponse(std::string inputStr);
 private:
     StaticFileRequestHandler* sessionFileHandler;
+    ActionRequestHandler* sessionActionReqHandler;
+    
     void handleRead(const boost::system::error_code& error,
                     size_t bytes_transferred);
 
     void handleWrite(const boost::system::error_code& error);
-    bool parseRequest(std::string inputStr);
     tcp::socket socket_;
     enum { max_length = 1024 };
     char data_[max_length];
-    bool isValidRequest(std::string inputStr);
 };
 
 class MockSession : public session

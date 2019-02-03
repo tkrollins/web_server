@@ -3,4 +3,7 @@ server {
     location /static {
         root /static_files/some_files;
     }
+    location /echo {
+    	action echo;
+    }
 }

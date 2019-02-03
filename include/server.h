@@ -15,6 +15,7 @@
 #include <vector>
 #include "session.h"
 #include "static_file_request_handler.h"
+#include "action_request_handler.h"
 #include "config_parser.h"
 using boost::asio::ip::tcp;
 
@@ -45,6 +46,7 @@ public:
     }
 
     StaticFileRequestHandler* fileHandler;
+    ActionRequestHandler* actionHandler;
 
 private:
     bool start_accept();

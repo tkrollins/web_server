@@ -11,7 +11,7 @@ using namespace httpRequestEnum;
 class HttpRequest
 {
 public:
-
+    std::string unparsedRequestString;
     // These are the components of the request
     httpMethod requestMethod;
     std::string httpVersion;
@@ -23,6 +23,10 @@ public:
 
     // Parses the request, sets components, and return true if valid
     bool parseHttpRequest(std::string requestString);
+    std::string getRequestURI()
+    {
+        return requestURI;
+    }
 
 private:
 

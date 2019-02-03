@@ -26,9 +26,10 @@ tcp::socket& session::socket()
     return socket_;
 }
 
-void session::start(StaticFileRequestHandler* handler)
+void session::start(StaticFileRequestHandler* staticFileHandler, ActionRequestHandler* actionRequestHandler)
 {
-    sessionFileHandler = handler;
+    sessionFileHandler = staticFileHandler;
+    sessionActionReqHandler = actionRequestHandler; 
     socket_.async_read_some(boost::asio::buffer(data_, max_length), // read incoming data in a new thread (data_ contains this information)
                             boost::bind(&session::handleRead, this, // once done, call session::handleRead
                                         boost::asio::placeholders::error,
@@ -43,21 +44,22 @@ void session::handleRead(const boost::system::error_code& error,
         assert (data_!=NULL);
         
         std::string socketReadBuffer  = std::string(data_);
+        
         HttpRequest receivedRequest;
-        receivedRequest.parseHttpRequest(socketReadBuffer);
+        bool successfullyParsedReq = receivedRequest.parseHttpRequest(socketReadBuffer);
 
-
-        // session::parseRequest(std::string(socketReadBuffer));
         BOOST_LOG_TRIVIAL(info) << "Client IP: " << socket_.remote_endpoint().address().to_string();
 
         // This is where the request handler is called
         //
         bool isStaticReq = false;
-        if(sessionFileHandler != nullptr)
+        bool isActionReq = false;
+        if(sessionFileHandler != nullptr && sessionActionReqHandler != nullptr)
         {
             isStaticReq = sessionFileHandler->canHandleRequest(receivedRequest);
+            isActionReq = sessionActionReqHandler->canHandleRequest(receivedRequest);
         }
-        if(isStaticReq)
+        if(isStaticReq && successfullyParsedReq)
         {
             // These write calls are pretty wonky but it was the only way I could get if functioning
             // TODO: refactor this code
@@ -71,28 +73,37 @@ void session::handleRead(const boost::system::error_code& error,
                                                  boost::asio::placeholders::error));
         }
         // This is left in to allow echo handling operate
-        // TODO: Add echo and error handlers here. /echo will be for echo, everything else will be error
-        else
-        {
-            std::string res = session::isValidRequest(socketReadBuffer)? session::renderResponse(socketReadBuffer) : "Bad Request!";
+        // if the request is for a server action, handle request through the session's action request handler
+        else if(isActionReq && successfullyParsedReq)
+        {   
+            printf("handling action request\n");
+            std::string res = sessionActionReqHandler->handleRequest(receivedRequest);
             boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
                                      boost::asio::buffer(res, res.length()), // the read data that will be written to socket_
                                      boost::bind(&session::handleWrite, this, // call session::handleWrite() once done writing
                                                  boost::asio::placeholders::error));
         }
+        // the the request is not asking for a static file or for an action, reply with bad request message
+        else
+        {
+            std::string badRequestStatus = "400";
+            std::string body = "400 Error: Bad request\n";
+            std::string contentLengthStr = std::to_string(body.length());
+            std::map<std::string,std::string> headers { {"Content-Type", "text/plain"},
+                                                        {"Content-Length", contentLengthStr}};
+            
+            HttpResponse httpResponse;
+            std::string res = httpResponse.buildHttpResponse(badRequestStatus, headers, body);
+            boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
+                                     boost::asio::buffer(res, res.length()), // the read data that will be written to socket_
+                                     boost::bind(&session::handleWrite, this, // call session::handleWrite() once done writing
+                                                 boost::asio::placeholders::error));
         }
+    }
     else
     {
         delete this;
     }
-}
-
-// define the valid http request to have "GET" as first word
-bool session::isValidRequest(std::string inputStr)
-{
-    if(inputStr.length() < 3)
-        return false;
-    return inputStr.substr(0, 3).compare("GET") == 0;
 }
 
 std::string session::renderResponse(std::string inputStr)
