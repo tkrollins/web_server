@@ -23,6 +23,25 @@ $ make test
 or
 $ cd ../tests && ../build/bin/config_parser_test; cd ../build
 
+Built and run tests
+
+$ cmake .. && make && make test
+
+*******************************************************************
+
+Generage Coverage Report
+
+First time:
+$ mkdir build_coverage
+$ cd build_coverage
+$ cmake -DCMAKE_BUILD_TYPE=Coverage ..
+$ make coverage
+
+Then you can find coverage report in {REPO}/build_coverage/report/index.html
+
+Then, under /build:
+$ cd ../build_coverage && cmake -DCMAKE_BUILD_TYPE=Coverage .. && make coverage; cd ../build
+
 *******************************************************************
 
 How to access the service on Google cloud:

@@ -38,7 +38,6 @@ private:
     tcp::socket socket_;
     enum { max_length = 1024 };
     char data_[max_length];
-    bool parse_http_request(char* inputStr, char* requestBody);
     bool isValidRequest(std::string inputStr);
 };
 

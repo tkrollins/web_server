@@ -95,40 +95,6 @@ bool session::isValidRequest(std::string inputStr)
     return inputStr.substr(0, 3).compare("GET") == 0;
 }
 
-bool session::parseRequest(std::string socketReadBuffer)
-{
-    HttpRequest requestMaker; // TODO: rewrite below function to httprequest
-
-    // The following loop detects the end of an HTTP message by using a naive blocking implementation: 
-    // iterates through the received message until you find \n\n or \r\n\r\n. The loop stores the pointer 
-    // to the end of the HTTP message into requestEndPtr
-    // TODO: parse rest of the buffer in the for loop to determine if it's an HTTP request and of what type. 
-    // Can also refactor this loop into a member function of the class containing data_. Additional 
-    // attributes should be added to the class accordingly, such as requestEndPtr and perhaps 
-    // HTTP request type 
-    char* requestEndPtr;
-    char* iterativeBuffer = new char[socketReadBuffer.length() + 1];
-    strcpy(iterativeBuffer, socketReadBuffer.c_str());
-    for (char* it = iterativeBuffer; *it; it++)
-    {
-        if (*it == '\n' && (*it+1) == '\n') // Linux HTTP request
-        {
-            BOOST_LOG_TRIVIAL(info) << "end of HTTP request detected";
-            requestEndPtr = it;
-            break;
-        }
-        else if (*it == '\r' && // Windows HTTP request
-                (*(it+1)) == '\n' && 
-                (*(it+2)) == '\r' && 
-                (*(it+3)) == '\n')
-        {
-            BOOST_LOG_TRIVIAL(info) << "end of HTTP request detected";
-            requestEndPtr = it;
-            break;
-        }
-    }
-}
-
 std::string session::renderResponse(std::string inputStr)
 {
     std::string res;
