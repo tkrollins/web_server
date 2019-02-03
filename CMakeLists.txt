@@ -54,12 +54,11 @@ target_link_libraries(server server_lib config_parser_lib Boost::system)
 target_link_libraries(server Boost::log_setup Boost::log Boost::regex)
 
 # build and link session_test
-add_executable(session_test tests/server_tests/session_test.cc src/static_file_request_handler.cc
-src/action_request_handler.cc)
-target_link_libraries(session_test server_lib gtest_main Boost::log_setup Boost::log Boost::regex)
+add_executable(session_test tests/server_tests/session_test.cc src/static_file_request_handler.cc)
+target_link_libraries(session_test server_lib gmock_main Boost::log_setup Boost::log Boost::regex Boost::system)
 
 # build and link server_test
-add_executable(server_test tests/server_tests/server_test.cc tests/server_tests/mock_test.cc tests/server_tests/mock_test.cc src/static_file_request_handler.cc src/action_request_handler.cc)
+add_executable(server_test tests/server_tests/server_test.cc src/static_file_request_handler.cc)
 target_link_libraries(server_test server_lib Boost::system gmock_main Boost::log_setup Boost::log Boost::regex)
 
 # TODO(!): Update tests executable name, srcs, and deps

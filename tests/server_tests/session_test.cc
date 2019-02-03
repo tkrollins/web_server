@@ -1,13 +1,21 @@
 #include "gtest/gtest.h"
 #include "server.h"
+#include "static_file_request_handler.h"
+#include "action_request_handler.h"
 #include <boost/asio.hpp>
+#include <boost/system/error_code.hpp>
 #include <iostream>
 
-class SessionTest : public ::testing::Test 
+using ::testing::Return;
+using ::testing::_;
+
+class SessionTest : public ::testing::Test
 {
   	protected:
     		boost::asio::io_service io_service_;
     		session new_session = session(io_service_);
+            boost::system::error_code err;
+            size_t bytesTransferred;
 };
 
 // The method, renderResponse, should return a properly-formatted HTTP 200 response to the client
@@ -38,6 +46,64 @@ TEST_F(SessionTest, RenderResponse200)
 	// pointers
   	EXPECT_STREQ(res.c_str(), outStr.c_str()); 
 }
+
+
+class MockActionHandler : public ActionRequestHandler
+{
+    public:
+        MOCK_METHOD1(canHandleRequest, bool(HttpRequest req));
+        MOCK_METHOD1(handleRequest, std::string(HttpRequest req));
+};
+
+class MockStaticHandler : public StaticFileRequestHandler
+{
+    public:
+        MOCK_METHOD1(canHandleRequest, bool(HttpRequest req));
+        MOCK_METHOD2(handleRequest, void(std::string* header, std::vector<char>* file));
+};
+
+TEST_F(SessionTest, NonHTTPRequestTest)
+{
+    char inputData[] = "Non-HTTP formatted input";
+    strcpy(new_session.data_, inputData);
+    std::string output = "HTTP/1.1 400 Bad Request\r\nContent-Length: 23\r\nContent-Type: text/plain\r\n\r\n400 Error: Bad request\n";
+    new_session.sessionFileHandler = nullptr;
+    new_session.handleRead(err, bytesTransferred);
+    EXPECT_STREQ(new_session.response.c_str(), output.c_str());
+}
+
+TEST_F(SessionTest, ActionRequestTest)
+{
+    char inputData[] = "GET /echo HTTP/1.1\r\nContent-Type: text/plain\r\n\r\n";
+    strcpy(new_session.data_, inputData);
+    MockActionHandler m_actionHandler;
+    MockStaticHandler m_staticHandler;
+    new_session.sessionActionReqHandler = &m_actionHandler;
+    new_session.sessionFileHandler = &m_staticHandler;
+    EXPECT_CALL(m_staticHandler, canHandleRequest(_)).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(m_actionHandler, canHandleRequest(_)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(m_staticHandler, handleRequest(_, _)).Times(0);
+    EXPECT_CALL(m_actionHandler, handleRequest(_)).Times(1);
+    
+    new_session.handleRead(err, bytesTransferred);
+}
+
+TEST_F(SessionTest, StaticFileRequestTest)
+{
+    char inputData[] = "GET /static/somefile HTTP/1.1\r\nContent-Type: text/plain\r\n\r\n";
+    strcpy(new_session.data_, inputData);
+    MockActionHandler m_actionHandler;
+    MockStaticHandler m_staticHandler;
+    new_session.sessionActionReqHandler = &m_actionHandler;
+    new_session.sessionFileHandler = &m_staticHandler;
+    EXPECT_CALL(m_staticHandler, canHandleRequest(_)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(m_actionHandler, canHandleRequest(_)).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(m_staticHandler, handleRequest(_, _)).Times(1);
+    EXPECT_CALL(m_actionHandler, handleRequest(_)).Times(0);
+    
+    new_session.handleRead(err, bytesTransferred);
+}
+
 /*
 // The method, render_response, should write an error message back to client upon receiving a bad
 // HTTP request

@@ -26,33 +26,22 @@ class session
 public:
     session(boost::asio::io_service& io_service) : socket_(io_service) {};
     tcp::socket& socket();
-
+    
     void start(StaticFileRequestHandler* staticFileHandler, ActionRequestHandler* actionRequestHandler);
     virtual std::string renderResponse(std::string inputStr);
 private:
+    FRIEND_TEST(SessionTest, NonHTTPRequestTest);
+    FRIEND_TEST(SessionTest, StaticFileRequestTest);
+    FRIEND_TEST(SessionTest, ActionRequestTest);
+    
     StaticFileRequestHandler* sessionFileHandler;
     ActionRequestHandler* sessionActionReqHandler;
+    std::string response;
     
     void handleRead(const boost::system::error_code& error,
                     size_t bytes_transferred);
-
     void handleWrite(const boost::system::error_code& error);
     tcp::socket socket_;
     enum { max_length = 1024 };
     char data_[max_length];
 };
-
-class MockSession : public session
-{
-public:
-    MockSession(boost::asio::io_service& io_service) : session(io_service), real_(trueIOS)
-    {
-        ON_CALL(*this, renderResponse(_))
-                .WillByDefault(Invoke(&real_, &session::renderResponse));
-    }
-    MOCK_METHOD1(renderResponse, std::string(std::string inputStr));
-private:
-    boost::asio::io_service trueIOS;
-    session real_;
-};
-

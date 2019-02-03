@@ -8,10 +8,10 @@ class ActionRequestHandler
 {
 public:
 	ActionRequestHandler(std::unordered_map<ServerAction, std::string> serverActionMap);
-
-    bool canHandleRequest(HttpRequest req);
+    ActionRequestHandler() {}; // for testing
+    virtual bool canHandleRequest(HttpRequest req);
     void clearVariables();
-    std::string handleRequest(HttpRequest req);
+    virtual std::string handleRequest(HttpRequest req);
     std::string echoRequest(HttpRequest req);
     std::string get400Response();
 

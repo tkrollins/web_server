@@ -85,5 +85,4 @@ void initLogging()
                           keywords::format = format);
     logging::add_console_log(std::clog, keywords::format = format);
     logging::add_common_attributes();
-    
 }

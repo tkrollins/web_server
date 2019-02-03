@@ -42,14 +42,16 @@ void session::handleRead(const boost::system::error_code& error,
     if (!error)
     {
         assert (data_!=NULL);
-        
         std::string socketReadBuffer  = std::string(data_);
         
         HttpRequest receivedRequest;
         bool successfullyParsedReq = receivedRequest.parseHttpRequest(socketReadBuffer);
 
-        BOOST_LOG_TRIVIAL(info) << "Client IP: " << socket_.remote_endpoint().address().to_string();
-
+        boost::system::error_code ec;
+        boost::asio::ip::tcp::endpoint endpoint = socket_.remote_endpoint(ec);
+        if (!ec)
+            BOOST_LOG_TRIVIAL(info) << "Client IP: " << endpoint.address().to_string();
+        
         // This is where the request handler is called
         //
         bool isStaticReq = false;
@@ -65,6 +67,8 @@ void session::handleRead(const boost::system::error_code& error,
             // TODO: refactor this code
             std::string headerToSend;
             std::vector<char> fileToSend;
+            if(!socket_.is_open()) // will not open during testing
+                return
             sessionFileHandler->handleRequest(&headerToSend, &fileToSend);
             boost::asio::write(socket_, boost::asio::buffer(headerToSend));
             boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
@@ -75,11 +79,11 @@ void session::handleRead(const boost::system::error_code& error,
         // This is left in to allow echo handling operate
         // if the request is for a server action, handle request through the session's action request handler
         else if(isActionReq && successfullyParsedReq)
-        {   
+        {
             printf("handling action request\n");
-            std::string res = sessionActionReqHandler->handleRequest(receivedRequest);
+            response = sessionActionReqHandler->handleRequest(receivedRequest);
             boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
-                                     boost::asio::buffer(res, res.length()), // the read data that will be written to socket_
+                                     boost::asio::buffer(response, response.length()), // the read data that will be written to socket_
                                      boost::bind(&session::handleWrite, this, // call session::handleWrite() once done writing
                                                  boost::asio::placeholders::error));
         }
@@ -93,9 +97,9 @@ void session::handleRead(const boost::system::error_code& error,
                                                         {"Content-Length", contentLengthStr}};
             
             HttpResponse httpResponse;
-            std::string res = httpResponse.buildHttpResponse(badRequestStatus, headers, body);
+            response = httpResponse.buildHttpResponse(badRequestStatus, headers, body);
             boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
-                                     boost::asio::buffer(res, res.length()), // the read data that will be written to socket_
+                                     boost::asio::buffer(response, response.length()), // the read data that will be written to socket_
                                      boost::bind(&session::handleWrite, this, // call session::handleWrite() once done writing
                                                  boost::asio::placeholders::error));
         }

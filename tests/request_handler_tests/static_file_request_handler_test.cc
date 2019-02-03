@@ -16,7 +16,6 @@ protected:
 };
 
 TEST_F(StaticFileRequestHandlerTest, SetURIAndFileName) {
-
     StaticFileRequestHandler fileHandler(pathMap, "../..");
     req.requestURI = "/static/home.html";
     fileHandler.setURIAndFileName(req.requestURI);

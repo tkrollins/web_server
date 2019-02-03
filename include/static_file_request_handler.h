@@ -8,9 +8,10 @@
 class StaticFileRequestHandler : public RequestHandler
 {
 public:
-    bool canHandleRequest(HttpRequest req) override;
+    virtual bool canHandleRequest(HttpRequest req) override;
+    StaticFileRequestHandler() {}; // for testing
     StaticFileRequestHandler(std::unordered_map<std::string, std::string> staticPathMap, std::string rootPath);
-    void handleRequest(std::string* header, std::vector<char>* file) override;
+    virtual void handleRequest(std::string* header, std::vector<char>* file) override;
 
 //private:
 
