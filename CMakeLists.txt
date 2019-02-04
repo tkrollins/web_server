@@ -79,7 +79,7 @@ gtest_discover_tests(static_file_request_handler_test WORKING_DIRECTORY ${CMAKE_
 gtest_discover_tests(action_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 
 add_test(NAME server_integration_test
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/test_echo_server.sh "./test_config"
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/integration_test.sh "./test_config"
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
 
 # TODO(!): Update with target/tests targets
