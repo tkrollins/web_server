@@ -63,7 +63,8 @@ void server::initRequestHandlers(NginxConfig* config)
 {
     if(!config->staticPathMap.empty())
     {
-        fileHandler = new StaticFileRequestHandler(config->staticPathMap, "/usr/src/projects/bigbear");
+        std::string root = config->parameters[ConfigParameter::ROOT];
+        fileHandler = new StaticFileRequestHandler(config->staticPathMap, root);
         actionHandler = new ActionRequestHandler(config->serverActionMap);
     }
     else

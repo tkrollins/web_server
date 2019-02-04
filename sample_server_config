@@ -1,4 +1,5 @@
 server {
+    root /usr/src/projects/bigbear;
     listen 80;
     location /static {
         root /static_files/some_files;

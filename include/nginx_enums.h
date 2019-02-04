@@ -12,7 +12,8 @@ namespace NginxEnum {
     enum ConfigParameter
     {
         LISTEN_PORT = 0,
-        LOCATION = 1
+        LOCATION = 1,
+        ROOT = 3
     };
 
     enum TokenType {

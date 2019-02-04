@@ -1,0 +1,8 @@
+foo "bar";
+
+server {
+  root /usr/src/projects/bigbear;
+  listen   80 test;
+  server_name foo.com;
+  root /home/ubuntu/sites/foo/;
+}

@@ -15,13 +15,14 @@ NginxConfigParser::NginxConfigParser()
     serverURI = "";
 
     // Each context key word will have a vector of parameters
-    std::vector<std::string> serverParam = {"listen"};
+    std::vector<std::string> serverParam = {"listen", "root"};
 
     // Key=context token, Value=vector of parameter tokens
     contextsMap.insert(std::make_pair("server", serverParam));
 
     // Key=parameter token, Value=Parameter enum
     parametersMap.insert({"listen", ConfigParameter::LISTEN_PORT});
+    parametersMap.insert({"root", ConfigParameter::ROOT});
 }
 
 NginxConfigParser::~NginxConfigParser()

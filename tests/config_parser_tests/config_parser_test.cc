@@ -15,13 +15,15 @@ TEST_F(NginxConfigParserTest, SimpleConfig) {
   EXPECT_TRUE(success);
 }
 
-TEST_F(NginxConfigParserTest, ParseListenPort) {
+TEST_F(NginxConfigParserTest, ParseRootAndPort) {
 
-    bool success = parser.Parse("example_config");
+    bool success = parser.Parse("parse_root_port");
     std::string port = parser.config->parameters[ConfigParameter::LISTEN_PORT];
+    std::string root = parser.config->parameters[ConfigParameter::ROOT];
 
     EXPECT_TRUE(success);
     EXPECT_TRUE(port == "80");
+    EXPECT_TRUE(root == "/usr/src/projects/bigbear");
 }
 
 // Try to parse non-existent file, this should fail
