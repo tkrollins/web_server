@@ -1,5 +1,6 @@
 #include "action_request_handler.h"
 #include "http_response.h"
+#include <boost/log/trivial.hpp>
 
 ActionRequestHandler::ActionRequestHandler(
         std::unordered_map<ServerAction, std::string> serverActionMap) 
@@ -62,10 +63,12 @@ std::string ActionRequestHandler::handleRequest(HttpRequest req)
     // to server config
     if (validActionMap[ACTION_ECHO].compare(req.getRequestURI()) == 0)
     {
+        BOOST_LOG_TRIVIAL(trace) << "ECHO Action Triggered";
         return echoRequest(req);
     }
     else
     {
+        BOOST_LOG_TRIVIAL(debug) << "Invalid request URI: " << req.getRequestURI();
         return get400Response();
     }
 }

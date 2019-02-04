@@ -19,6 +19,8 @@ http://35.247.92.66/static/bearlist.txt
 
 In terminal, use
 $ printf "GET /static/bearlist.txt HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n" | nc localhost 80
+or
+$ curl -X GET localhost/static/bearlist.txt
 
 *******************************************************************
 
@@ -29,6 +31,8 @@ http://35.247.92.66/echo
 
 In terminal, use
 $ printf "GET /echo HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n" | nc localhost 80
+or
+$ curl -X GET localhost/echo
 
 *******************************************************************
 

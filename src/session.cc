@@ -65,6 +65,7 @@ void session::handleRead(const boost::system::error_code& error,
         {
             // These write calls are pretty wonky but it was the only way I could get if functioning
             // TODO: refactor this code
+            BOOST_LOG_TRIVIAL(trace) << "Static File Request Received";
             std::string headerToSend;
             std::vector<char> fileToSend;
             sessionFileHandler->handleRequest(&headerToSend, &fileToSend);
@@ -79,16 +80,17 @@ void session::handleRead(const boost::system::error_code& error,
         // if the request is for a server action, handle request through the session's action request handler
         else if(isActionReq && successfullyParsedReq)
         {
-            printf("handling action request\n");
+            BOOST_LOG_TRIVIAL(trace) << "Action Request Received";
             response = sessionActionReqHandler->handleRequest(receivedRequest);
-            boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
-                                     boost::asio::buffer(response, response.length()), // the read data that will be written to socket_
-                                     boost::bind(&session::handleWrite, this, // call session::handleWrite() once done writing
+            boost::asio::async_write(socket_, 
+                                     boost::asio::buffer(response, response.length()), 
+                                     boost::bind(&session::handleWrite, this, 
                                                  boost::asio::placeholders::error));
         }
         // the the request is not asking for a static file or for an action, reply with bad request message
         else
         {
+            BOOST_LOG_TRIVIAL(debug) << "Bad request:\n" << receivedRequest.unparsedRequestString;
             std::string badRequestStatus = "400";
             std::string body = "400 Error: Bad request\n";
             std::string contentLengthStr = std::to_string(body.length());
@@ -97,9 +99,9 @@ void session::handleRead(const boost::system::error_code& error,
             
             HttpResponse httpResponse;
             response = httpResponse.buildHttpResponse(badRequestStatus, headers, body);
-            boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
-                                     boost::asio::buffer(response, response.length()), // the read data that will be written to socket_
-                                     boost::bind(&session::handleWrite, this, // call session::handleWrite() once done writing
+            boost::asio::async_write(socket_, 
+                                     boost::asio::buffer(response, response.length()),
+                                     boost::bind(&session::handleWrite, this, 
                                                  boost::asio::placeholders::error));
         }
     }

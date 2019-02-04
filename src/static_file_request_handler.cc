@@ -1,5 +1,6 @@
 #include "static_file_request_handler.h"
 #include "http_response.h"
+#include <boost/log/trivial.hpp>
 
 using std::ifstream;
 using std::ios;
@@ -117,6 +118,7 @@ void StaticFileRequestHandler::initRequestVariables()
     setPathToFile();
     if(!doesFileExist())
     {
+        BOOST_LOG_TRIVIAL(debug) << "Invalid File Request:" << pathToFile;
         fileName = "404error.html";
         pathToFile = root + "/static_files/404error.html";
         status = "404";

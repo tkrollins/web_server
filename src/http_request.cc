@@ -1,6 +1,7 @@
 #include "http_request.h"
 #include <queue>
 #include <iostream>
+#include <boost/log/trivial.hpp>
 #include <boost/algorithm/string.hpp>
 
 bool HttpRequest::setMethod(std::string method)
@@ -11,11 +12,10 @@ bool HttpRequest::setMethod(std::string method)
     }
 
     // TODO: implement function
-    printf("http method: ");
     if (method.compare("GET") == 0)
     {
         this->requestMethod = GET;
-        std::cout << method << std::endl;
+        // std::cout << method << std::endl;
         return true;
     }
     return false;
@@ -23,16 +23,14 @@ bool HttpRequest::setMethod(std::string method)
 
 bool HttpRequest::setURI(std::string requestTarget)
 {
-    printf("request target: ");
-    std::cout << requestTarget << std::endl;
+    // std::cout << requestTarget << std::endl;
     this->requestURI = requestTarget;
     return true;
 }
 
 bool HttpRequest::setVersion(std::string version)
 {
-    printf("version: ");
-    std::cout << version << std::endl;
+    // std::cout << version << std::endl;
     this->httpVersion = version;
     return true;
 }
@@ -48,10 +46,8 @@ bool HttpRequest::setHeaderFields(std::string headerField, std::string headerVal
     // case-insensitive compare the header field with legal header field strings 
     // (is there a cleaner way of doing this? Hashing won't work because the comparison
     // needs to be case-insensitive)
-    printf("setting header field: ");
-    std::cout << headerField << std::endl;
-    printf("to: ");
-    std::cout << headerValue << std::endl;
+    // std::cout << headerField << std::endl << "to: " << headerValue << std::endl;
+
     if (boost::iequals(headerField, "Accept"))
     {
         this->headerFields[ACCEPT] = headerValue;
@@ -98,7 +94,7 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
 
     unparsedRequestString = requestString;
 
-    printf("Parsing HTTP request \n");
+    BOOST_LOG_TRIVIAL(trace) << "Parsing HTTP request";
 
     // divide up the requestString into lines
     std::vector<std::string> requestLines; // requestLines contains all parts of the request before the \r\n\r\n sequence
@@ -197,12 +193,6 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
             headersFound = setHeaderFields(headerField, headerValue); 
         }
     }
-
-    // if (headersFound)
-    // {
-    //     for (auto& x: this->headerFields)
-    //         std::cout << x.first << ": " << x.second << std::endl;
-    // }
 
     bool bodyFound = false;
 

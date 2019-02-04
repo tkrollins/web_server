@@ -5,8 +5,8 @@ server {
         root /static_files/some_files;
     }
     location /fun {
-            root /static_files/more_files;
-        }
+        root /static_files/more_files;
+    }
     location /echo {
         action echo;
     }
