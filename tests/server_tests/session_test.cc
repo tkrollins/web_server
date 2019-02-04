@@ -11,9 +11,9 @@ using ::testing::_;
 
 class SessionTest : public ::testing::Test
 {
-  	protected:
-    		boost::asio::io_service io_service_;
-    		session new_session = session(io_service_);
+    protected:
+            boost::asio::io_service io_service_;
+            session new_session = session(io_service_);
             boost::system::error_code err;
             size_t bytesTransferred;
 };
@@ -22,29 +22,29 @@ class SessionTest : public ::testing::Test
 // upon receiving a valid HTTP request
 TEST_F(SessionTest, RenderResponse200) 
 {
-  	// take an example HTTP request and compare the expected response with renderResponse's return
-  	std::string s = "GET /index.html HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n";
+    // take an example HTTP request and compare the expected response with renderResponse's return
+    std::string s = "GET /index.html HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n";
 
     // call renderResponse
-  	std::string outStr;
-  	outStr = new_session.renderResponse(s);
+    std::string outStr;
+    outStr = new_session.renderResponse(s);
 
     std::string content = s;
-  	std::string res = "";
-  	std::string h = "HTTP/1.1 200 OK\r\n";
+    std::string res = "";
+    std::string h = "HTTP/1.1 200 OK\r\n";
     std::string contentLength = "Content-Length: " + std::to_string(content.length()) + "\r\n";
     std::string type = "Content-Type: text/plain\r\n\r\n"; // did't put \r\n here, since the parse_http_request offers
 
-  	// input with leading \r\n
-  	res = h + contentLength + type + content;
+    // input with leading \r\n
+    res = h + contentLength + type + content;
 
-  	std::cout << res << std::endl;
+    std::cout << res << std::endl;
     std::cout << outStr << std::endl;
 
-  	
-	// used STREQ instead of EQ because we want to compare the strings, not the memory locations of 
-	// pointers
-  	EXPECT_STREQ(res.c_str(), outStr.c_str()); 
+    
+    // used STREQ instead of EQ because we want to compare the strings, not the memory locations of 
+    // pointers
+    EXPECT_STREQ(res.c_str(), outStr.c_str()); 
 }
 
 

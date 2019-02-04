@@ -4,15 +4,31 @@ Buliding command (execute at /build):
 $ cmake .. && make && sudo bin/server ../sample_server_config
 
 In another terminal, I used nc to send an example GET request:
-$ printf "GET /index.html HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n" | nc localhost 80
-
-Sending a POST request with request body:
-$ printf "POST /cgi-bin/process.cgi HTTP/1.1\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\nHost: www.tutorialspoint.com\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: length\r\nAccept-Language: en-us\r\nAccept-Encoding: gzip, deflate\r\nConnection: Keep-Alive\r\n\r\nlicenseID=string&content=string&/paramsXML=string" | nc localhost 8080
+$ printf "GET /echo HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n" | nc localhost 80
 
 Test other mmessages by doing:
 $ printf "whatever message here" | nc localhost 8080
 
 There might be a better way of doing this, but this is all I know so far
+*******************************************************************
+
+Request Static Files
+
+In Browser, go:
+http://35.247.92.66/static/bearlist.txt
+
+In terminal, use
+$ printf "GET /static/bearlist.txt HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n" | nc localhost 80
+
+*******************************************************************
+
+Run Echo Service
+
+In Browser, go:
+http://35.247.92.66/echo
+
+In terminal, use
+$ printf "GET /echo HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n" | nc localhost 80
 
 *******************************************************************
 
@@ -41,6 +57,7 @@ Then you can find coverage report in {REPO}/build_coverage/report/index.html
 
 Then, under /build:
 $ cd ../build_coverage && cmake -DCMAKE_BUILD_TYPE=Coverage .. && make coverage; cd ../build
+
 
 *******************************************************************
 

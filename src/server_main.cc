@@ -28,48 +28,48 @@ void termination_handler(int param)
 // TODO: THis code definitely needs to be refactored
 int main(int argc, char* argv[])
 {
-  try
-  {
-    if (argc != 2)
+    try
     {
-      std::cerr << "Usage: async_tcp_echo_server <port>\n";
-      return 1;
-    }
+        if (argc != 2)
+        {
+            std::cerr << "Usage: async_tcp_echo_server <port>\n";
+            return 1;
+        }
 
-    boost::asio::io_service io_service;
+        boost::asio::io_service io_service;
   
-    NginxConfigParser parser;
+        NginxConfigParser parser;
 
-    // Enable Boost Logs
-    initLogging();
+        // Enable Boost Logs
+        initLogging();
 
-    std::string listenPort;
-    if(parser.Parse(argv[1]))
-    {
-      listenPort = parser.config->parameters[ConfigParameter::LISTEN_PORT];
-    }
+        std::string listenPort;
+        if(parser.Parse(argv[1]))
+        {
+            listenPort = parser.config->parameters[ConfigParameter::LISTEN_PORT];
+        }
 
-    for (int i = 0; i < listenPort.length(); i++)
-    {
-      if (!(listenPort[i] >= '0' && listenPort[i] <= '9')) throw 11;
-    }
-    int intListenPort = stoi(listenPort);
-    if (intListenPort >= 65536 || intListenPort < 0)
-    {
-        BOOST_LOG_TRIVIAL(fatal) << "Bad port number!";
-        throw 10; // TODO: probably should return a exceptions class......
-    }
-      
-    BOOST_LOG_TRIVIAL(info) << "Listening port:" << listenPort;
-    signal(SIGINT, termination_handler);
-    BOOST_LOG_TRIVIAL(info) << "Server is running";
-    server s(io_service, intListenPort, parser.config);
-    io_service.run();
-  }
-  catch (std::exception& e)
-  {
-    BOOST_LOG_TRIVIAL(fatal) << "Exception: " << e.what() << "\n";
-  }
+        for (int i = 0; i < listenPort.length(); i++)
+        {
+            if (!(listenPort[i] >= '0' && listenPort[i] <= '9')) throw 11;
+        }
+        int intListenPort = stoi(listenPort);
+        if (intListenPort >= 65536 || intListenPort < 0)
+        {
+            BOOST_LOG_TRIVIAL(fatal) << "Bad port number!";
+            throw 10; // TODO: probably should return a exceptions class......
+        }
+          
+        BOOST_LOG_TRIVIAL(info) << "Listening port:" << listenPort;
+        signal(SIGINT, termination_handler);
+        BOOST_LOG_TRIVIAL(info) << "Server is running";
+        server s(io_service, intListenPort, parser.config);
+        io_service.run();
+      }
+      catch (std::exception& e)
+      {
+            BOOST_LOG_TRIVIAL(fatal) << "Exception: " << e.what() << "\n";
+      }
 
-  return 0;
+      return 0;
 }
