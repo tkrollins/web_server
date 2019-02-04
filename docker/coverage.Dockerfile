@@ -3,13 +3,13 @@
 FROM bigbear:base as builder
 
 # Share work directory
-COPY . /usr/src/project
-WORKDIR /usr/src/project/build
+COPY . /usr/src/projects/bigbear
+WORKDIR /usr/src/projects/bigbear/build
 
 RUN cmake ..
 RUN make
 
-WORKDIR /usr/src/project/build_coverage
+WORKDIR /usr/src/projects/bigbear/build_coverage
 
 # Build and test
 RUN cmake -DCMAKE_BUILD_TYPE=Coverage ..
