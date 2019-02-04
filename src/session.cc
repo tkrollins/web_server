@@ -67,8 +67,8 @@ void session::handleRead(const boost::system::error_code& error,
             // TODO: refactor this code
             std::string headerToSend;
             std::vector<char> fileToSend;
-            if(!socket_.is_open()) { return; }// will not open during testing
             sessionFileHandler->handleRequest(&headerToSend, &fileToSend);
+            if(!socket_.is_open()) { return; }// will not open during testing
             boost::asio::write(socket_, boost::asio::buffer(headerToSend));
             boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
                                      boost::asio::buffer(fileToSend), // the read data that will be written to socket_

@@ -88,7 +88,7 @@ TEST_F(SessionTest, ActionRequestTest)
     new_session.handleRead(err, bytesTransferred);
 }
 // This test broke when I fixed the bug in session.cc, it needs to be fixed as well
-/*
+
 TEST_F(SessionTest, StaticFileRequestTest)
 {
     char inputData[] = "GET /static/somefile HTTP/1.1\r\nContent-Type: text/plain\r\n\r\n";
@@ -104,7 +104,7 @@ TEST_F(SessionTest, StaticFileRequestTest)
     
     new_session.handleRead(err, bytesTransferred);
 }
-*/
+
 /*
 // The method, render_response, should write an error message back to client upon receiving a bad
 // HTTP request
