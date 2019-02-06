@@ -44,7 +44,7 @@ bool server::handle_accept(session* new_session,
     if (!error)
     {
         BOOST_LOG_TRIVIAL(trace) << "TCP socket connection established";
-        new_session->start(fileHandler, actionHandler);
+        new_session->start(&requestHandlers);
         clientConnectionEstablished_ = true;
     }
     else
@@ -58,21 +58,19 @@ bool server::handle_accept(session* new_session,
 }
 
 // Sets up request handler objects
-// TODO: Add echo/error handler here
 void server::initRequestHandlers(NginxConfig* config)
 {
     if(!config->staticPathMap.empty())
     {
+        assert(config->parameters.count(ConfigParameter::ROOT));
         std::string root = config->parameters[ConfigParameter::ROOT];
-        fileHandler = new StaticFileRequestHandler(config->staticPathMap, root);
-        actionHandler = new ActionRequestHandler(config->serverActionMap);
+        requestHandlers.emplace_back(new StaticFileRequestHandler(config->staticPathMap, root));
     }
-    else
+    if(!config->serverActionMap.empty())
     {
-        fileHandler = nullptr;
+        requestHandlers.emplace_back(new ActionRequestHandler(config->serverActionMap));
     }
-
-
+    requestHandlers.emplace_back(new ErrorRequestHandler);
 }
 
 void initLogging()

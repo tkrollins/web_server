@@ -16,6 +16,7 @@
 #include "session.h"
 #include "static_file_request_handler.h"
 #include "action_request_handler.h"
+#include "error_request_handler.h"
 #include "config_parser.h"
 using boost::asio::ip::tcp;
 
@@ -52,6 +53,7 @@ private:
     bool start_accept();
 //    std::vector<RequestHandler*>* requestHandlers;
     void initRequestHandlers(NginxConfig* config);
+    std::vector<RequestHandler*> requestHandlers;
 
 
     bool handle_accept(session* new_session,

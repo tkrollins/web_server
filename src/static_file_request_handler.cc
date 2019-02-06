@@ -127,13 +127,14 @@ void StaticFileRequestHandler::initRequestVariables()
 }
 
 // https://stackoverflow.com/questions/25308676/send-file-via-boost-asio-tcp-how-to-stream-char-array-to-socket
-std::vector<char> StaticFileRequestHandler::fileToVector(const std::string &name)
+std::string StaticFileRequestHandler::fileToString(const std::string &name)
 {
     using namespace std;
     ifstream fl(name);
     fl.seekg( 0, ios::end );
     size_t len = fl.tellg();
-    vector<char> ret(len);
+    string ret;
+    ret.resize(len);
     fl.seekg(0, ios::beg);
     if (len)
         fl.read(&ret[0], len);
@@ -142,13 +143,13 @@ std::vector<char> StaticFileRequestHandler::fileToVector(const std::string &name
     return move(ret);
 }
 
-void StaticFileRequestHandler::handleRequest(std::string* header, std::vector<char>* file)
+void StaticFileRequestHandler::handleRequest(std::string* response)
 {
     initRequestVariables();
 
-    std::vector<char> fileCharVector = fileToVector(pathToFile);
-    *header = createResponseHeader(fileCharVector.size());
-    file->resize(fileCharVector.size());
-    *file = fileCharVector;
+    std::string fileStr = fileToString(pathToFile);
+    std::string header = createResponseHeader(fileStr.size());
+    response->resize(header.size() + fileStr.size());
+    *response = header + fileStr;
 }
 

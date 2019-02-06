@@ -14,12 +14,11 @@ class RequestHandler
 public:
     // The inputs of this are a little weird to make static handler work
     // TODO: refactor this function to have more straightforward API
-    virtual void handleRequest(std::string* header, std::vector<char>* file) = 0;
+    virtual void handleRequest(std::string* response) = 0;
     RequestHandler() = default;
     virtual bool canHandleRequest(HttpRequest req) = 0;
 
 protected:
-    std::vector<const_buffer>* responseBuffer;
     std::string status;
 };
 

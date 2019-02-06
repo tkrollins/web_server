@@ -20,32 +20,34 @@ class SessionTest : public ::testing::Test
 
 // The method, renderResponse, should return a properly-formatted HTTP 200 response to the client
 // upon receiving a valid HTTP request
-TEST_F(SessionTest, RenderResponse200) 
-{
-    // take an example HTTP request and compare the expected response with renderResponse's return
-    std::string s = "GET /index.html HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n";
 
-    // call renderResponse
-    std::string outStr;
-    outStr = new_session.renderResponse(s);
+//TEST_F(SessionTest, RenderResponse200)
+//{
+//    // take an example HTTP request and compare the expected response with renderResponse's return
+//    //std::string s = "GET /index.html HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n";
+//
+//    // call renderResponse
+//    std::string outStr;
+//    outStr = new_session.renderResponse(s);
+//
+//    std::string content = s;
+//    std::string res = "";
+//    std::string h = "HTTP/1.1 200 OK\r\n";
+//    std::string contentLength = "Content-Length: " + std::to_string(content.length()) + "\r\n";
+//    std::string type = "Content-Type: text/plain\r\n\r\n"; // did't put \r\n here, since the parse_http_request offers
+//
+//    // input with leading \r\n
+//    res = h + contentLength + type + content;
+//
+//    std::cout << res << std::endl;
+//    std::cout << outStr << std::endl;
+//
+//
+//    // used STREQ instead of EQ because we want to compare the strings, not the memory locations of
+//    // pointers
+//    EXPECT_STREQ(res.c_str(), outStr.c_str());
+//}
 
-    std::string content = s;
-    std::string res = "";
-    std::string h = "HTTP/1.1 200 OK\r\n";
-    std::string contentLength = "Content-Length: " + std::to_string(content.length()) + "\r\n";
-    std::string type = "Content-Type: text/plain\r\n\r\n"; // did't put \r\n here, since the parse_http_request offers
-
-    // input with leading \r\n
-    res = h + contentLength + type + content;
-
-    std::cout << res << std::endl;
-    std::cout << outStr << std::endl;
-
-    
-    // used STREQ instead of EQ because we want to compare the strings, not the memory locations of 
-    // pointers
-    EXPECT_STREQ(res.c_str(), outStr.c_str()); 
-}
 
 
 class MockActionHandler : public ActionRequestHandler
@@ -61,7 +63,7 @@ class MockStaticHandler : public StaticFileRequestHandler
         MOCK_METHOD1(canHandleRequest, bool(HttpRequest req));
         MOCK_METHOD2(handleRequest, void(std::string* header, std::vector<char>* file));
 };
-
+/*
 TEST_F(SessionTest, NonHTTPRequestTest)
 {
     char inputData[] = "Non-HTTP formatted input";
@@ -105,7 +107,7 @@ TEST_F(SessionTest, StaticFileRequestTest)
     new_session.handleRead(err, bytesTransferred);
 }
 
-/*
+
 // The method, render_response, should write an error message back to client upon receiving a bad
 // HTTP request
 TEST_F(SessionTest, RenderResponse400Error)

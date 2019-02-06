@@ -27,16 +27,15 @@ public:
     session(boost::asio::io_service& io_service) : socket_(io_service) {};
     tcp::socket& socket();
     
-    void start(StaticFileRequestHandler* staticFileHandler, ActionRequestHandler* actionRequestHandler);
-    virtual std::string renderResponse(std::string inputStr);
+    void start(std::vector<RequestHandler*>* requestHandlers);
 private:
     FRIEND_TEST(SessionTest, NonHTTPRequestTest);
     FRIEND_TEST(SessionTest, StaticFileRequestTest);
     FRIEND_TEST(SessionTest, ActionRequestTest);
-    
-    StaticFileRequestHandler* sessionFileHandler;
-    ActionRequestHandler* sessionActionReqHandler;
-    std::string response;
+
+    void writeToSocket(std::string response);
+
+    std::vector<RequestHandler*>* sessionRequestHandlers;
     
     void handleRead(const boost::system::error_code& error,
                     size_t bytes_transferred);

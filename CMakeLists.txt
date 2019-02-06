@@ -43,14 +43,13 @@ include_directories(include)
 # TODO(!): Update name and srcs
 add_library(config_parser_lib src/config_parser/config_parser.cc src/config_parser/nginx_config_tokens.cc)
 add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/static_file_request_handler.cc src/action_request_handler.cc)
-add_library(request_handler_lib src/static_file_request_handler.cc src/action_request_handler.cc)
+add_library(request_handler_lib src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc)
 add_library(http_response src/http_response.cc)
 add_library(http_request src/http_request.cc)
 
 # TODO(!): Update executable name, srcs, and deps
-add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/static_file_request_handler.cc src/action_request_handler.cc)
-target_link_libraries(server server_lib config_parser_lib Boost::system)
-
+add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
+target_link_libraries(server server_lib config_parser_lib request_handler_lib Boost::system)
 target_link_libraries(server Boost::log_setup Boost::log Boost::regex)
 
 # build and link session_test
