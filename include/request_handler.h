@@ -19,7 +19,7 @@ public:
     virtual bool canHandleRequest(HttpRequest req) = 0;
 
 protected:
-    std::string status;
+    int status;
 };
 
 

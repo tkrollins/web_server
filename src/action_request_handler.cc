@@ -7,14 +7,14 @@ ActionRequestHandler::ActionRequestHandler(
         RequestHandler()
 {
     validActionMap = serverActionMap;
-    status = "200";
+    status = 200;
 }
 
 
 void ActionRequestHandler::clearVariables()
 {
     URI = "";
-    status = "200";
+    status = 200;
 }
 
 bool ActionRequestHandler::canHandleRequest(HttpRequest req)

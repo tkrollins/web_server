@@ -10,7 +10,7 @@ bool ErrorRequestHandler::canHandleRequest(HttpRequest req)
 
 void ErrorRequestHandler::handleRequest(std::string *response)
 {
-    status = "400";
+    status = 400;
     std::string body = "400 Error: Bad request\n";
     std::string contentLengthStr = std::to_string(body.length());
     std::map<std::string,std::string> headers { {"Content-Type", "text/plain"},

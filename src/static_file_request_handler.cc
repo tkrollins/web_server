@@ -11,7 +11,7 @@ StaticFileRequestHandler::StaticFileRequestHandler(
 {
     validURIMap = staticPathMap;
     root = rootPath;
-    status = "200";
+    status = 200;
 }
 
 void StaticFileRequestHandler::setFileType()
@@ -39,7 +39,7 @@ void StaticFileRequestHandler::clearVariables()
     fileName = "";
     pathToFile = "";
     URI = "";
-    status = "200";
+    status = 200;
 }
 
 void StaticFileRequestHandler::setURIAndFileName(std::string uriWithFileName)
@@ -121,7 +121,7 @@ void StaticFileRequestHandler::initRequestVariables()
         BOOST_LOG_TRIVIAL(debug) << "Invalid File Request:" << pathToFile;
         fileName = "404error.html";
         pathToFile = root + "/static_files/404error.html";
-        status = "404";
+        status = 404;
     }
     setFileType();
 }

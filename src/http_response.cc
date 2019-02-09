@@ -5,16 +5,25 @@
 
 namespace logging = boost::log;
 
-std::string HttpResponse::buildStatus(std::string status)
+std::string HttpResponse::buildStatus(int status)
 {
-    std::string httpProtocol = "HTTP/1.1 ";
-    if (!status.compare(std::string("200"))) status += " OK";
-    else if (!status.compare(std::string("400"))) status += " Bad Request";
-    else if (!status.compare(std::string("404"))) status += " File Not Found";
-    else if (!status.compare(std::string("418"))) status += " I'm a teapot"; // Not joking here
+    std::string httpProtocol = "HTTP/1.1 " + std::to_string(status);
+    switch(status){
+        case 200: httpProtocol += " OK";
+        break;
+        case 400: httpProtocol += " Bad Request";
+        break;
+        case 404: httpProtocol += " File Not Found";
+        break;
+        case 418: httpProtocol += " I'm a teapot";
+        break;
+        default:
+        BOOST_LOG_TRIVIAL(debug) << "Invalid status number passed: " << status;
+        break;
+    }
     // TODO: add other status code discribtion
     // TODO: add an enum for return status also?
-    return  httpProtocol + status + "\r\n";
+    return  httpProtocol + "\r\n";
 }
 
 std::string HttpResponse::buildHeaders(std::string headerName, std::string headerValue)
@@ -28,7 +37,7 @@ std::string HttpResponse::buildBody(std::string input)
     return "\r\n" + input;
 }
 
-std::string HttpResponse::buildHttpResponse(std::string status, std::map<std::string, std::string> headers,
+std::string HttpResponse::buildHttpResponse(int status, std::map<std::string, std::string> headers,
                                             std::string body)
 {
     std::string res = "";

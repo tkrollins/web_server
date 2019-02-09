@@ -7,7 +7,7 @@
 class ErrorRequestHandler : public RequestHandler
 {
 public:
-    ErrorRequestHandler() { status = "400"; }
+    ErrorRequestHandler() { status = 400; }
     bool canHandleRequest(HttpRequest req) override;
     void handleRequest(std::string* response) override;
 };
