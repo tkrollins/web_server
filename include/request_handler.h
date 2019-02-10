@@ -17,6 +17,7 @@ public:
     virtual void handleRequest(std::string* response) = 0;
     RequestHandler() = default;
     virtual bool canHandleRequest(HttpRequest req) = 0;
+    virtual ~RequestHandler() {}
 
 protected:
     int status;

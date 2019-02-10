@@ -54,7 +54,7 @@ target_link_libraries(server Boost::log_setup Boost::log Boost::regex)
 
 # build and link session_test
 add_executable(session_test tests/server_tests/session_test.cc src/static_file_request_handler.cc)
-target_link_libraries(session_test server_lib gmock_main Boost::log_setup Boost::log Boost::regex Boost::system)
+target_link_libraries(session_test server_lib request_handler_lib gmock_main Boost::log_setup Boost::log Boost::regex Boost::system)
 
 # build and link server_test
 add_executable(server_test tests/server_tests/server_test.cc src/static_file_request_handler.cc)

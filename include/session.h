@@ -29,6 +29,7 @@ public:
     
     void start(std::vector<RequestHandler*>* requestHandlers);
 private:
+    friend class SessionTest;
     FRIEND_TEST(SessionTest, NonHTTPRequestTest);
     FRIEND_TEST(SessionTest, StaticFileRequestTest);
     FRIEND_TEST(SessionTest, ActionRequestTest);
