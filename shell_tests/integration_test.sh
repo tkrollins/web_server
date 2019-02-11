@@ -34,5 +34,11 @@ expected_response=$'Here is a list of bears:\n\nGrizzly Bear\nPanda Bear\nGummy 
 test_response $SERVER_PID $URI "$expected_response"
 echo "Static .txt response is correct"
 
+# test 404 error response
+URI="/static/notFound.txt"
+expected_response=$'<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <title>404</title>\n</head>\n<body>\n404 - File Not Found\n</body>\n</html>'
+test_response $SERVER_PID $URI "$expected_response"
+echo "404 error response is correct"
+
 kill $SERVER_PID
 exit 0
