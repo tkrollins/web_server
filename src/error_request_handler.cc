@@ -1,6 +1,7 @@
 #include "error_request_handler.h"
 #include "http_response.h"
 #include <boost/log/trivial.hpp>
+#include <memory>
 
 bool ErrorRequestHandler::canHandleRequest(HttpRequest req)
 {
@@ -17,4 +18,18 @@ void ErrorRequestHandler::handleRequest(std::string *response)
                                                 {"Content-Length", contentLengthStr}};
     HttpResponse res;
     *response = res.buildHttpResponse(status, headers, body);
+}
+
+std::unique_ptr<HttpResponse> ErrorRequestHandler::HandleRequest2(const HttpRequest& request)
+{
+    status = 400;
+    std::string body = "400 Error: Bad request\n";
+    std::string mimeType = "";
+    std::string contentLengthStr = std::to_string(body.length());
+    std::map<std::string,std::string> headers { {"Content-Type", "text/plain"},
+                                                {"Content-Length", contentLengthStr}};
+    HttpResponse res;
+    // res.setHttpResponse(status, mimeType , headers, body);
+    std::unique_ptr<HttpResponse> resPtr = std::make_unique<HttpResponse>(res);
+    return resPtr;
 }

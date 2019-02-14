@@ -5,15 +5,15 @@
 #include <boost/asio.hpp>
 #include <vector>
 #include "http_request.h"
-
+#include "config_parser.h"
 
 using boost::asio::const_buffer;
 
 class RequestHandler
 {
 public:
-    // The inputs of this are a little weird to make static handler work
-    // TODO: refactor this function to have more straightforward API
+	//The following function must be implemented in all handler subclass
+    // static RequestHandler* create(const NginxConfig& config, const std::string& root_path);
     virtual void handleRequest(std::string* response) = 0;
     RequestHandler() = default;
     virtual bool canHandleRequest(HttpRequest req) = 0;

@@ -2,12 +2,17 @@
 #define STATIC_FILE_REQUEST_HANDLER_H
 
 #include "request_handler.h"
+#include "http_response.h"
 #include "fstream"
-
+#include "config_parser.h"
+#include <memory>
 
 class StaticFileRequestHandler : public RequestHandler
 {
 public:
+    static RequestHandler* create(const NginxConfig& config, const std::string& root_path);
+    std::unique_ptr<HttpResponse> HandleRequest2(const HttpRequest& request);
+    
     virtual bool canHandleRequest(HttpRequest req) override;
     StaticFileRequestHandler() {}; // for testing
     StaticFileRequestHandler(std::unordered_map<std::string, std::string> staticPathMap, std::string rootPath);
