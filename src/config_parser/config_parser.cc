@@ -1,262 +1,141 @@
 #include <stack>
 #include "config_parser.h"
-#include "nginx_config_tokens.h"
 
-bool isPath(std::string path)
+
+void NginxConfigParser::addFlatParamToConfig(NginxConfig *conf, std::deque<std::string> tokensInStatement)
 {
-    return (path.front() == '/');
-}
+    if(tokensInStatement.empty())
+    {
+        return;
+    }
+    std::string paramName = tokensInStatement.front();
+    tokensInStatement.pop_front();
+    std::string parameterValue;
 
-// Constructor for NGginxConfigParser.  Inits the member variables
-// With hard-coded values.
-NginxConfigParser::NginxConfigParser()
-{
-    config = nullptr;
-    serverURI = "";
-
-    // Each context key word will have a vector of parameters
-    std::vector<std::string> serverParam = {"listen", "root"};
-
-    // Key=context token, Value=vector of parameter tokens
-    contextsMap.insert(std::make_pair("server", serverParam));
-
-    // Key=parameter token, Value=Parameter enum
-    parametersMap.insert({"listen", ConfigParameter::LISTEN_PORT});
-    parametersMap.insert({"root", ConfigParameter::ROOT});
-}
-
-NginxConfigParser::~NginxConfigParser()
-{
-    delete config;
-}
-
-void NginxConfigParser::setParameterNameAndValue(std::string &parameterName, std::string &parameterValue,
-                                                 std::deque<std::string> tokens)
-{
-    parameterName = tokens.back();
-    tokens.pop_back();
-    parameterValue = "";
     // For if a parameter value is multi-word
-    while (!tokens.empty())
+    while (!tokensInStatement.empty())
     {
-        parameterValue += tokens.back();
+        parameterValue += tokensInStatement.front();
         parameterValue += " ";
-        tokens.pop_back();
+        tokensInStatement.pop_front();
     }
-    parameterValue.pop_back();
+    if(!parameterValue.empty())
+    {
+        parameterValue.pop_back();
+    }
+
+    conf->addFlatParam(paramName, parameterValue);
 }
 
-bool NginxConfigParser::findParameterToSet(std::string context, std::string parameterName,
-                                           std::string parameterValue, ConfigParameter& parameterToSet)
+std::string NginxConfigParser::getHandlerName(std::string handler)
 {
-    // If currently within a context
-    if (contextsMap.count(context))
+    unsigned numEncountered = 1;
+
+    if(handlersEncountered.count(handler))
     {
-        // Loops through all parameters within that context
-        for (std::string prmtr : contextsMap.at(context))
-        {
-            // If the prev token seen is a known parameter
-            if (prmtr == parameterName)
-            {
-                parameterToSet = parametersMap.at(parameterName);
-                return true;
-            }
-        }
+        numEncountered += handlersEncountered[handler]++;
     }
-    else if (parametersMap.count(parameterName))
+    else
     {
-        parameterToSet = parametersMap.at(parameterName);
-        return true;
+        handlersEncountered.insert( {handler, numEncountered} );
     }
-    return false;
+    // return handler name + how many times its been seen
+    return (handler + std::to_string(numEncountered));
 }
 
-void NginxConfigParser::setServerPath(std:: deque<std::string> tokens)
+bool NginxConfigParser::addNestedParamToConfig(NginxConfig *conf, std::deque<std::string> tokensInStatement,
+                                               std::deque<Token*>& TOKENS)
 {
-    std::unordered_map<std::string,int > actions { {"echo", (int)ServerAction::ACTION_ECHO} };
-
-    if(tokens.size() == 2)
+    bool isBlockSet = false;
+    if(tokensInStatement.size() == 2)
     {
-        if(tokens.back() == "root" && isPath(tokens.front()))
+        // context is a request handler
+        if(tokensInStatement.front() == "handler")
         {
-            std::string staticFileURI = tokens.front();
-            config->staticPathMap.insert( {serverURI, staticFileURI} );
-            serverURI = "";
-        }
-        else if(tokens.back() == "action")
-        {
-            std::string action = tokens.front();
-            if(actions.count(tokens.front()))
-            {
-                ServerAction actionToSet = (ServerAction)actions.at(action);
-                config->serverActionMap.insert( {actionToSet, serverURI} );
-                serverURI = "";
-            }
+            std::string handlerName = tokensInStatement.back();
+            std::string enumeratedHandlerName = getHandlerName(handlerName);
+            NginxConfig* handlerConfig = new NginxConfig(enumeratedHandlerName);
+            conf->addNestedParam(enumeratedHandlerName, handlerConfig);
+            // recursive call to set inner config
+            isBlockSet = setConfigBlock(handlerConfig, TOKENS);
         }
     }
+    // any context other than request handler
+    else if(tokensInStatement.size() == 1)
+    {
+        NginxConfig* nestedConfig = new NginxConfig(tokensInStatement.front());
+        conf->addNestedParam(tokensInStatement.front(), nestedConfig);
+        // recursive call to set inner config
+        isBlockSet = setConfigBlock(nestedConfig, TOKENS);
+    }
+    return isBlockSet;
 }
 
-// TODO: make this work for nested contexts
-void NginxConfigParser::setConfig(std::deque<std::string> tokens, std::string context)
+bool NginxConfigParser::setConfigBlock(NginxConfig* conf, std::deque<Token*>& TOKENS)
 {
-    if (tokens.size() >= 2)
+    // currTokenValue == '{'
+    std::string currTokenValue = TOKENS.front()->value;
+    TokenType currTokenType = TOKENS.front()->type;
+    TOKENS.pop_front();
+
+    if(currTokenType != TOKEN_TYPE_START_BLOCK) { return false; }
+
+    // currTokenValue == first word of statement
+    currTokenValue = TOKENS.front()->value;
+    currTokenType = TOKENS.front()->type;
+
+    std::deque<std::string> tokensInStatement;
+
+    while(!TOKENS.empty() && currTokenType != TOKEN_TYPE_END_BLOCK)
     {
-        if(context == "location")
+        while(!TOKENS.empty() && currTokenType == TOKEN_TYPE_NORMAL)
         {
-            setServerPath(tokens);
+            // collect all normal tokens until ';' or '{' is reached
+            tokensInStatement.push_back(currTokenValue);
+            TOKENS.pop_front();
+            currTokenValue = TOKENS.front()->value;
+            currTokenType = TOKENS.front()->type;
         }
-        else
+
+        switch(currTokenType)
         {
-            std::string parameterName, parameterValue;
-            ConfigParameter parameterToSet;
-
-            setParameterNameAndValue(parameterName, parameterValue, tokens);
-            bool setParameter = findParameterToSet(context, parameterName, parameterValue, parameterToSet);
-
-            if (setParameter)
-            {
-                config->parameters.insert(std::make_pair(parameterToSet, parameterValue));
-            }
+            case TOKEN_TYPE_STATEMENT_END:
+                addFlatParamToConfig(conf, tokensInStatement);
+                break;
+            case TOKEN_TYPE_START_BLOCK:
+                if(!addNestedParamToConfig(conf, tokensInStatement, TOKENS)) { return false; }
+                break;
+            default:
+                return false;
         }
+        //clear previous statement
+        tokensInStatement.clear();
+
+        TOKENS.pop_front();
+        if(TOKENS.empty()) { return false; }
+        currTokenValue = TOKENS.front()->value;
+        currTokenType = TOKENS.front()->type;
     }
+    // last token in context must be '}'
+    return (currTokenType == TOKEN_TYPE_END_BLOCK);
 }
 
-// TODO: refactor this into a more manageable state
-bool NginxConfigParser::Parse(std::istream* config_file)
+bool NginxConfigParser::Parse(std::istream* config_file, NginxConfig* conf)
 {
     NginxConfigTokens* tokenList = NginxConfigTokens::makeNginxConfigTokens(config_file);
-    if(tokenList == nullptr)
-    {
-        return false;
-    }
-    delete config;
-    config = new NginxConfig;
+    if(tokenList == nullptr) { return false; }
 
-    bool isError = false;
-    std::deque<std::string> tokens;
-    TokenType last_token_type = TOKEN_TYPE_START;
-    TokenType tokenType;
-    std::string last_token_str = "";
-    std::stack<std::string> context;  // Keeps track of context level
-    context.push("");
+    std::deque<Token*> TOKENS = tokenList->getTokens();
 
-    for (Token* token : tokenList->tokens)
-    {
-        std::string tokenValue = token->value;
-        tokenType = token->type;
+    // only allow for configs that start with 'server' context
+    if(TOKENS.front()->value != "server") { return false; }
+    TOKENS.pop_front();
 
-        printf ("%s: %s\n", TokenTypeAsString(tokenType), tokenValue.c_str());
-        if (tokenType == TOKEN_TYPE_ERROR)
-        {
-            isError = true;
-            break;
-        }
+    return setConfigBlock(conf, TOKENS);
 
-        if (tokenType == TOKEN_TYPE_COMMENT)
-        {
-            // Skip comments.
-            continue;
-        }
-
-        if (tokenType == TOKEN_TYPE_START)
-        {
-            isError = true;
-            break;
-        }
-        else if (tokenType == TOKEN_TYPE_NORMAL)
-        {
-            tokens.push_front(tokenValue);
-            if (!(last_token_type == TOKEN_TYPE_START ||
-                  last_token_type == TOKEN_TYPE_STATEMENT_END ||
-                  last_token_type == TOKEN_TYPE_START_BLOCK ||
-                  last_token_type == TOKEN_TYPE_END_BLOCK ||
-                  last_token_type == TOKEN_TYPE_NORMAL))
-            {
-                isError = true;
-                break;
-            }
-        }
-        else if (tokenType == TOKEN_TYPE_STATEMENT_END)
-        {
-            tokens.clear();
-            if (last_token_type != TOKEN_TYPE_NORMAL)
-            {
-                isError = true;
-                break;
-            }
-        }
-        else if (tokenType == TOKEN_TYPE_START_BLOCK)
-        {
-            // If a start block is seen then the last token will
-            // be the context token.
-            if(isPath(tokens.front()))
-            {
-                context.push("location");
-                if(serverURI != "")
-                {
-                    isError = true;
-                    break;
-                }
-                serverURI = tokens.front();
-            }
-            else
-            {
-                context.push(tokens.back());
-            }
-            tokens.clear();
-            if (last_token_type != TOKEN_TYPE_NORMAL)
-            {
-                isError = true;
-                break;
-            }
-        }
-        else if (tokenType == TOKEN_TYPE_END_BLOCK)
-        {
-            // If an end block is seen, we are exiting
-            context.pop();
-            if (last_token_type != TOKEN_TYPE_STATEMENT_END &&
-                last_token_type != TOKEN_TYPE_END_BLOCK)
-            {
-                // This means that the end block can follow a ';'
-                // or a '}' and be legal.
-                isError = true;
-                break;
-            }
-        }
-        else
-        {
-            isError = true;
-            break;
-        }
-        last_token_type = tokenType;
-        setConfig(tokens, context.top());
-        last_token_str = tokenValue;
-    }
-    if (context.top() != "")
-    {
-        // This means that there is an unequal number of
-        // opening and closing brackets
-        // Error
-        printf("Bracket Count: %u", (unsigned)context.size());
-        isError = true;
-    }
-    else if (last_token_type != TOKEN_TYPE_STATEMENT_END && last_token_type != TOKEN_TYPE_END_BLOCK)
-    {
-        isError = true;
-    }
-    if(isError)
-    {
-        // TODO: need to get rid of this after refactor
-        printf("Bad transition from %s to %s\n",
-               TokenTypeAsString(last_token_type),
-               TokenTypeAsString(tokenType));
-        delete config;
-        config = nullptr;
-    }
-    return !isError;
 }
 
-bool NginxConfigParser::Parse(const char* file_name) {
+bool NginxConfigParser::Parse(const char* file_name, NginxConfig* conf) {
     std::ifstream config_file;
     config_file.open(file_name);
     if (!config_file.good()) {
@@ -265,7 +144,7 @@ bool NginxConfigParser::Parse(const char* file_name) {
     }
 
     const bool return_value =
-            Parse(dynamic_cast<std::istream*>(&config_file));
+            Parse(dynamic_cast<std::istream*>(&config_file), conf);
     config_file.close();
     return return_value;
 }

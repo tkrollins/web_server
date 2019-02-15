@@ -7,15 +7,14 @@
 
 using std::string;
 
-// TODO: fix name later once other class removed
-class NginxConfigg
+class NginxConfig
 {
 public:
-    NginxConfigg() { depth = 1; }
-    explicit NginxConfigg(string n) { depth = 1; name = n;  }
+    NginxConfig() { depth = 1; }
+    explicit NginxConfig(string n) { depth = 1; name = n;  }
 
     std::unordered_map<string,string> getFlatParameters();
-    std::unordered_map<string,NginxConfigg*> getNestedParameters();
+    std::unordered_map<string,NginxConfig*> getNestedParameters();
 
     // vector with param names in order found of context
     std::vector<string> getOrderOfParams();
@@ -28,15 +27,15 @@ public:
     unsigned getDepth();
 
     void addFlatParam(string key, string value);
-    void addNestedParam(string handler, NginxConfigg* config);
+    void addNestedParam(string handler, NginxConfig* config);
 
+    ~NginxConfig();
 private:
-    ~NginxConfigg();
 
     // all single line params for a given context
     std::unordered_map<string, string> flatParams;
     // all nested params for a given context
-    std::unordered_map<string, NginxConfigg*> nestedParams;
+    std::unordered_map<string, NginxConfig*> nestedParams;
     // stores param names in order found of context
     std::vector<string> orderOfParams;
 

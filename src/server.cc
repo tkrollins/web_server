@@ -58,7 +58,7 @@ bool server::handle_accept(session* new_session,
 }
 
 // Sets up request handler objects
-void server::initRequestHandlers(NginxConfig* config)
+void server::initRequestHandlers(NginxConfig_old* config)
 {
     if(!config->staticPathMap.empty())
     {

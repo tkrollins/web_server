@@ -41,7 +41,7 @@ message("Boost LIBRARIES: ${Boost_LIBRARIES}")
 include_directories(include)
 
 # TODO(!): Update name and srcs
-add_library(config_parser_lib src/config_parser/config_parser.cc src/config_parser/nginx_config_tokens.cc)
+add_library(config_parser_lib src/config_parser/config_parser.cc src/config_parser/nginx_config_tokens.cc src/config_parser/config_parser_old.cc src/config_parser/nginx_config.cc)
 add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/static_file_request_handler.cc src/action_request_handler.cc)
 add_library(request_handler_lib src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/handler_manager.cc)
 add_library(http_response src/http_response.cc)
@@ -88,5 +88,5 @@ gtest_discover_tests(request_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOUR
 # TODO(!): Update with target/tests targets
 if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
     include(cmake/CodeCoverageReportConfig.cmake)
-    generate_coverage_report(TARGETS server server_lib config_parser_lib request_handler_lib TESTS config_parser_test session_test server_test static_file_request_handler_test action_request_handler_test)
+    generate_coverage_report(TARGETS server server_lib config_parser_lib request_handler_lib TESTS config_parser_test session_test server_test static_file_request_handler_test action_request_handler_test request_manager_test)
 endif()

@@ -2,7 +2,7 @@
 #define NGINX_CONFIG_TOKENS_H
 
 #include <string>
-#include <vector>
+#include <deque>
 #include "nginx_enums.h"
 
 using namespace NginxEnum;
@@ -17,14 +17,15 @@ public:
 class NginxConfigTokens
 {
 public:
-    std::vector<Token*> tokens;
     // will return a new NginxConfigTokens object if input config is valid
     // otherwise will return nullptr
     static NginxConfigTokens* makeNginxConfigTokens(std::istream* input);
+    std::deque<Token*> getTokens();
 
-private:
+//private:
     NginxConfigTokens() {}
     ~NginxConfigTokens();
+    std::deque<Token*> tokens;
 
     TokenType handleStateChangeChars(TokenParserState &state, TokenParserState newState, std::string& value, char c, std::istream *input);
     TokenType handleStatementEndChars(TokenParserState state, TokenType TYPE, std::string& value, char c, std::istream *input);

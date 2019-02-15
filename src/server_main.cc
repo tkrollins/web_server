@@ -13,6 +13,7 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include "server.h"
+#include "config_parser_old.h"
 #include "config_parser.h"
 #include <boost/log/trivial.hpp>
 
@@ -37,8 +38,15 @@ int main(int argc, char* argv[])
         }
 
         boost::asio::io_service io_service;
-  
-        NginxConfigParser parser;
+
+//        // TODO: This will be the new code after dispatcher/HandlerManager implemeented
+//        NginxConfig config;
+//        NginxConfigParser parser;
+//        parser.Parse(argv[1], &config);
+//        // Pass config into server and onto dispatcher/HandlerManager
+
+        // TODO: replace all of the below with new config parser
+        NginxConfigParser_old parser;
 
         // Enable Boost Logs
         initLogging();

@@ -5,91 +5,45 @@
 class NginxConfigParserTest : public ::testing::Test {
   protected:
     NginxConfigParser parser;
+
 };
 
 // Basic Ngnix config
-TEST_F(NginxConfigParserTest, SimpleConfig) {
+TEST_F(NginxConfigParserTest, ValidConfig) {
 
-  bool success = parser.Parse("example_config");
+    NginxConfig config;
+    std::vector<std::string> expectedOrder = {"root", "listen", "static1", "echo1", "static2", "echo2"};
 
-  EXPECT_TRUE(success);
-}
+    std::unordered_map<std::string, std::string> expectedFlatParamsServer { {"root", "/usr/src/projects/bigbear"},
+                                                                          {"listen", "5476"}};
+    std::unordered_map<std::string, std::string> expectedFlatParamsStatic1 { {"location", "/static"},
+                                                                           {"root", "static_files/some_files"}};
+    std::unordered_map<std::string, std::string> expectedFlatParamsStatic2 { {"location", "/static2"},
+                                                                           {"root", "static_files/more_files"}};
+    std::unordered_map<std::string, std::string> expectedFlatParamsEcho1 { {"location", "/echo"}};
 
-TEST_F(NginxConfigParserTest, ParseRootAndPort) {
+    std::unordered_map<std::string, std::string> expectedFlatParamsEcho2 { {"location", "/echo2"}};
 
-    bool success = parser.Parse("parse_root_port");
-    std::string port = parser.config->parameters[ConfigParameter::LISTEN_PORT];
-    std::string root = parser.config->parameters[ConfigParameter::ROOT];
+    bool success = parser.Parse("valid_config", &config);
+
+    std::unordered_map<std::string, std::string> actualFlatParamsServer = config.getFlatParameters();
+    std::unordered_map<std::string, std::string> actualFlatParamsStatic1 = config.getNestedParameters()["static1"]->getFlatParameters();
+    std::unordered_map<std::string, std::string> actualFlatParamsStatic2 = config.getNestedParameters()["static2"]->getFlatParameters();
+    std::unordered_map<std::string, std::string> actualFlatParamsEcho1 = config.getNestedParameters()["echo1"]->getFlatParameters();
+    std::unordered_map<std::string, std::string> actualFlatParamsEcho2 = config.getNestedParameters()["echo2"]->getFlatParameters();
 
     EXPECT_TRUE(success);
-    EXPECT_TRUE(port == "80");
-    EXPECT_TRUE(root == "/usr/src/projects/bigbear");
+    EXPECT_EQ(config.getOrderOfParams(), expectedOrder);
+    EXPECT_EQ(actualFlatParamsServer, expectedFlatParamsServer);
+    EXPECT_EQ(actualFlatParamsStatic1, expectedFlatParamsStatic1);
+    EXPECT_EQ(actualFlatParamsStatic2, expectedFlatParamsStatic2);
+    EXPECT_EQ(actualFlatParamsEcho1, expectedFlatParamsEcho1);
+    EXPECT_EQ(actualFlatParamsEcho2, expectedFlatParamsEcho2);
 }
 
-// Try to parse non-existent file, this should fail
-TEST_F(NginxConfigParserTest, FileDoesNotExist) {
+TEST_F(NginxConfigParserTest, MissingBrace) {
+    NginxConfig config;
+    bool success = parser.Parse("missing_braces", &config);
 
-  bool success = parser.Parse("does_not_exist");
-
-  EXPECT_FALSE(success);
-}
-
-// Nginx config without any braces
-TEST_F(NginxConfigParserTest, NoBraces) {
-
-  bool success = parser.Parse("no_braces");
-
-  EXPECT_TRUE(success);
-}
-
-// Nginx config file with a missing semi-colon, this should fail
-TEST_F(NginxConfigParserTest, MissingSemicolon) {
-
-  bool success = parser.Parse("missing_semicolon");
-
-  EXPECT_FALSE(success);
-}
-
-// A one line Nginx config file
-TEST_F(NginxConfigParserTest, OneLine) {
-
-  bool success = parser.Parse("one_line");
-
-  EXPECT_TRUE(success);
-}
-
-// A Nginx config file with just a server block
-TEST_F(NginxConfigParserTest, StdServer) {
-
-  bool success = parser.Parse("std_server");
-
-  EXPECT_TRUE(success);
-}
-
-// Nginx config file with nested block statements
-TEST_F(NginxConfigParserTest, Nested) {
-
-  bool success = parser.Parse("nested");
-
-  EXPECT_TRUE(success);
-}
-
-// Nginx config file with missing close bracket, this should fail
-TEST_F(NginxConfigParserTest, BracketsUnequal) {
-
-  bool success = parser.Parse("brackets_unequal");
-
-  EXPECT_FALSE(success);
-}
-
-// Tests parsing of static and action paths
-TEST_F(NginxConfigParserTest, StaticPaths) {
-
-    bool success = parser.Parse("server_locations");
-
-    std::string rootPath = parser.config->staticPathMap["/static"];
-    std::string echoPath = parser.config->serverActionMap[ServerAction::ACTION_ECHO];
-
-    EXPECT_TRUE(rootPath == "/bigbear/static_files");
-    EXPECT_TRUE(echoPath == "/echo");
+    EXPECT_FALSE(success);
 }

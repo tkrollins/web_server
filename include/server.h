@@ -17,6 +17,7 @@
 #include "static_file_request_handler.h"
 #include "action_request_handler.h"
 #include "error_request_handler.h"
+#include "config_parser_old.h"
 #include "config_parser.h"
 using boost::asio::ip::tcp;
 
@@ -24,7 +25,9 @@ using boost::asio::ip::tcp;
 class server
 {
 public:
-    server(boost::asio::io_service& io_service, short port, NginxConfig* config)
+    //TODO: refactor server construtor to use NginxConfig object, and init HandlerManager/Dispatcher
+
+    server(boost::asio::io_service& io_service, short port, NginxConfig_old* config)
         : io_service_(io_service),
         acceptor_(io_service, tcp::endpoint(tcp::v4(), port)) // establishes server endpoint
         {
@@ -51,8 +54,10 @@ public:
 
 private:
     bool start_accept();
-//    std::vector<RequestHandler*>* requestHandlers;
-    void initRequestHandlers(NginxConfig* config);
+
+    //TODO: remove this function, call dispatcher instead
+    void initRequestHandlers(NginxConfig_old* config);
+    //TODO: remove
     std::vector<RequestHandler*> requestHandlers;
 
 

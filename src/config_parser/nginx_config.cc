@@ -1,44 +1,44 @@
 #include "nginx_config.h"
 
-std::unordered_map<string, string> NginxConfigg::getFlatParameters()
+std::unordered_map<string, string> NginxConfig::getFlatParameters()
 {
     return flatParams;
 }
 
-std::unordered_map<string, NginxConfigg *> NginxConfigg::getNestedParameters()
+std::unordered_map<string, NginxConfig *> NginxConfig::getNestedParameters()
 {
     return nestedParams;
 }
 
-std::vector<string> NginxConfigg::getOrderOfParams()
+std::vector<string> NginxConfig::getOrderOfParams()
 {
     return orderOfParams;
 }
 
-string NginxConfigg::getName()
+string NginxConfig::getName()
 {
     return name;
 }
 
-unsigned NginxConfigg::getDepth()
+unsigned NginxConfig::getDepth()
 {
     return depth;
 }
 
-void NginxConfigg::addFlatParam(string key, string value)
+void NginxConfig::addFlatParam(string key, string value)
 {
     flatParams.insert( {key, value} );
     orderOfParams.push_back(key);
 }
 
-void NginxConfigg::addNestedParam(string handler, NginxConfigg* config)
+void NginxConfig::addNestedParam(string handler, NginxConfig* config)
 {
     nestedParams.insert( {handler, config} );
     orderOfParams.push_back(handler);
     depth++;
 }
 
-string NginxConfigg::compareParamOrder(string param1, string param2)
+string NginxConfig::compareParamOrder(string param1, string param2)
 {
     for(auto name : orderOfParams)
     {
@@ -55,9 +55,9 @@ string NginxConfigg::compareParamOrder(string param1, string param2)
     return "";
 }
 
-NginxConfigg::~NginxConfigg()
+NginxConfig::~NginxConfig()
 {
-    std::unordered_map<string, NginxConfigg*>::iterator it;
+    std::unordered_map<string, NginxConfig*>::iterator it;
     for(it = nestedParams.begin(); it != nestedParams.end(); it++)
     {
         // deletes each nested config

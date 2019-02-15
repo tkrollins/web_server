@@ -164,6 +164,18 @@ bool NginxConfigTokens::tokenizer(std::istream *input)
 
     while (input->good()) {
         const char c = input->get();
+
+        // Skips comments
+        if(c == '#')
+        {
+            char comment;
+            do
+            {
+                comment = input->get();
+            } while(comment != '\n' && comment != '\r');
+            continue;
+        }
+
         // Used to ID the type of token
         TokenType type = TOKEN_TYPE_UNFINISHED;
         if (!input->good()) {
@@ -197,4 +209,9 @@ bool NginxConfigTokens::tokenizer(std::istream *input)
     }
     // return true if there are not unclosed quotes
     return (state != TOKEN_STATE_SINGLE_QUOTE && state != TOKEN_STATE_DOUBLE_QUOTE);
+}
+
+std::deque<Token*> NginxConfigTokens::getTokens()
+{
+    return tokens;
 }
