@@ -53,3 +53,14 @@ void ActionRequestHandler::handleRequest(std::string* response)
         *response = echoRequest();
 }
 
+std::unique_ptr<RequestHandler> ActionRequestHandler::create(const NginxConfig& config, const std::string& root_path)
+{
+
+}
+
+std::unique_ptr<HttpResponse> ActionRequestHandler::HandleRequest2(const HttpRequest& request)
+{
+
+
+}
+

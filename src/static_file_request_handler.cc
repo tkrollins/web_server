@@ -153,3 +153,12 @@ void StaticFileRequestHandler::handleRequest(std::string* response)
     *response = header + fileStr;
 }
 
+std::unique_ptr<RequestHandler> StaticFileRequestHandler::create(const NginxConfig& config, const std::string& root_path)
+{
+
+}
+
+std::unique_ptr<HttpResponse> StaticFileRequestHandler::HandleRequest2(const HttpRequest& request)
+{
+
+}

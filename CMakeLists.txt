@@ -43,7 +43,7 @@ include_directories(include)
 # TODO(!): Update name and srcs
 add_library(config_parser_lib src/config_parser/config_parser.cc src/config_parser/nginx_config_tokens.cc)
 add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/static_file_request_handler.cc src/action_request_handler.cc)
-add_library(request_handler_lib src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc)
+add_library(request_handler_lib src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/handler_manager.cc)
 add_library(http_response src/http_response.cc)
 add_library(http_request src/http_request.cc)
 
@@ -70,12 +70,16 @@ target_link_libraries(static_file_request_handler_test request_handler_lib http_
 add_executable(action_request_handler_test tests/request_handler_tests/action_request_handler_test.cc)
 target_link_libraries(action_request_handler_test request_handler_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
 
+add_executable(request_manager_test tests/request_handler_tests/request_manager_test.cc)
+target_link_libraries(request_manager_test request_handler_lib config_parser_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
+
 # TODO(!): Update with tests binary
 gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/config_parser_tests)
 gtest_discover_tests(session_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/server_tests)
 gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/server_tests)
 gtest_discover_tests(static_file_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(action_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
+gtest_discover_tests(request_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 
  add_test(NAME server_integration_test
          COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/integration_test.sh "./test_config"

@@ -47,3 +47,21 @@ std::string HttpResponse::buildHttpResponse(int status, std::map<std::string, st
     BOOST_LOG_TRIVIAL(trace) << "built http response";
     return res;
 }
+
+void HttpResponse::setHttpResponse(int errorCode, std::string mimeType, std::map<std::string,std::string> headers, std::string body)
+{
+    this -> errorCode = errorCode;
+    this -> mimeType = mimeType;
+    this -> headers = headers;
+    this -> body = body;
+}
+
+std::string HttpResponse::buildHttpResponse()
+{
+    std::string res = "";
+    res += HttpResponse::buildStatus(this -> errorCode);
+    for (auto x : this -> headers) res += HttpResponse::buildHeaders(x.first, x.second);
+    res += HttpResponse::buildBody(this -> body);
+    BOOST_LOG_TRIVIAL(trace) << "built http response";
+    return res;
+}

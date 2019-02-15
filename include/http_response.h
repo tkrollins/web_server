@@ -10,9 +10,10 @@ class HttpResponse
 {
 public:
     // I think buildHttpResponse is moving to dispatcher?
+    // TODO: remove this function after all components are set.
     std::string buildHttpResponse(int status, std::map<std::string,std::string> headers = {{}},
                                   std::string body = "");
-    
+    std::string buildHttpResponse();
     void setHttpResponse(int errorCode, std::string mimeType = "", std::map<std::string,std::string> headers = {}, std::string body = "");
     int errorCode;
     std::string mimeType;

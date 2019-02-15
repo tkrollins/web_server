@@ -9,7 +9,7 @@
 class ErrorRequestHandler : public RequestHandler
 {
 public:
-	static RequestHandler* create(const NginxConfig& config, const std::string& root_path);
+	static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
     std::unique_ptr<HttpResponse> HandleRequest2(const HttpRequest& request);
 
     ErrorRequestHandler() { status = 400; }
