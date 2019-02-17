@@ -26,7 +26,6 @@ class server
 {
 public:
     //TODO: refactor server construtor to use NginxConfig object, and init HandlerManager/Dispatcher
-
     server(boost::asio::io_service& io_service, short port, NginxConfig_old* config)
         : io_service_(io_service),
         acceptor_(io_service, tcp::endpoint(tcp::v4(), port)) // establishes server endpoint

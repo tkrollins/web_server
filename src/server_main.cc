@@ -42,8 +42,12 @@ int main(int argc, char* argv[])
 //        // TODO: This will be the new code after dispatcher/HandlerManager implemeented
 //        NginxConfig config;
 //        NginxConfigParser parser;
-//        parser.Parse(argv[1], &config);
-//        // Pass config into server and onto dispatcher/HandlerManager
+//        if(parser.Parse(argv[1], &config))
+//        {
+//            // config will be used to init server parameters and be passed
+//            // on to relevant handlers by dispatcher
+//            server svr(io_service, &config)
+//        }
 
         // TODO: replace all of the below with new config parser
         NginxConfigParser_old parser;
