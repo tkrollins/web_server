@@ -13,8 +13,8 @@ public:
     NginxConfig() { depth = 1; }
     explicit NginxConfig(string n) { depth = 1; name = n;  }
 
-    std::unordered_map<string,string> getFlatParameters();
-    std::unordered_map<string,NginxConfig*> getNestedParameters();
+    std::unordered_map<string,string> getFlatParameters() const;
+    std::unordered_map<string,NginxConfig*> getNestedParameters() const;
 
     // vector with param names in order found of context
     std::vector<string> getOrderOfParams();

@@ -6,6 +6,7 @@
 #include <vector>
 #include "http_request.h"
 #include "config_parser.h"
+#include "nginx_config.h"
 #include "http_response.h"
 
 using boost::asio::const_buffer;

@@ -6,7 +6,7 @@ using std::ifstream;
 using std::ios;
 
 StaticFileRequestHandler::StaticFileRequestHandler(
-        std::unordered_map<std::string, std::string> staticPathMap, std::string rootPath) :
+        const std::unordered_map<std::string, std::string> staticPathMap, std::string rootPath) :
         RequestHandler()
 {
     validURIMap = staticPathMap;
@@ -113,6 +113,32 @@ std::string StaticFileRequestHandler::createResponseHeader(unsigned contentLengt
     return response.buildHttpResponse(status, headers);
 }
 
+
+void StaticFileRequestHandler::setResponse(HttpResponse& response, std::string& fileStr)
+{
+    std::string contentLengthStr(std::to_string(fileStr.length()));
+    std::string mimeType;
+    switch (fileType)
+    {
+        case TXT:
+            mimeType = "text/plain";
+            break;
+        case HTML:
+            mimeType = "text/html";
+            break;
+        case GIF:
+            mimeType = "image/gif";
+            break;
+        case JPEG:
+            mimeType = "image/jpeg";
+            break;
+    }
+    std::map<std::string,std::string> headers { {"Content-Type", mimeType},
+                                                {"Content-Length", contentLengthStr}};
+
+    response.setHttpResponse(status, mimeType, headers, fileStr);
+}
+
 void StaticFileRequestHandler::initRequestVariables()
 {
     setPathToFile();
@@ -155,10 +181,17 @@ void StaticFileRequestHandler::handleRequest(std::string* response)
 
 std::unique_ptr<RequestHandler> StaticFileRequestHandler::create(const NginxConfig& config, const std::string& root_path)
 {
-
+    StaticFileRequestHandler staticHandler(config.getFlatParameters(), root_path);
+    return std::make_unique<StaticFileRequestHandler>(staticHandler);
 }
 
 std::unique_ptr<HttpResponse> StaticFileRequestHandler::HandleRequest2(const HttpRequest& request)
 {
+    setURIAndFileName(request.requestURI);
+    initRequestVariables();
+    std::string fileStr = fileToString(pathToFile);
 
+    HttpResponse response;
+    setResponse(response, fileStr);
+    return std::make_unique<HttpResponse>(response);
 }

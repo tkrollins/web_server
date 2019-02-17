@@ -1,11 +1,11 @@
 #include "nginx_config.h"
 
-std::unordered_map<string, string> NginxConfig::getFlatParameters()
+std::unordered_map<string, string> NginxConfig::getFlatParameters() const
 {
     return flatParams;
 }
 
-std::unordered_map<string, NginxConfig *> NginxConfig::getNestedParameters()
+std::unordered_map<string, NginxConfig *> NginxConfig::getNestedParameters() const
 {
     return nestedParams;
 }

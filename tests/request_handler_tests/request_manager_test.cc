@@ -20,6 +20,29 @@ TEST(HandlerManagerTest, ErrorHandler)
     EXPECT_TRUE(res -> buildHttpResponse() == expectedOutput);
 }
 
+TEST(HandlerManagerTest, StaticHandler)
+{
+    // create the handler
+    NginxConfig config;
+    config.addFlatParam("/static", "/static_files/some_files");
+    std::string root_path = "../..";
+    HandlerManager manager;
+    std::unique_ptr<RequestHandler> staticHandler = manager.createByName("static", config, root_path);
+
+    // create fake request
+    HttpRequest request;
+    request.requestURI = "/static/home.html";
+
+    // call handleRequest and verify the response
+    std::unique_ptr<HttpResponse> response = staticHandler -> HandleRequest2(request);
+    EXPECT_TRUE(response -> errorCode == 200);
+    EXPECT_TRUE(response -> mimeType == "text/html");
+
+    // make sure the body contains "THIS IS THE HOME PAGE OF BIGBEAR"
+    EXPECT_TRUE(response -> body.find("THIS IS THE HOME PAGE OF BIGBEAR") != std::string::npos);
+    std::cerr << response -> body;
+}
+
 
 
 

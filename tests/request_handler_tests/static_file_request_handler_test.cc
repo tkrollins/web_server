@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "static_file_request_handler.h"
 #include "http_request.h"
+#include "nginx_config.h"
 #include <unordered_map>
 #include "boost/filesystem.hpp"
 

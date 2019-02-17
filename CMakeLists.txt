@@ -46,6 +46,7 @@ add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http
 add_library(request_handler_lib src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/handler_manager.cc)
 add_library(http_response src/http_response.cc)
 add_library(http_request src/http_request.cc)
+target_link_libraries(request_handler_lib config_parser_lib)
 
 # TODO(!): Update executable name, srcs, and deps
 add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
@@ -57,8 +58,8 @@ add_executable(session_test tests/server_tests/session_test.cc src/static_file_r
 target_link_libraries(session_test server_lib request_handler_lib gmock_main Boost::log_setup Boost::log Boost::regex Boost::system)
 
 # build and link server_test
-add_executable(server_test tests/server_tests/server_test.cc src/static_file_request_handler.cc)
-target_link_libraries(server_test server_lib Boost::system gmock_main Boost::log_setup Boost::log Boost::regex)
+add_executable(server_test tests/server_tests/server_test.cc)
+target_link_libraries(server_test request_handler_lib server_lib Boost::system gmock_main Boost::log_setup Boost::log Boost::regex)
 
 # TODO(!): Update tests executable name, srcs, and deps
 add_executable(config_parser_test tests/config_parser_tests/config_parser_test.cc tests/config_parser_tests/nginx_config_tokens_test.cc)

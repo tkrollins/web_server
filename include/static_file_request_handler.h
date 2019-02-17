@@ -15,7 +15,7 @@ public:
     
     virtual bool canHandleRequest(HttpRequest req) override;
     StaticFileRequestHandler() {}; // for testing
-    StaticFileRequestHandler(std::unordered_map<std::string, std::string> staticPathMap, std::string rootPath);
+    StaticFileRequestHandler(const std::unordered_map<std::string, std::string> staticPathMap, std::string rootPath);
     virtual void handleRequest(std::string* response) override;
 
 //private:
@@ -45,6 +45,7 @@ public:
     // https://stackoverflow.com/questions/25308676/send-file-via-boost-asio-tcp-how-to-stream-char-array-to-socket
     std::string fileToString(const std::string &name);
     std::string createResponseHeader(unsigned contentLength);
+    void setResponse(HttpResponse& response, std::string& fileStr);
     bool doesFileExist();
     void initRequestVariables();
 
