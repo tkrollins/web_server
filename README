@@ -77,3 +77,47 @@ IP: 35.247.92.66
 Port: 80
 Ex: curl -X GET "http://35.247.92.66" -d "Hello World"
 
+*******************************************************************
+
+How to add a request handler:
+
+1. A new request handler should have the following two functions in order to work:
+
+    - static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
+
+        Description: Based on the config file and root_path, set up and return a RequestHandler pointer.
+
+        Parameters:
+            * config: The NginxConfig object defined in nginx_config.h.
+            * root_path: a std::string that specifies your working directory.
+
+        Return Value:
+            * a unique_ptr that has the parent type RequestHandler
+
+    - std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest& request);
+
+        Description: Takes in a HttpRequest object and returns the HttpResponse accordingly.
+
+        Parameters:
+            * request: The HttpRequest object defined in http_request.h
+
+        Return Value:
+            * a unique pointer pointing to a HttpResponse object defined in http_response.h
+
+
+2. In handler_manager.cc, add an "else if" statement to register a new handler.
+
+3. Update CMakeLists.txt to include your new handler
+
+
+The StaticFileRequestHandler as an Example:
+
+    - std::unordered_map<std::string, std::string> validURIMap: The mapping from URI to path.
+
+    - void setURIAndFileName(std::string uriWithFileName): Parse the whole request URI to setup the URI(without filename) and file name
+
+    - void initRequestVariables(): Setup the file path and file type to prepare for the response. If the file doesn't exist, set the response to 404.
+
+    - std::string fileToString(const std::string &name): Takes the file path as input and return the file in a string
+
+    - void setResponse(HttpResponse& response, std::string& fileStr): Takes the file string and setup the response to the HttpResponse object.
