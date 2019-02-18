@@ -29,6 +29,7 @@ std::unique_ptr<RequestHandler> ErrorRequestHandler::create(const NginxConfig& c
 
 std::unique_ptr<HttpResponse> ErrorRequestHandler::HandleRequest2(const HttpRequest& request)
 {
+    BOOST_LOG_TRIVIAL(debug) << "Invalid request URI: " << request.requestURI;
     status = 400;
     std::string body = "400 Error: Bad request\r\n";
     std::string contentLengthStr = std::to_string(body.length());

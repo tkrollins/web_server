@@ -39,27 +39,28 @@ int main(int argc, char* argv[])
 
         boost::asio::io_service io_service;
 
-//        // TODO: This will be the new code after dispatcher/HandlerManager implemeented
-//        NginxConfig config;
-//        NginxConfigParser parser;
-//        if(parser.Parse(argv[1], &config))
-//        {
-//            // config will be used to init server parameters and be passed
-//            // on to relevant handlers by dispatcher
-//            server svr(io_service, &config)
-//        }
+        // TODO: This will be the new code after dispatcher/HandlerManager implemeented
+        NginxConfig config;
+        NginxConfigParser parser;
+        std::string listenPort;
+        if(parser.Parse(argv[1], &config))
+        {
+            // config will be used to init server parameters and be passed
+            // on to relevant handlers by dispatcher
+            listenPort = config.getFlatParameters()["listen"];
+        }
 
-        // TODO: replace all of the below with new config parser
-        NginxConfigParser_old parser;
+//        // TODO: replace all of the below with new config parser
+//        NginxConfigParser_old parser;
 
         // Enable Boost Logs
         initLogging();
 
-        std::string listenPort;
-        if(parser.Parse(argv[1]))
-        {
-            listenPort = parser.config->parameters[ConfigParameter::LISTEN_PORT];
-        }
+
+//        if(parser.Parse(argv[1]))
+//        {
+//            listenPort = parser.config->parameters[ConfigParameter::LISTEN_PORT];
+//        }
 
         for (int i = 0; i < listenPort.length(); i++)
         {
@@ -75,7 +76,7 @@ int main(int argc, char* argv[])
         BOOST_LOG_TRIVIAL(info) << "Listening port:" << listenPort;
         signal(SIGINT, termination_handler);
         BOOST_LOG_TRIVIAL(info) << "Server is running";
-        server s(io_service, intListenPort, parser.config);
+        server s(io_service, intListenPort, &config);
         io_service.run();
       }
       catch (std::exception& e)

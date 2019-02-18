@@ -26,9 +26,11 @@ tcp::socket& session::socket()
     return socket_;
 }
 
-void session::start(std::vector<RequestHandler*>* requestHandlers)
+void session::start(HandlerManager* manager, RequestHandlerDispatcher* dispatcher, NginxConfig* config)
 {
-    sessionRequestHandlers = requestHandlers;
+    sessionDispatcher = dispatcher;
+    sessionManager = manager;
+    sessionConfig = config;
     socket_.async_read_some(boost::asio::buffer(data_, max_length), // read incoming data in a new thread (data_ contains this information)
                             boost::bind(&session::handleRead, this, // once done, call session::handleRead
                                         boost::asio::placeholders::error,
@@ -61,18 +63,10 @@ void session::handleRead(const boost::system::error_code& error,
 
         if(successfullyParsedReq)
         {
-            for (auto handler : *sessionRequestHandlers)
-            {
-                if (handler->canHandleRequest(receivedRequest))
-                {
-                    BOOST_LOG_TRIVIAL(trace) << "Request Received";
-                    handler->handleRequest(&response);
-                    if(!socket_.is_open()) { return; }// will not open during testing
-                    writeToSocket(response);
-                    return;
-                }
-            }
+            response = sessionDispatcher->dispatchHandler(receivedRequest, sessionManager, *sessionConfig);
+            writeToSocket(response);
         }
+
     }
     else
     {

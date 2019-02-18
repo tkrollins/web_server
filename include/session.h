@@ -14,8 +14,8 @@
 #include <boost/asio.hpp>
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "static_file_request_handler.h"
-#include "action_request_handler.h"
+#include "request_handler_dispatcher.h"
+#include "nginx_config.h"
 
 using boost::asio::ip::tcp;
 using ::testing::_;
@@ -27,7 +27,7 @@ public:
     session(boost::asio::io_service& io_service) : socket_(io_service) {};
     tcp::socket& socket();
     
-    void start(std::vector<RequestHandler*>* requestHandlers);
+    void start(HandlerManager* manager, RequestHandlerDispatcher* dispatcher, NginxConfig* config);
 private:
     friend class SessionTest;
     FRIEND_TEST(SessionTest, NonHTTPRequestTest);
@@ -36,7 +36,9 @@ private:
 
     void writeToSocket(std::string response);
 
-    std::vector<RequestHandler*>* sessionRequestHandlers;
+    RequestHandlerDispatcher* sessionDispatcher;
+    HandlerManager* sessionManager;
+    NginxConfig* sessionConfig;
     
     void handleRead(const boost::system::error_code& error,
                     size_t bytes_transferred);

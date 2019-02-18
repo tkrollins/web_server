@@ -14,11 +14,6 @@
 #include <boost/asio.hpp>
 #include <vector>
 #include "session.h"
-#include "static_file_request_handler.h"
-#include "action_request_handler.h"
-#include "error_request_handler.h"
-#include "config_parser_old.h"
-#include "config_parser.h"
 using boost::asio::ip::tcp;
 
 
@@ -26,7 +21,7 @@ class server
 {
 public:
     //TODO: refactor server construtor to use NginxConfig object, and init HandlerManager/Dispatcher
-    server(boost::asio::io_service& io_service, short port, NginxConfig_old* config)
+    server(boost::asio::io_service& io_service, int port, NginxConfig* config)
         : io_service_(io_service),
         acceptor_(io_service, tcp::endpoint(tcp::v4(), port)) // establishes server endpoint
         {
@@ -34,7 +29,7 @@ public:
             // object. It then calls async_accept which allows server to accept
             // data streams over its socket connection after a socket connection is established
             //initLogging();
-            initRequestHandlers(config);
+            init(config);
             start_accept();
         }
 
@@ -48,16 +43,14 @@ public:
         return clientConnectionEstablished_;
     }
 
-    StaticFileRequestHandler* fileHandler;
-    ActionRequestHandler* actionHandler;
-
 private:
     bool start_accept();
 
-    //TODO: remove this function, call dispatcher instead
-    void initRequestHandlers(NginxConfig_old* config);
-    //TODO: remove
-    std::vector<RequestHandler*> requestHandlers;
+    RequestHandlerDispatcher* dispatcher;
+    HandlerManager* manager;
+    NginxConfig* serverConfig;
+
+    void init(NginxConfig* config);
 
 
     bool handle_accept(session* new_session,

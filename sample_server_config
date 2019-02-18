@@ -1,13 +1,15 @@
 server {
     root /usr/src/projects/bigbear;
     listen 80;
-    location /static {
-        root /static_files/some_files;
+    handler static {
+        location /static;
+        root static_files/some_files;
     }
-    location /fun {
-        root /static_files/more_files;
+    handler static {
+        location /fun;
+        root static_files/more_files;
     }
-    location /echo {
-        action echo;
+    handler echo {
+        location /echo;
     }
 }

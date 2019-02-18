@@ -44,7 +44,7 @@ bool server::handle_accept(session* new_session,
     if (!error)
     {
         BOOST_LOG_TRIVIAL(trace) << "TCP socket connection established";
-        new_session->start(&requestHandlers);
+        new_session->start(manager, dispatcher, serverConfig);
         clientConnectionEstablished_ = true;
     }
     else
@@ -58,19 +58,11 @@ bool server::handle_accept(session* new_session,
 }
 
 // Sets up request handler objects
-void server::initRequestHandlers(NginxConfig_old* config)
+void server::init(NginxConfig* config)
 {
-    if(!config->staticPathMap.empty())
-    {
-        assert(config->parameters.count(ConfigParameter::ROOT));
-        std::string root = config->parameters[ConfigParameter::ROOT];
-        requestHandlers.emplace_back(new StaticFileRequestHandler(config->staticPathMap, root));
-    }
-    if(!config->serverActionMap.empty())
-    {
-        requestHandlers.emplace_back(new ActionRequestHandler(config->serverActionMap));
-    }
-    requestHandlers.emplace_back(new ErrorRequestHandler);
+    dispatcher = new RequestHandlerDispatcher(*config);
+    manager = new HandlerManager;
+    serverConfig = config;
 }
 
 void initLogging()

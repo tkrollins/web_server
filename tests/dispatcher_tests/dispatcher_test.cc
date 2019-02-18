@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-#include "request_handler_dispatcher.h"
 #include "server.h"
 
 class DispatcherTest : public ::testing::Test {

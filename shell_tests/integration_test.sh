@@ -12,7 +12,7 @@ function test_response
     fi
 }
 
-../build/bin/server ./test_config > /dev/null &
+../build/bin/server ./test_config &
 SERVER_PID=$!
 sleep .5
 
@@ -24,7 +24,7 @@ echo "Echo response is correct"
 
 # test bad-request response
 URI="/bad"
-expected_response=$'400 Error: Bad request'
+expected_response=$'400 Error: Bad request\r'
 test_response $SERVER_PID $URI "$expected_response"
 echo "Bad-request response is correct"
 

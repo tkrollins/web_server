@@ -69,8 +69,9 @@ void StaticFileRequestHandler::setURIAndFileName(std::string uriWithFileName)
 
 void StaticFileRequestHandler::setPathToFile()
 {
-    std::string path = root + validURIMap["root"];
+    std::string path = root + '/' + validURIMap["root"];
     pathToFile = path + '/' + fileName;
+    std::cout << "PATH TO FILE: " << pathToFile << std::endl;
 }
 
 bool StaticFileRequestHandler::doesFileExist()
