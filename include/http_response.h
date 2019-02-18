@@ -14,7 +14,7 @@ public:
     std::string buildHttpResponse(int status, std::map<std::string,std::string> headers = {{}},
                                   std::string body = "");
     std::string buildHttpResponse();
-    void setHttpResponse(int errorCode, std::string mimeType = "", std::map<std::string,std::string> headers = {}, std::string body = "");
+    void setHttpResponse(int errorCode, std::map<std::string,std::string> headers = {}, std::string body = "");
     int errorCode;
     std::string mimeType;
     std::map<std::string,std::string> headers;

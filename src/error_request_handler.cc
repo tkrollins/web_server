@@ -31,12 +31,11 @@ std::unique_ptr<HttpResponse> ErrorRequestHandler::HandleRequest2(const HttpRequ
 {
     status = 400;
     std::string body = "400 Error: Bad request\r\n";
-    std::string mimeType = "";
     std::string contentLengthStr = std::to_string(body.length());
     std::map<std::string,std::string> headers { {"Content-Type", "text/plain"},
                                                 {"Content-Length", contentLengthStr}};
     HttpResponse res;
-    res.setHttpResponse(status, mimeType , headers, body);
+    res.setHttpResponse(status, headers, body);
     std::unique_ptr<HttpResponse> resPtr = std::make_unique<HttpResponse>(res);
     return resPtr;
 }

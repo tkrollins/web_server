@@ -48,10 +48,9 @@ std::string HttpResponse::buildHttpResponse(int status, std::map<std::string, st
     return res;
 }
 
-void HttpResponse::setHttpResponse(int errorCode, std::string mimeType, std::map<std::string,std::string> headers, std::string body)
+void HttpResponse::setHttpResponse(int errorCode, std::map<std::string,std::string> headers, std::string body)
 {
     this -> errorCode = errorCode;
-    this -> mimeType = mimeType;
     this -> headers = headers;
     this -> body = body;
 }

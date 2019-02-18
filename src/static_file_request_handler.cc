@@ -136,7 +136,7 @@ void StaticFileRequestHandler::setResponse(HttpResponse& response, std::string& 
     std::map<std::string,std::string> headers { {"Content-Type", mimeType},
                                                 {"Content-Length", contentLengthStr}};
 
-    response.setHttpResponse(status, mimeType, headers, fileStr);
+    response.setHttpResponse(status, headers, fileStr);
 }
 
 void StaticFileRequestHandler::initRequestVariables()
