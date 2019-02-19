@@ -9,8 +9,7 @@ using namespace std;
 
 class StaticFileRequestHandlerTest : public ::testing::Test {
 protected:
-    unordered_map<string, string> pathMap { {"/static", "/static_files/some_files"},
-                                            {"/static2", "/more_static_files"}};
+    unordered_map<string, string> pathMap { {"root", "static_files/some_files"} };
 
     HttpRequest req;
 
@@ -34,12 +33,10 @@ TEST_F(StaticFileRequestHandlerTest, FileFound) {
 
     StaticFileRequestHandler fileHandler(pathMap, "../..");
     req.requestURI = "/static/home.html";
-    bool validReq = fileHandler.canHandleRequest(req);
     fileHandler.setFileType();
     fileHandler.setPathToFile();
     bool fileExists = fileHandler.doesFileExist();
 
-    EXPECT_TRUE(validReq);
     EXPECT_TRUE(fileExists);
     cout << "Path to file: " << fileHandler.pathToFile << endl;
 //    boost::filesystem::path full_path(boost::filesystem::current_path());
@@ -50,7 +47,7 @@ TEST_F(StaticFileRequestHandlerTest, FileNotFound) {
 
     StaticFileRequestHandler fileHandler(pathMap, "../..");
     req.requestURI = "/static/doesntExist.txt";
-    bool validReq = fileHandler.canHandleRequest(req);
+    fileHandler.setURIAndFileName(req.requestURI);
     fileHandler.initRequestVariables();
     EXPECT_TRUE(fileHandler.fileName == "404error.html");
     EXPECT_TRUE(fileHandler.pathToFile == "../../static_files/404error.html");
@@ -63,7 +60,7 @@ TEST_F(StaticFileRequestHandlerTest, BuildResponseHeader) {
 
     StaticFileRequestHandler fileHandler(pathMap, "../..");
     req.requestURI = "/static/home.html";
-    bool validReq = fileHandler.canHandleRequest(req);
+    fileHandler.setURIAndFileName(req.requestURI);
     fileHandler.initRequestVariables();
 
     string header = fileHandler.createResponseHeader(15);
@@ -85,7 +82,6 @@ TEST_F(StaticFileRequestHandlerTest, TestHttpParse) {
     request.parseHttpRequest(requestString);
 
     EXPECT_TRUE(request.requestURI == "/static");
-    EXPECT_TRUE(fileHandler.canHandleRequest(request));
     cout << "Request URI: " << request.requestURI << endl;
 }
 

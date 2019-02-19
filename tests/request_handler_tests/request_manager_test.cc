@@ -24,7 +24,7 @@ TEST(HandlerManagerTest, StaticHandler)
 {
     // create the handler
     NginxConfig config;
-    config.addFlatParam("/static", "/static_files/some_files");
+    config.addFlatParam("root", "static_files/some_files");
     std::string root_path = "../..";
     HandlerManager manager;
     std::unique_ptr<RequestHandler> staticHandler = manager.createByName("static", config, root_path);
