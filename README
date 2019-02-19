@@ -1,7 +1,7 @@
 Build and Run our project:
 
 Buliding command (execute at /build):
-$ cmake .. && make && sudo bin/server ../server_config_new
+$ cmake .. && make && make test && sudo bin/server ../sample_server_config
 
 In another terminal, I used nc to send an example GET request:
 $ printf "GET /echo HTTP/1.1\r\nUser-Agent: nc/0.0.1\r\nHost: 127.0.0.1\r\nAccept: */*\r\n\r\n" | nc localhost 80
@@ -76,6 +76,9 @@ To access the server:
 IP: 35.247.92.66
 Port: 80
 Ex: curl -X GET "http://35.247.92.66" -d "Hello World"
+
+To access server with URL:
+http://static.bigbear.cs130.org/
 
 *******************************************************************
 

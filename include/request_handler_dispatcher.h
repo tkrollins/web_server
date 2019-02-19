@@ -40,4 +40,6 @@ private:
 
     // Status Counter // TODO: maybe we can set up an independent class for counter
     std::unordered_map<int, int> statusCounter = {{200, 0}, {400, 0}, {404, 0}}; // TODO: maybe we can let it accomodate status code dynamically
+
+    std::string renderStatusInfo(NginxConfig& config);
 };

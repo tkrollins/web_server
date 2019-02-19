@@ -122,32 +122,9 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
     // printf("dispatched %s\n", handlerName.c_str());
     std::size_t locationOfNumericChars = handlerName.find_first_of("1234567890");
 
-    if (handlerName.substr(0, locationOfNumericChars).compare("status") ==0)
+    if (handlerName.substr(0, locationOfNumericChars).compare("status") == 0)
     {
-        // Add status information to config, for status handler
-        string statusInfo = "";
-        for (auto stat : config.getNestedParameters())
-        {
-            for (auto a : stat.second->getFlatParameters()){
-                if (a.first.compare("location") == 0)
-                {
-                    statusInfo += a.first;
-                    statusInfo += ": ";
-                    statusInfo += a.second;
-                    statusInfo += "\n";
-                }
-            }
-        }
-        for (auto stat : statusCounter)
-        {
-            statusInfo += std::to_string(stat.first);
-            statusInfo += ": ";
-            statusInfo += std::to_string(stat.second);
-            statusInfo += "\n";
-        }
-        string str1("statusInfo");
-        auto tmp = *config.getNestedParameters()[handlerName];
-        config.getNestedParameters()[handlerName]->addFlatParam(str1, statusInfo);
+        config.getNestedParameters()[handlerName]->addFlatParam(std::string("statusInfo"), renderStatusInfo(config));
     }
 
     std::unique_ptr<RequestHandler> handler = handlerManager->createByName(
@@ -167,4 +144,31 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
     // handler.reset();
     // printf("response string: %s\n", responseString.c_str());
     return responseString;
+}
+
+std::string RequestHandlerDispatcher::renderStatusInfo(NginxConfig& config)
+{
+    // Add status information to config, for status handler
+    string statusInfo = "Valid handlers: URL prefix\n-------\n";
+    for (auto stat : config.getNestedParameters())
+    {
+        for (auto a : stat.second->getFlatParameters()){
+            if (a.first.compare("location") == 0)
+            {
+                statusInfo += stat.first;
+                statusInfo += ": ";
+                statusInfo += a.second;
+                statusInfo += "\n";
+            }
+        }
+    }
+    statusInfo += "\n================\nStatus Code: Triggered Count\n-------\n";
+    for (auto stat : statusCounter)
+    {
+        statusInfo += std::to_string(stat.first);
+        statusInfo += ": ";
+        statusInfo += std::to_string(stat.second);
+        statusInfo += "\n";
+    }
+    return statusInfo;
 }
