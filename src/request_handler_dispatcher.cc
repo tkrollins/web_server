@@ -1,4 +1,5 @@
 #include "request_handler_dispatcher.h"
+#include <boost/log/trivial.hpp>
 
 RequestHandlerDispatcher::RequestHandlerDispatcher(NginxConfig& config)
 {
@@ -121,14 +122,35 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
     // printf("dispatched %s\n", handlerName.c_str());
     std::size_t locationOfNumericChars = handlerName.find_first_of("1234567890");
 
+    // Add status information to config, for status handler
+    string statusInfo = "";
+    for (auto stat : statusCounter)
+    {
+        // BOOST_LOG_TRIVIAL(debug) << "dispatcher.cc -> statusCounter: " << std::to_string(stat.first) << ", " << std::to_string(stat.second);
+        statusInfo += std::to_string(stat.first);
+        statusInfo += ": ";
+        statusInfo += std::to_string(stat.second);
+        statusInfo += "\n";
+    }
+    string str1("statusInfo");
+
+    if (handlerName.substr(0, locationOfNumericChars).compare("status") ==0)
+    {
+        auto tmp = *config.getNestedParameters()[handlerName];
+        config.getNestedParameters()[handlerName]->addFlatParam(str1, statusInfo);
+    }
+
     std::unique_ptr<RequestHandler> handler = handlerManager->createByName(
         handlerName.substr(0, locationOfNumericChars),
-        *config.getNestedParameters()[handlerName],
+        *config.getNestedParameters()[handlerName], // Passed config here, but the other side still doesn't get statusInfo ....
         config.getFlatParameters().at("root"));
 
     std::unique_ptr<HttpResponse> response = handler->HandleRequest2(request);
 
     std:string responseString = response->buildHttpResponse();
+    
+    // renew status counter
+    statusCounter[response->errorCode] += 1;
 
     // c++ question: we don't need to explicitly delete a unique ptr, correct? Will
     // it delete itself when we go out of the scope of the function?

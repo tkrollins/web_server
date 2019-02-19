@@ -27,7 +27,9 @@ unsigned NginxConfig::getDepth()
 
 void NginxConfig::addFlatParam(string key, string value)
 {
-    flatParams.insert( {key, value} );
+    auto it = flatParams.find(key);
+    if(it != flatParams.end()) it-> second = value;
+    else flatParams.insert( {key, value} );
     orderOfParams.push_back(key);
 }
 

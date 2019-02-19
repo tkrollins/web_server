@@ -3,6 +3,7 @@
 #include "http_request.h"
 #include "http_response.h"
 #include "request_handler.h"
+#include <unordered_map>
 
 // Server will have a RequestHandlerDispatcher, which is used by session
 class RequestHandlerDispatcher
@@ -36,4 +37,7 @@ private:
 
     // takes in an HttpRequest and returns the name of the proper handler. Calls getLongestMatchingURI
     std::string getHandlerName(HttpRequest request);
+
+    // Status Counter // TODO: maybe we can set up an independent class for counter
+    std::unordered_map<int, int> statusCounter = {{200, 0}, {400, 0}, {404, 0}}; // TODO: maybe we can let it accomodate status code dynamically
 };

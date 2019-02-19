@@ -12,4 +12,7 @@ server {
     handler echo {
         location /echo;
     }
+    handler status {
+        location /status;
+    }
 }

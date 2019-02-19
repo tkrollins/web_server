@@ -5,7 +5,9 @@
 #include "handler_manager.h"
 #include "static_file_request_handler.h"
 #include "error_request_handler.h"
+#include "status_request_handler.h"
 #include "action_request_handler.h"
+#include <boost/log/trivial.hpp>
 
 std::unique_ptr<RequestHandler> HandlerManager::createByName(const std::string& name, const NginxConfig& config, const std::string& root_path)
 {
@@ -16,6 +18,10 @@ std::unique_ptr<RequestHandler> HandlerManager::createByName(const std::string& 
     else if (name == "static")
     {
         return StaticFileRequestHandler::create(config, root_path);
+    }
+    else if (name == "status")
+    {
+        return StatusRequestHandler::create(config, root_path);
     }
     else
     {
