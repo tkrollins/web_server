@@ -19,10 +19,18 @@ bool RequestHandlerDispatcher::isPrefix(std::string str1, std::string str2)
 {
     // implemented James Kanze's solution at:
     // https://stackoverflow.com/questions/7913835/check-if-one-string-is-a-prefix-of-another
-        return std::equal(
-        str1.begin(),
-        str1.begin() + std::min( str1.size(), str2.size() ),
-        str2.begin() );
+    if(str1.length() > str2.length())
+    {
+        return false;
+    }
+    for(int i = 0; i < str1.length(); ++i)
+    {
+        if(str1[i] != str2[i])
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool RequestHandlerDispatcher::isSuffix (std::string suffix, std::string fullString)
@@ -76,9 +84,9 @@ std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestU
         // printf("request without file path: ");
         // printf("%s\n", requestURI.c_str());
     }
-
+    std::cout << "rGLM URI: " << requestURI << std::endl;
     // edge case: request URI is longer than the longest server endpoint
-    if (comparePathDepths(requestURI, sortedURIs_.at(0)))
+    if (comparePathDepths(requestURI, sortedURIs_.at(0))) // TODO: Seems incorrect
     {
         // printf("request uri: %s\n", requestURI.c_str());
         // printf("longest endpoint: %s\n",sortedURIs_.at(0).c_str());
@@ -88,9 +96,12 @@ std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestU
     // find the longest server endpoint with a prefix that matches the request URI
     for (auto &serverEndpointURI : sortedURIs_)
     {
+        std::cout << "rURI: " << requestURI << std::endl;
+        std::cout << "serverEp" << serverEndpointURI << std::endl;
         // printf("Checked server endpoint: %s\n", serverEndpointURI.c_str());
-        if (isPrefix(requestURI, serverEndpointURI))
+        if (isPrefix(serverEndpointURI, requestURI))
         {
+            std::cout << "Got it" << std::endl;
             return serverEndpointURI;
         }
     }
@@ -119,7 +130,7 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
 {
     // handlerName ex) "echo123"
     std::string handlerName = getHandlerName(request);
-    // printf("dispatched %s\n", handlerName.c_str());
+    std::cout << "handler Name: " << handlerName << std::endl;
     std::size_t locationOfNumericChars = handlerName.find_first_of("1234567890");
 
     if (handlerName.substr(0, locationOfNumericChars).compare("status") == 0)
