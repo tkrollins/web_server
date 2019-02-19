@@ -24,7 +24,7 @@ echo "Echo response is correct"
 
 # test bad-request response
 URI="/bad"
-expected_response=$'400 Error: Bad request\r'
+expected_response=$'404 not found\r'
 test_response $SERVER_PID $URI "$expected_response"
 echo "Bad-request response is correct"
 

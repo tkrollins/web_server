@@ -30,8 +30,8 @@ std::unique_ptr<RequestHandler> ErrorRequestHandler::create(const NginxConfig& c
 std::unique_ptr<HttpResponse> ErrorRequestHandler::HandleRequest2(const HttpRequest& request)
 {
     BOOST_LOG_TRIVIAL(debug) << "Invalid request URI: " << request.requestURI;
-    status = 400;
-    std::string body = "400 Error: Bad request\r\n";
+    status = 404;
+    std::string body = "404 not found\r\n";
     std::string contentLengthStr = std::to_string(body.length());
     std::map<std::string,std::string> headers { {"Content-Type", "text/plain"},
                                                 {"Content-Length", contentLengthStr}};

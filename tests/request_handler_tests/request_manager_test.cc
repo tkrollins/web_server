@@ -12,11 +12,11 @@ TEST(HandlerManagerTest, ErrorHandler)
 
     HttpRequest req;
     std::unique_ptr<HttpResponse> res = errorHandler -> HandleRequest2(req);
-    std::string expectedOutput = "HTTP/1.1 400 Bad Request\r\n"
-                                 "Content-Length: 24\r\n"
+    std::string expectedOutput = "HTTP/1.1 404 File Not Found\r\n"
+                                 "Content-Length: 15\r\n"
                                  "Content-Type: text/plain\r\n"
                                  "\r\n"
-                                 "400 Error: Bad request\r\n";
+                                 "404 not found\r\n";
     EXPECT_TRUE(res -> buildHttpResponse() == expectedOutput);
 }
 
@@ -70,7 +70,31 @@ TEST(HandlerManagerTest, ActionHandler)
     std::cerr << response -> buildHttpResponse();
 }
 
+TEST(HandlerManagerTest, StatusHandler)
+{
+    // create the handler
+    NginxConfig config;
+    string str1("statusInfo");
+    string statusInfo = "200: 0";
+    config.addFlatParam(str1, statusInfo);
+    std::string root_path = "../..";
+    
+    HandlerManager manager;
+    std::unique_ptr<RequestHandler> actionHandler = manager.createByName("status", config, root_path);
 
+    // create fake request
+    HttpRequest request;
+    request.requestURI = "/status";
+    std::string targetString = "200: ";
 
+    // call handleRequest and verify the response
+    std::unique_ptr<HttpResponse> response = actionHandler -> HandleRequest2(request);
+    EXPECT_TRUE(response -> errorCode == 200);
 
+    // make sure the header contains the mime-type text/plain
+    EXPECT_TRUE(response -> headers["Content-Type"] == "text/plain");
 
+    // make sure the response body contains the request  
+    EXPECT_TRUE(response -> body.find(targetString) != std::string::npos);
+    std::cerr << response -> buildHttpResponse();
+}

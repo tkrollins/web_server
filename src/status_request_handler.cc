@@ -18,8 +18,7 @@ std::unique_ptr<RequestHandler> StatusRequestHandler::create(const NginxConfig& 
 std::unique_ptr<HttpResponse> StatusRequestHandler::HandleRequest2(const HttpRequest& request)
 {
     int status = 200;
-    std::string body; 
-    // TODO: get status info from config
+    std::string body;
     body = selfConfig->getFlatParameters()["statusInfo"];
 
     std::string contentLengthStr = std::to_string(body.length());
