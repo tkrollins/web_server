@@ -77,7 +77,7 @@ std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestU
     }
 
     // edge case: request URI is longer than the longest server endpoint
-    if (requestURI.length() > sortedURIs_.at(0).length())
+    if (comparePathDepths(requestURI, sortedURIs_.at(0)))
     {
         // printf("request uri: %s\n", requestURI.c_str());
         // printf("longest endpoint: %s\n",sortedURIs_.at(0).c_str());

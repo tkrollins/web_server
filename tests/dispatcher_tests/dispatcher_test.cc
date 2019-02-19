@@ -1,14 +1,16 @@
 #include "gtest/gtest.h"
 #include "server.h"
+#include "config_parser.h"
 
 class DispatcherTest : public ::testing::Test {
   protected:
-  	HandlerManager handlerManager;
+    HandlerManager handlerManager;
     NginxConfig topLevelConfig;
     NginxConfig* static1Config = new NginxConfig("static1");
     NginxConfig* static2Config = new NginxConfig("static2");
     NginxConfig* static3Config = new NginxConfig("static3");
     HttpRequest request;
+    NginxConfigParser parser;
 };
 
 // we expect to dispatch static handler number 2 because it will have a more specific
@@ -16,8 +18,8 @@ class DispatcherTest : public ::testing::Test {
 // directory
 TEST_F(DispatcherTest, dispatchStaticHandler2)
 {
-	request.requestURI = "/static/home.html";
-	std::string expectedOutput = "HTTP/1.1 200 OK\r\nContent-Length: 168\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Home.html</title>\n</head>\n<body>\n<h1>THIS IS THE HOME PAGE OF BIGBEAR</h1>\n</body>\n</html>";
+    request.requestURI = "/static/home.html";
+    std::string expectedOutput = "HTTP/1.1 200 OK\r\nContent-Length: 168\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Home.html</title>\n</head>\n<body>\n<h1>THIS IS THE HOME PAGE OF BIGBEAR</h1>\n</body>\n</html>";
     
     // static handler 1 with endpoint /static/foo
     static1Config->addFlatParam("location", "/static/foo");
@@ -39,8 +41,20 @@ TEST_F(DispatcherTest, dispatchStaticHandler2)
     topLevelConfig.addNestedParam("static3", static3Config);
 
     // init and call the dispatcher and expect the static 2 handler to be dispatched
-	RequestHandlerDispatcher dispatcher(topLevelConfig);
-	std::string dispatcherOutput = dispatcher.dispatchHandler(request, &handlerManager, topLevelConfig);
+    RequestHandlerDispatcher dispatcher(topLevelConfig);
+    std::string dispatcherOutput = dispatcher.dispatchHandler(request, &handlerManager, topLevelConfig);
 
-	EXPECT_STREQ(dispatcherOutput.c_str(), expectedOutput.c_str());
+    EXPECT_STREQ(dispatcherOutput.c_str(), expectedOutput.c_str());
+}
+
+TEST_F(DispatcherTest, dispatchStaticHandlerGivenRealConfig)
+{
+    bool success = parser.Parse("../server_config_new", &topLevelConfig);
+    request.requestURI = "/static/home.html";
+    std::string expectedOutput = "HTTP/1.1 200 OK\r\nContent-Length: 168\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Home.html</title>\n</head>\n<body>\n<h1>THIS IS THE HOME PAGE OF BIGBEAR</h1>\n</body>\n</html>";
+
+    RequestHandlerDispatcher dispatcher(topLevelConfig);
+    std::string dispatcherOutput = dispatcher.dispatchHandler(request, &handlerManager, topLevelConfig);
+    
+    EXPECT_STREQ(dispatcherOutput.c_str(), expectedOutput.c_str());
 }
