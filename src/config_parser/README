@@ -22,20 +22,6 @@ server {
     }
 }
 
-INITIALIZATION OF NginxConfig OBJECT:
------------------------------------
-
-#include "nginx_config.h"
-#include "config_parser.h"
-
-NginxConfig config;
-NginxConfigParser parser;
-
-if(parser.Parse("config_file_name", &config))
-{
-    // config will now hold all info in config file
-}
-
 
 ATTRIBUTES OF NginxConfig CLASS:
 ------------------------------
@@ -62,21 +48,6 @@ ATTRIBUTES OF NginxConfig CLASS:
                              - if neither name is found in the config, "" will be returned
 
 
-FOR USE WITH SERVER:
--------------------
-
-#include "nginx_config.h"
-#include "config_parser.h"
-
-NginxConfig config;
-NginxConfigParser parser;
-
-if(parser.Parse("config_file_name", &config))
-{
-    // config will be used to init server parameters and be passed
-    // on to relevant handlers by dispatcher
-    server svr(io_service, &config)
-}
 
 USE WITH REQUEST HANDLER:
 ----------------------------
@@ -94,3 +65,34 @@ USE WITH REQUEST HANDLER:
 
     * Anything specified in the handler block of the config file
       will be available to the handler for construction
+
+
+INITIALIZATION OF NginxConfig OBJECT:
+-----------------------------------
+
+#include "nginx_config.h"
+#include "config_parser.h"
+
+NginxConfig config;
+NginxConfigParser parser;
+
+if(parser.Parse("config_file_name", &config))
+{
+    // config will now hold all info in config file
+}
+
+FOR USE WITH SERVER:
+-------------------
+
+#include "nginx_config.h"
+#include "config_parser.h"
+
+NginxConfig config;
+NginxConfigParser parser;
+
+if(parser.Parse("config_file_name", &config))
+{
+    // config will be used to init server parameters and be passed
+    // on to relevant handlers by dispatcher
+    server svr(io_service, &config)
+}
