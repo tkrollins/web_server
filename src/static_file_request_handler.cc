@@ -186,7 +186,7 @@ std::unique_ptr<RequestHandler> StaticFileRequestHandler::create(const NginxConf
     return std::make_unique<StaticFileRequestHandler>(staticHandler);
 }
 
-std::unique_ptr<HttpResponse> StaticFileRequestHandler::HandleRequest2(const HttpRequest& request)
+std::unique_ptr<HttpResponse> StaticFileRequestHandler::HandleRequest(const HttpRequest &request)
 {
     setURIAndFileName(request.requestURI);
     initRequestVariables();

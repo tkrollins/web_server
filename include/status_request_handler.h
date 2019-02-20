@@ -16,7 +16,7 @@ public:
 	~StatusRequestHandler() {};
 
     static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
-    std::unique_ptr<HttpResponse> HandleRequest2(const HttpRequest& request);
+    std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request);
 private:
     const NginxConfig* selfConfig;
     std::string retrieveStatusInfo(const NginxConfig& config);

@@ -78,7 +78,7 @@ std::unique_ptr<RequestHandler> ActionRequestHandler::create(const NginxConfig& 
     return std::make_unique<ActionRequestHandler>(actionHandler);
 }
 
-std::unique_ptr<HttpResponse> ActionRequestHandler::HandleRequest2(const HttpRequest& request)
+std::unique_ptr<HttpResponse> ActionRequestHandler::HandleRequest(const HttpRequest &request)
 {
     HttpResponse response;
     setResponse(response, request);

@@ -15,7 +15,7 @@ std::unique_ptr<RequestHandler> StatusRequestHandler::create(const NginxConfig& 
     return std::make_unique<StatusRequestHandler>(statusHandler);
 }
 
-std::unique_ptr<HttpResponse> StatusRequestHandler::HandleRequest2(const HttpRequest& request)
+std::unique_ptr<HttpResponse> StatusRequestHandler::HandleRequest(const HttpRequest &request)
 {
     int status = 200;
     std::string body;

@@ -12,7 +12,7 @@ class ActionRequestHandler : public RequestHandler
 {
 public:
 	static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
-    std::unique_ptr<HttpResponse> HandleRequest2(const HttpRequest& request);
+    std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request);
 	void setResponse(HttpResponse& response, const HttpRequest& request);
 
 	ActionRequestHandler(std::unordered_map<ServerAction, std::string> serverActionMap);

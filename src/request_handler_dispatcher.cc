@@ -134,7 +134,7 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
         *config.getNestedParameters()[handlerName],
         config.getFlatParameters().at("root"));
 
-    std::unique_ptr<HttpResponse> response = handler->HandleRequest2(request);
+    std::unique_ptr<HttpResponse> response = handler->HandleRequest(request);
 
     std:string responseString = response->buildHttpResponse();
     

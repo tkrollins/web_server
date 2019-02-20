@@ -11,7 +11,7 @@ TEST(HandlerManagerTest, ErrorHandler)
     std::unique_ptr<RequestHandler> errorHandler = manager.createByName("400", config, root_path);
 
     HttpRequest req;
-    std::unique_ptr<HttpResponse> res = errorHandler -> HandleRequest2(req);
+    std::unique_ptr<HttpResponse> res = errorHandler->HandleRequest(req);
     std::string expectedOutput = "HTTP/1.1 404 File Not Found\r\n"
                                  "Content-Length: 15\r\n"
                                  "Content-Type: text/plain\r\n"
@@ -34,7 +34,7 @@ TEST(HandlerManagerTest, StaticHandler)
     request.requestURI = "/static/home.html";
 
     // call handleRequest and verify the response
-    std::unique_ptr<HttpResponse> response = staticHandler -> HandleRequest2(request);
+    std::unique_ptr<HttpResponse> response = staticHandler->HandleRequest(request);
     EXPECT_TRUE(response -> errorCode == 200);
 
     // make sure the header contains the mime-type text/html
@@ -59,7 +59,7 @@ TEST(HandlerManagerTest, ActionHandler)
     request.unparsedRequestString = "I am testing the echo handler";
 
     // call handleRequest and verify the response
-    std::unique_ptr<HttpResponse> response = actionHandler -> HandleRequest2(request);
+    std::unique_ptr<HttpResponse> response = actionHandler->HandleRequest(request);
     EXPECT_TRUE(response -> errorCode == 200);
 
     // make sure the header contains the mime-type text/plain
@@ -88,7 +88,7 @@ TEST(HandlerManagerTest, StatusHandler)
     std::string targetString = "200: ";
 
     // call handleRequest and verify the response
-    std::unique_ptr<HttpResponse> response = actionHandler -> HandleRequest2(request);
+    std::unique_ptr<HttpResponse> response = actionHandler->HandleRequest(request);
     EXPECT_TRUE(response -> errorCode == 200);
 
     // make sure the header contains the mime-type text/plain

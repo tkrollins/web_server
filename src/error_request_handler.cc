@@ -27,7 +27,7 @@ std::unique_ptr<RequestHandler> ErrorRequestHandler::create(const NginxConfig& c
     return std::make_unique<ErrorRequestHandler>(errorHandler);
 }
 
-std::unique_ptr<HttpResponse> ErrorRequestHandler::HandleRequest2(const HttpRequest& request)
+std::unique_ptr<HttpResponse> ErrorRequestHandler::HandleRequest(const HttpRequest &request)
 {
     BOOST_LOG_TRIVIAL(debug) << "Invalid request URI: " << request.requestURI;
     status = 404;
