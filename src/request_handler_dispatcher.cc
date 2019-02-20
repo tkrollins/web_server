@@ -15,22 +15,16 @@ RequestHandlerDispatcher::RequestHandlerDispatcher(NginxConfig& config)
 
 }
 
-bool RequestHandlerDispatcher::isPrefix(std::string str1, std::string str2)
+int RequestHandlerDispatcher::isPrefix(std::string str1, std::string str2)
 {
     // implemented James Kanze's solution at:
     // https://stackoverflow.com/questions/7913835/check-if-one-string-is-a-prefix-of-another
-    if(str1.length() > str2.length())
-    {
-        return false;
-    }
-    for(int i = 0; i < str1.length(); ++i)
-    {
-        if(str1[i] != str2[i])
-        {
-            return false;
-        }
-    }
-    return true;
+    // if(str1.length() > str2.length()) return -1;
+    // for(int i = 0; i < str1.length(); ++i)
+    // {
+    //     if(str1[i] != str2[i]) return -1;
+    // }
+    return ((str1.compare(str2) == 0) ? int(str1.length()) : 0);
 }
 
 bool RequestHandlerDispatcher::isSuffix (std::string suffix, std::string fullString)
@@ -81,32 +75,29 @@ std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestU
     if (uriContainsFileExtension(requestURI))
     {
         requestURI = removeChildPath(requestURI);
-        // printf("request without file path: ");
-        // printf("%s\n", requestURI.c_str());
     }
-    std::cout << "rGLM URI: " << requestURI << std::endl;
+    // std::cout << "rGLM URI: " << requestURI << std::endl;
     // edge case: request URI is longer than the longest server endpoint
     if (comparePathDepths(requestURI, sortedURIs_.at(0))) // TODO: Seems incorrect
     {
-        // printf("request uri: %s\n", requestURI.c_str());
-        // printf("longest endpoint: %s\n",sortedURIs_.at(0).c_str());
         return std::string();
     }
-
+    std::pair<int, std::string> ans(0, std::string(""));
     // find the longest server endpoint with a prefix that matches the request URI
     for (auto &serverEndpointURI : sortedURIs_)
     {
-        std::cout << "rURI: " << requestURI << std::endl;
-        std::cout << "serverEp" << serverEndpointURI << std::endl;
-        // printf("Checked server endpoint: %s\n", serverEndpointURI.c_str());
-        if (isPrefix(serverEndpointURI, requestURI))
+        // std::cout << "rURI: " << requestURI << "|" << std::endl;
+        // std::cout << "serverEp: " << serverEndpointURI << "|" << std::endl;
+        int tmp = isPrefix(serverEndpointURI, requestURI);
+        if ( tmp > ans.first)
         {
-            std::cout << "Got it" << std::endl;
-            return serverEndpointURI;
+            // std::cout << "Got it" << std::endl;
+            ans.first = tmp;
+            ans.second = serverEndpointURI;
         }
     }
-
-    return std::string(); // return empty string if we've exhausted our search
+    // std::cout << ans.first << " " << ans.second << std::endl;
+    return ans.second;
 }
 
 std::string RequestHandlerDispatcher::getHandlerName(HttpRequest request)
@@ -130,7 +121,7 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
 {
     // handlerName ex) "echo123"
     std::string handlerName = getHandlerName(request);
-    std::cout << "handler Name: " << handlerName << std::endl;
+    // std::cout << "handler Name: " << handlerName << std::endl;
     std::size_t locationOfNumericChars = handlerName.find_first_of("1234567890");
 
     if (handlerName.substr(0, locationOfNumericChars).compare("status") == 0)

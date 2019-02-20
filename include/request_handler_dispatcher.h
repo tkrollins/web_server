@@ -24,7 +24,7 @@ private:
     std::vector<std::string> sortedURIs_;
 
     // auxilliary functions used by the dispatcher
-    bool isPrefix(std::string str1, std::string str2);
+    int isPrefix(std::string str1, std::string str2);
     bool isSuffix(std::string fullString, std::string suffix);
     bool uriContainsFileExtension(std::string uri);
     static bool comparePathDepths(const std::string& str1, const std::string& str2);

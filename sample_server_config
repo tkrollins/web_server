@@ -15,4 +15,7 @@ server {
     handler status {
         location /status;
     }
+    handler error {
+        location /;
+    }
 }
