@@ -77,6 +77,9 @@ target_link_libraries(request_manager_test request_handler_lib config_parser_lib
 add_executable(dispatcher_test tests/dispatcher_tests/dispatcher_test.cc)
 target_link_libraries(dispatcher_test request_handler_lib config_parser_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
 
+add_executable(http_request_test tests/http_request_object_tests/http_request_test.cc)
+target_link_libraries(http_request_test http_request gtest_main Boost::system Boost::log Boost::regex)
+
 # TODO(!): Update with tests binary
 gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/config_parser_tests)
 gtest_discover_tests(session_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/server_tests)
@@ -85,6 +88,7 @@ gtest_discover_tests(static_file_request_handler_test WORKING_DIRECTORY ${CMAKE_
 gtest_discover_tests(action_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(request_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(dispatcher_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/dispatcher_tests)
+gtest_discover_tests(http_request_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/http_request_tests)
 
  add_test(NAME server_integration_test
          COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/integration_test.sh "./test_config"
@@ -93,5 +97,5 @@ gtest_discover_tests(dispatcher_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DI
 # TODO(!): Update with target/tests targets
 if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
     include(cmake/CodeCoverageReportConfig.cmake)
-    generate_coverage_report(TARGETS server server_lib config_parser_lib request_handler_lib TESTS config_parser_test session_test server_test static_file_request_handler_test action_request_handler_test request_manager_test dispatcher_test)
+    generate_coverage_report(TARGETS server server_lib config_parser_lib request_handler_lib TESTS config_parser_test session_test server_test static_file_request_handler_test action_request_handler_test request_manager_test dispatcher_test http_request_test)
 endif()

@@ -14,6 +14,8 @@
 #include <boost/asio.hpp>
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "http_response.h"
+#include "http_request.h"
 #include "request_handler_dispatcher.h"
 #include "nginx_config.h"
 
@@ -43,6 +45,7 @@ private:
     void handleRead(const boost::system::error_code& error,
                     size_t bytes_transferred);
     void handleWrite(const boost::system::error_code& error);
+    void finishRead(const boost::system::error_code& error, HttpRequest request);
     tcp::socket socket_;
     enum { max_length = 1024 };
     char data_[max_length];

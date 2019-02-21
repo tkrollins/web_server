@@ -17,6 +17,7 @@ public:
     std::string httpVersion;
     std::string requestURI;
     std::string requestBody;
+    bool isComplete;
 
     // Map of header field and its corresponding value
     std::unordered_map<httpHeaderFields, std::string> headerFields;
@@ -27,6 +28,11 @@ public:
     {
         return requestURI;
     }
+
+    // If we have previously parsed an incomplete HTTP request, we 
+    // call this function when we receive the rest of the HTTP request
+    // (or if we receive another piece of the request)
+    bool finishParsingRequest(std::string partialRequest);
 
 private:
 

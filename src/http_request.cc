@@ -100,40 +100,29 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
     std::vector<std::string> requestLines; // requestLines contains all parts of the request before the \r\n\r\n sequence
     int lineBeginning = 0; // index of the char at the beginning of each line
     int requestBodyStart;
+    bool requestEndFound = false;
     for (int i = 0; i < requestString.length(); i++)
     {
         // loop through each char in request, and if you see a new line,
         // push that line to the requestLines vector
-        bool requestEndFound = false;
-        if (requestString[i] == '\n' && requestString[i+1] == '\n' && !requestEndFound)
-        {
-            int lineLength = i - lineBeginning; // number of chars in the line
-            std::string subString = requestString.substr(lineBeginning, lineLength); // the line
-            requestLines.push_back(subString);
-            requestBodyStart = i + 2; // the index of the request body's first char, if it exists
-            break;
-        }
-        else if (requestString[i] == '\r' && // Windows HTTP request
-                requestString[i+1] == '\n' && 
-                requestString[i+2] == '\r' && 
-                requestString[i+3] == '\n' &&
-                !requestEndFound)
+        if (requestString.substr(i,4) == "\r\n\r\n")
         {
             int lineLength = i - lineBeginning; // number of chars in the line
             std::string subString = requestString.substr(lineBeginning, lineLength); // the line
             requestLines.push_back(subString);
             requestBodyStart = i + 4; // the index of the request body's first char, if it exists
+            requestEndFound = true;
             break;
         }
-        else if (requestString[i] == '\n')
+        else if (requestString[i] == '\r')
         {
             int lineLength = i - lineBeginning; // number of chars in the line
             std::string subString = requestString.substr(lineBeginning, lineLength); // the line
             requestLines.push_back(subString);
-            lineBeginning = i + 1; // update the index of the char in the next line
+            lineBeginning = i + 2; // update the index of the char in the next line
         }
     }
-
+    isComplete = requestEndFound;
     bool methodFound = false;
     bool targetFound = false;
     bool versionFound = false;
@@ -141,6 +130,7 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
 
     for (int lineNumber = 0; lineNumber < requestLines.size(); ++lineNumber)
     {
+        printf("parse this line: %s\n", requestLines[lineNumber].c_str());
         // first line is parsed out for the http method and version
         if (lineNumber == 0)
         {
@@ -154,19 +144,17 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
             {
                 // white space delimits the method, target and version. TODO: There's definitely a cleaner
                 // way to do this via the string's member functions
-                if (*characterPtr == ' ' || *characterPtr == '\n')
+                if (*characterPtr == ' ' || *characterPtr == '\n' || *characterPtr == '\r')
                 {
                     if (!methodFound)
                     {
                         int nCharsInRequestMethod = characterPtr - requestLines[lineNumber].begin();
-
                         methodFound = setMethod(requestLines[lineNumber].substr(methodBegin, nCharsInRequestMethod));
                         targetBegin = methodBegin + nCharsInRequestMethod + 1;
                     }
                     else if (!targetFound)
                     {
                         int nCharsInRequestTarget = characterPtr - targetBegin - requestLines[lineNumber].begin();
-
                         targetFound = setURI(requestLines[lineNumber].substr(targetBegin, nCharsInRequestTarget));
                         versionBegin = targetBegin + nCharsInRequestTarget + 1;
                     }
@@ -206,10 +194,18 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
     //     bodyFound = setBody(requestString.substr(requestBodyStart, std::stoi(this->headerFields[CONTENT_LENGTH])));
     // }
 
-    if (methodFound && targetFound && versionFound && headersFound)
+    if (methodFound && targetFound && versionFound && headersFound && isComplete)
         return true;
     else
     {
         return false;
     }
+}
+
+bool HttpRequest::finishParsingRequest(std::string partialRequest)
+{
+    // concatenate incomplete request string with remaining request
+    unparsedRequestString = unparsedRequestString + partialRequest;
+    // reparse the request and return if successful
+    return parseHttpRequest(unparsedRequestString);
 }

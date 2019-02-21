@@ -13,8 +13,6 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include "session.h"
-#include "http_response.h"
-#include "http_request.h"
 #include <string>
 #include <boost/log/trivial.hpp>
 #include <map>
@@ -31,8 +29,8 @@ void session::start(HandlerManager* manager, RequestHandlerDispatcher* dispatche
     sessionDispatcher = dispatcher;
     sessionManager = manager;
     sessionConfig = config;
-    socket_.async_read_some(boost::asio::buffer(data_, max_length), // read incoming data in a new thread (data_ contains this information)
-                            boost::bind(&session::handleRead, this, // once done, call session::handleRead
+    socket_.async_read_some(boost::asio::buffer(data_, max_length),
+                            boost::bind(&session::handleRead, this, // once done reading, call session::handleRead
                                         boost::asio::placeholders::error,
                                         boost::asio::placeholders::bytes_transferred));
 }
@@ -66,6 +64,15 @@ void session::handleRead(const boost::system::error_code& error,
             response = sessionDispatcher->dispatchHandler(receivedRequest, sessionManager, *sessionConfig);
             writeToSocket(response);
         }
+        else if (!receivedRequest.isComplete)
+        {
+            printf("incomplete request\n");
+            // wait for rest of http request to come in, and then finish reading HTTP request
+            socket_.async_read_some(boost::asio::buffer(data_, max_length),
+                        boost::bind(&session::finishRead, this,
+                                    boost::asio::placeholders::error,
+                                    receivedRequest));
+        }
 
     }
     else
@@ -83,6 +90,37 @@ void session::handleWrite(const boost::system::error_code& error)
                                       boost::asio::placeholders::error,
                                       boost::asio::placeholders::bytes_transferred));
         socket_.close();
+    }
+    else
+    {
+        delete this;
+    }
+}
+
+void session::finishRead(const boost::system::error_code& error, HttpRequest request)
+{
+    if (!error)
+    {    
+        std::string socketReadBuffer  = std::string(data_);
+    
+        bool successfullyParsedReq = request.finishParsingRequest(socketReadBuffer);
+        std::string response;
+
+        if(successfullyParsedReq)
+        {
+            printf("finished parsing request\n");
+            response = sessionDispatcher->dispatchHandler(request, sessionManager, *sessionConfig);
+            writeToSocket(response);
+        }
+        else if (!request.isComplete)
+        {
+            printf("still not finished parsing request\n");
+            // wait for rest of http request to come in, and then finish reading HTTP request
+            socket_.async_read_some(boost::asio::buffer(data_, max_length),
+                        boost::bind(&session::finishRead, this,
+                                    boost::asio::placeholders::error,
+                                    request));
+        }
     }
     else
     {
