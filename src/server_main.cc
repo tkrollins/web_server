@@ -13,7 +13,6 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include "server.h"
-#include "config_parser_old.h"
 #include "config_parser.h"
 #include <boost/log/trivial.hpp>
 

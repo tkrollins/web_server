@@ -12,11 +12,9 @@ class StaticFileRequestHandler : public RequestHandler
 public:
     static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
     std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request);
-    
-    virtual bool canHandleRequest(HttpRequest req) override;
+
     StaticFileRequestHandler() {}; // for testing
     StaticFileRequestHandler(const std::unordered_map<std::string, std::string> staticPathMap, std::string rootPath);
-    virtual void handleRequest(std::string* response) override;
 
 //private:
 

@@ -12,15 +12,13 @@ class ActionRequestHandler : public RequestHandler
 {
 public:
 	static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
-    std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request);
+    std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request) override;
 	void setResponse(HttpResponse& response, const HttpRequest& request);
 
 	ActionRequestHandler(std::unordered_map<ServerAction, std::string> serverActionMap);
 	ActionRequestHandler(std::unordered_map<std::string, std::string> actionMap, const std::string& root_path);
     ActionRequestHandler() = default; // for testing
-    virtual bool canHandleRequest(HttpRequest req);
     void clearVariables();
-    virtual void handleRequest(std::string* response);
     std::string echoRequest();
 
     std::string URI;

@@ -9,14 +9,12 @@
 class StatusRequestHandler : public RequestHandler
 {
 public:
-	virtual bool canHandleRequest(HttpRequest req) override {}; // TODO: delete
-	virtual void handleRequest(std::string* response) override {}; // TODO: delete
 
 	StatusRequestHandler(const NginxConfig& config);
-	~StatusRequestHandler() {};
+	~StatusRequestHandler() = default;
 
     static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
-    std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request);
+    std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request) override;
 private:
     const NginxConfig* selfConfig;
     std::string retrieveStatusInfo(const NginxConfig& config);

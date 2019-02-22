@@ -80,13 +80,6 @@ bool StaticFileRequestHandler::doesFileExist()
     return fileToServe.good();
 }
 
-bool StaticFileRequestHandler::canHandleRequest(HttpRequest req)
-{
-    clearVariables();
-    setURIAndFileName(req.requestURI);
-    return (bool)validURIMap.count(URI);
-}
-
 std::string StaticFileRequestHandler::createResponseHeader(unsigned contentLength)
 {
     std::string contentLengthStr(std::to_string(contentLength));
@@ -168,16 +161,6 @@ std::string StaticFileRequestHandler::fileToString(const std::string &name)
     fl.close();
     // returns file as vector<char>
     return move(ret);
-}
-
-void StaticFileRequestHandler::handleRequest(std::string* response)
-{
-    initRequestVariables();
-
-    std::string fileStr = fileToString(pathToFile);
-    std::string header = createResponseHeader(fileStr.size());
-    response->resize(header.size() + fileStr.size());
-    *response = header + fileStr;
 }
 
 std::unique_ptr<RequestHandler> StaticFileRequestHandler::create(const NginxConfig& config, const std::string& root_path)

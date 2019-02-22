@@ -17,10 +17,8 @@ public:
 	//The following function must be implemented in all handler subclass
     // static RequestHandler* create(const NginxConfig& config, const std::string& root_path);
     RequestHandler() = default;
-    virtual void handleRequest(std::string* response) = 0; // TODO: delete
     virtual std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request) = 0;
-    virtual bool canHandleRequest(HttpRequest req) = 0; // TODO: delete
-    virtual ~RequestHandler() {};
+    virtual ~RequestHandler() = default;
 protected:
     int status;
 };

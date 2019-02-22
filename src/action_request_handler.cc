@@ -25,24 +25,6 @@ void ActionRequestHandler::clearVariables()
     status = 200;
 }
 
-bool ActionRequestHandler::canHandleRequest(HttpRequest req)
-{    
-    // TODO: It would be nice if we could redefine the action map to map
-    // the other way around, then this one-liner would work. Otherwise,
-    // we would need to add a new OR condition in this if statement every time we add a new action
-    if (validActionMap[ACTION_ECHO] == req.getRequestURI())
-    {
-        clearVariables();
-        URI = req.getRequestURI();
-        body = req.unparsedRequestString;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
 std::string ActionRequestHandler::echoRequest()
 {
     // should it return the raw request back or an http response containing the request in the body?
@@ -64,12 +46,6 @@ void ActionRequestHandler::setResponse(HttpResponse& response, const HttpRequest
                                                 {"Content-Length", contentLengthStr}};
 
     response.setHttpResponse(status, headers, request.unparsedRequestString);
-}
-
-void ActionRequestHandler::handleRequest(std::string* response)
-{
-        BOOST_LOG_TRIVIAL(trace) << "ECHO Action Triggered";
-        *response = echoRequest();
 }
 
 std::unique_ptr<RequestHandler> ActionRequestHandler::create(const NginxConfig& config, const std::string& root_path)
