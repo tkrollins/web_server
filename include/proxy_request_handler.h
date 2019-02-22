@@ -14,8 +14,8 @@ public:
     virtual ~ProxyRequestHandler() {};
     static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
     std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request);
-    virtual bool canHandleRequest(HttpRequest req) override {};
-    virtual void handleRequest(std::string* response) override {};
+//    virtual bool canHandleRequest(HttpRequest req) override {};
+//    virtual void handleRequest(std::string* response) override {};
 
 private:
     std::string dest;

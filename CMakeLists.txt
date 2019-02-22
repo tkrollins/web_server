@@ -88,7 +88,7 @@ gtest_discover_tests(static_file_request_handler_test WORKING_DIRECTORY ${CMAKE_
 gtest_discover_tests(action_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(request_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(dispatcher_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/dispatcher_tests)
-gtest_discover_tests(http_request_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/http_request_tests)
+gtest_discover_tests(http_request_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/http_request_object_tests)
 
  add_test(NAME server_integration_test
          COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/integration_test.sh "./test_config"
