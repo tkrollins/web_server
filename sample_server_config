@@ -18,4 +18,9 @@ server {
     handler error {
         location /;
     }
+
+    handler proxy{
+        location /proxy;
+        dest www.rubberducks.cs130.org;
+    }
 }
