@@ -6,11 +6,17 @@
 #include "http_response.h"
 #include <memory>
 #include <boost/log/trivial.hpp>
+#include <iostream>
+#include <istream>
+#include <ostream>
+#include <boost/asio.hpp>
+
+using boost::asio::ip::tcp;
 
 class ProxyRequestHandler : public RequestHandler
 {
 public:
-    ProxyRequestHandler(const NginxConfig& config);
+    ProxyRequestHandler(const std::unordered_map<std::string, std::string> staticPathMap, std::string destPath);
     virtual ~ProxyRequestHandler() {};
     static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
     std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request);
@@ -18,6 +24,7 @@ public:
 //    virtual void handleRequest(std::string* response) override {};
 
 private:
+    std::unordered_map<std::string, std::string> validURIMap;
     std::string dest;
 };
 

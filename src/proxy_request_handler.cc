@@ -3,14 +3,18 @@
 
 #include "proxy_request_handler.h"
 
-ProxyRequestHandler::ProxyRequestHandler(const NginxConfig &config){
-    dest = "";
+ProxyRequestHandler::ProxyRequestHandler(
+    const std::unordered_map<std::string, std::string> staticPathMap, std::string destPath):
+    RequestHandler()
+{
+    validURIMap = staticPathMap;
+    dest = validURIMap["dest"];
     std::cout << "destinated proxy address: " +  dest << std::endl;
 }
 
 
-std::unique_ptr<RequestHandler> ProxyRequestHandler::create(const NginxConfig& config, const std::string& root_path){
-    ProxyRequestHandler proxyHandler(config);
+std::unique_ptr<RequestHandler> ProxyRequestHandler::create(const NginxConfig& config, const std::string& destPath){
+    ProxyRequestHandler proxyHandler(config.getFlatParameters(), destPath);
     return std::make_unique<ProxyRequestHandler>(proxyHandler);
 }
 

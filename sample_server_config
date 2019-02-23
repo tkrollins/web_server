@@ -20,7 +20,12 @@ server {
     }
 
     handler proxy{
-        location /proxy;
+        location /rubberducks;
         dest www.rubberducks.cs130.org;
+    }
+
+    handler proxy{
+        location /ucla;
+        dest www.ucla.edu;
     }
 }
