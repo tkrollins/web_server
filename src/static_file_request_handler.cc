@@ -44,6 +44,7 @@ void StaticFileRequestHandler::clearVariables()
 
 void StaticFileRequestHandler::setURIAndFileName(std::string uriWithFileName)
 {
+    std::cout << "uriWithFileName:" << uriWithFileName << std::endl;
     if(uriWithFileName.length() > 1)
     {
         std::string::iterator it = uriWithFileName.begin();
@@ -65,6 +66,8 @@ void StaticFileRequestHandler::setURIAndFileName(std::string uriWithFileName)
             }
         }
     }
+    std::cout << "uri:" << URI << std::endl;
+    std::cout << "filename:" << fileName << std::endl;
 }
 
 void StaticFileRequestHandler::setPathToFile()

@@ -24,8 +24,12 @@ public:
 //    virtual void handleRequest(std::string* response) override {};
 
 private:
+    void setURI(std::string request_uri);
+
     std::unordered_map<std::string, std::string> validURIMap;
     std::string dest;
+    std::string uri;
+    std::string filePath;
 };
 
 #endif //PROXY_REQUEST_HANDLER_H

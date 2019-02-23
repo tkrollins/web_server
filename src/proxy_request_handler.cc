@@ -10,6 +10,35 @@ ProxyRequestHandler::ProxyRequestHandler(
     validURIMap = proxyPathMap;
     dest = validURIMap["dest"];
     std::cout << "destinated proxy address: " +  dest << std::endl;
+    // uri = "";
+    // filePath = "";
+}
+
+void ProxyRequestHandler::setURI(std::string request_uri)
+{
+    if(request_uri.length() > 1)
+    {
+        std::string::iterator it = request_uri.begin();
+        if (*it == '/')
+        {
+            ++it;
+            uri.push_back('/');
+            for (; *it != '/' && it != request_uri.end(); ++it)
+            {
+                uri.push_back(*it);
+            }
+            if (it != request_uri.end())
+            {
+                ++it;
+                for (; it != request_uri.end(); ++it)
+                {
+                    filePath.push_back(*it);
+                }
+            }
+        }
+    }
+    std::cout << "uri: " +  uri << std::endl;
+    std::cout << "filepath: " +  filePath << std::endl;
 }
 
 std::unique_ptr<RequestHandler> ProxyRequestHandler::create(const NginxConfig& config, const std::string& destPath){
@@ -17,14 +46,16 @@ std::unique_ptr<RequestHandler> ProxyRequestHandler::create(const NginxConfig& c
     return std::make_unique<ProxyRequestHandler>(proxyHandler);
 }
 
-std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpRequest &request)
-{
+std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpRequest &request){
+    //
+    setURI(request.requestURI);
+
     //test for sending request to dest server
     boost::asio::io_service io_service;
 
     // Get a list of endpoints corresponding to the server name.
     tcp::resolver resolver(io_service);
-    tcp::resolver::query query("www.ucla.edu", "http");
+    tcp::resolver::query query(dest, "http");
     tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
 
     // Try each endpoint until we successfully establish a connection.
@@ -37,7 +68,7 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     boost::asio::streambuf req;
     std::ostream request_stream(&req);
     request_stream << "GET " << "/" << " HTTP/1.0\r\n";
-    request_stream << "Host: " << "www.ucla.edu" << "\r\n";
+    request_stream << "Host: " << dest << "\r\n";
     request_stream << "Accept: */*\r\n";
     request_stream << "Connection: close\r\n\r\n";
 
@@ -86,6 +117,7 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
            boost::asio::transfer_at_least(1), error))
        std::cout << &response;
     if (error != boost::asio::error::eof)
+       //modify here to log later
        throw boost::system::system_error(error);
 
 
@@ -93,7 +125,7 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     status = 200;
     std::string body = "Proxy Test\r\n";
     std::string contentLengthStr = std::to_string(body.length());
-    std::map<std::string,std::string> headers { {"Content-Type", "text/plain"},
+    std::map<std::string,std::string> headers { {"Content-Type", "text/html"},
                                                 {"Content-Length", contentLengthStr}};
     HttpResponse res;
     res.setHttpResponse(status, headers, body);
