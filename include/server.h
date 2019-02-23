@@ -45,8 +45,8 @@ public:
 
 private:
     bool start_accept();
+    void startThread(session* new_session);
 
-    RequestHandlerDispatcher* dispatcher;
     HandlerManager* manager;
     NginxConfig* serverConfig;
 

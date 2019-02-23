@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10.0)
 project(bigbear)
 
 set(CMAKE_CXX_STANDARD 14)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 # Make sure developers do not run cmake in the main project directory, to keep
 # build artifacts from becoming clutter
@@ -28,6 +29,9 @@ enable_testing()
 include(GoogleTest)
 add_subdirectory(/usr/src/googletest googletest)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 # Enable Boost
 # Use static libraries so binaries can be deployed without a full boost install
 set(Boost_USE_STATIC_LIBS ON)
@@ -52,6 +56,7 @@ target_link_libraries(request_handler_lib config_parser_lib)
 add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
 target_link_libraries(server server_lib config_parser_lib request_handler_lib Boost::system)
 target_link_libraries(server Boost::log_setup Boost::log Boost::regex)
+target_link_libraries(server Threads::Threads)
 
 # build and link session_test
 add_executable(session_test tests/server_tests/session_test.cc src/static_file_request_handler.cc)
@@ -93,6 +98,10 @@ gtest_discover_tests(http_request_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_
  add_test(NAME server_integration_test
          COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/integration_test.sh "./test_config"
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
+
+add_test(NAME threadedness_test
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/test_threads.sh "./test_config"
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
 
 # TODO(!): Update with target/tests targets
 if(CMAKE_BUILD_TYPE STREQUAL "Coverage")

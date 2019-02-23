@@ -1,9 +1,14 @@
 #include "request_handler_dispatcher.h"
 #include <boost/log/trivial.hpp>
+#include <mutex>
+
+std::unordered_map<int,int> RequestHandlerDispatcher::statusCounter = {{200, 0}, {400, 0}, {404, 0}};
+
+std::mutex mtx_1;
 
 RequestHandlerDispatcher::RequestHandlerDispatcher(NginxConfig& config)
 {
-    for(auto nests : config.getNestedParameters())
+    for(auto& nests : config.getNestedParameters())
     {
         std::string uri = nests.second->getFlatParameters().at("location");
         std::string handlerName = nests.first;
@@ -129,6 +134,9 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
         config.getNestedParameters()[handlerName]->addFlatParam(std::string("statusInfo"), renderStatusInfo(config));
     }
 
+    // Locks access to handler manager and statusCounter
+    std::lock_guard<std::mutex> lock(mtx_1);
+
     std::unique_ptr<RequestHandler> handler = handlerManager->createByName(
         handlerName.substr(0, locationOfNumericChars),
         *config.getNestedParameters()[handlerName],
@@ -137,7 +145,7 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
     std::unique_ptr<HttpResponse> response = handler->HandleRequest(request);
 
     std:string responseString = response->buildHttpResponse();
-    
+
     // renew status counter
     statusCounter[response->errorCode] += 1;
 
@@ -164,6 +172,7 @@ std::string RequestHandlerDispatcher::renderStatusInfo(NginxConfig& config)
             }
         }
     }
+    std::lock_guard<std::mutex> lock(mtx_1);
     statusInfo += "\n================\nStatus Code: Triggered Count\n-------\n";
     for (auto stat : statusCounter)
     {

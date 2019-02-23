@@ -10,6 +10,8 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <thread>
+#include <mutex>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/log/trivial.hpp>
@@ -23,6 +25,7 @@ using boost::asio::ip::tcp;
 namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
 namespace sinks = boost::log::sinks;
+
 
 // this function creates a new session object which in turn initializes a socket
 // object. It then calls async_accept which allows server to accept
@@ -44,7 +47,9 @@ bool server::handle_accept(session* new_session,
     if (!error)
     {
         BOOST_LOG_TRIVIAL(trace) << "TCP socket connection established";
-        new_session->start(manager, dispatcher, serverConfig);
+        std::thread newThread(&server::startThread, this, new_session);
+        BOOST_LOG_TRIVIAL(trace) << "New thread handling connection. ID: " << newThread.get_id();
+        newThread.detach();
         clientConnectionEstablished_ = true;
     }
     else
@@ -57,10 +62,15 @@ bool server::handle_accept(session* new_session,
     return clientConnectionEstablished_;
 }
 
+void server::startThread(session *new_session)
+{
+    auto dispatcher = new RequestHandlerDispatcher(*serverConfig);
+    new_session->start(manager, dispatcher, serverConfig);
+}
+
 // Sets up request handler objects
 void server::init(NginxConfig* config)
 {
-    dispatcher = new RequestHandlerDispatcher(*config);
     manager = new HandlerManager;
     serverConfig = config;
 }

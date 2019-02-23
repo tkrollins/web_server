@@ -77,6 +77,7 @@ void session::handleRead(const boost::system::error_code& error,
     }
     else
     {
+        delete sessionDispatcher;
         delete this;
     }
 }
@@ -93,6 +94,7 @@ void session::handleWrite(const boost::system::error_code& error)
     }
     else
     {
+        delete sessionDispatcher;
         delete this;
     }
 }
@@ -124,6 +126,7 @@ void session::finishRead(const boost::system::error_code& error, HttpRequest req
     }
     else
     {
+        delete sessionDispatcher;
         delete this;
     }
 }
