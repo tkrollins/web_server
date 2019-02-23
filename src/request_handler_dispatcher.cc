@@ -29,7 +29,13 @@ int RequestHandlerDispatcher::isPrefix(std::string str1, std::string str2)
     // {
     //     if(str1[i] != str2[i]) return -1;
     // }
-    return ((str1.compare(str2) == 0) ? int(str1.length()) : 0);
+    // return ((str1.compare(str2) == 0) ? int(str1.length()) : 0);
+
+    //fix the check prefix function
+    if(str2.substr(0, str1.length()) == str1){
+      return  str1.length();
+    }
+    return 0;
 }
 
 bool RequestHandlerDispatcher::isSuffix (std::string suffix, std::string fullString)
@@ -78,25 +84,28 @@ std::string RequestHandlerDispatcher::removeChildPath(std::string path)
 std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestURI)
 {
     std::cout << requestURI << std::endl;
+    // Remove trailing slashes
+    while (requestURI.length() > 1 && requestURI.back() == '/')
+        requestURI.pop_back();
+
     if (uriContainsFileExtension(requestURI))
     {
         requestURI = removeChildPath(requestURI);
     }
+    std::cout << requestURI << std::endl;
     // std::cout << "rGLM URI: " << requestURI << std::endl;
     // edge case: request URI is longer than the longest server endpoint
-    for(int i = 0; i < sortedURIs_.size(); i++){
-        std::cout << sortedURIs_[i] << std::endl;
-    }
-    if (comparePathDepths(requestURI, sortedURIs_.at(0))) // TODO: Seems incorrect
-    {
-        return std::string();
-    }
+
+    // if (comparePathDepths(requestURI, sortedURIs_.at(0))) // TODO: Seems incorrect
+    // {
+    //     return std::string();
+    // }
     std::pair<int, std::string> ans(0, std::string(""));
     // find the longest server endpoint with a prefix that matches the request URI
     for (auto &serverEndpointURI : sortedURIs_)
     {
         // std::cout << "rURI: " << requestURI << "|" << std::endl;
-        // std::cout << "serverEp: " << serverEndpointURI << "|" << std::endl;
+        std::cout << "serverEp: " << serverEndpointURI << "|" << std::endl;
         int tmp = isPrefix(serverEndpointURI, requestURI);
         if ( tmp > ans.first)
         {
