@@ -22,23 +22,19 @@ void ProxyRequestHandler::setURI(std::string request_uri)
         if (*it == '/')
         {
             ++it;
-            uri.push_back('/');
-            for (; *it != '/' && it != request_uri.end(); ++it)
-            {
-                uri.push_back(*it);
-            }
+            // uri.push_back('/');
+            for (; *it != '/' && it != request_uri.end(); ++it);
             if (it != request_uri.end())
             {
                 ++it;
                 for (; it != request_uri.end(); ++it)
                 {
-                    filePath.push_back(*it);
+                    uriPath.push_back(*it);
                 }
             }
         }
     }
-    std::cout << "uri: " +  uri << std::endl;
-    std::cout << "filepath: " +  filePath << std::endl;
+    std::cout << "uriPath: " +  uriPath << std::endl;
 }
 
 std::unique_ptr<RequestHandler> ProxyRequestHandler::create(const NginxConfig& config, const std::string& destPath){
@@ -67,7 +63,7 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     // allow us to treat all data up until the EOF as the content.
     boost::asio::streambuf req;
     std::ostream request_stream(&req);
-    request_stream << "GET " << "/" << " HTTP/1.0\r\n";
+    request_stream << "GET " << "/" + uriPath << " HTTP/1.0\r\n";
     request_stream << "Host: " << dest << "\r\n";
     request_stream << "Accept: */*\r\n";
     request_stream << "Connection: close\r\n\r\n";
@@ -107,6 +103,10 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
         std::cout << header << "\n";
     std::cout << "\n";
 
+    std::string content;
+    while (std::getline(response_stream, content) && content != "\r")
+        std::cout << content << "\n";
+
     // Write whatever content we already have to output.
     if (response.size() > 0)
         std::cout << &response;
@@ -125,7 +125,7 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     status = 200;
     std::string body = "Proxy Test\r\n";
     std::string contentLengthStr = std::to_string(body.length());
-    std::map<std::string,std::string> headers { {"Content-Type", "text/html"},
+    std::map<std::string,std::string> headers { {"Content-Type", "text/plain"},
                                                 {"Content-Length", contentLengthStr}};
     HttpResponse res;
     res.setHttpResponse(status, headers, body);

@@ -88,6 +88,9 @@ std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestU
     while (requestURI.length() > 1 && requestURI.back() == '/')
         requestURI.pop_back();
 
+    // actually I think there's no need to remove the child path of filename
+    // as long as we can find the longest matching prefix
+    // by: zephyrwyz (rubberducks)
     if (uriContainsFileExtension(requestURI))
     {
         requestURI = removeChildPath(requestURI);

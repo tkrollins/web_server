@@ -28,8 +28,7 @@ private:
 
     std::unordered_map<std::string, std::string> validURIMap;
     std::string dest;
-    std::string uri;
-    std::string filePath;
+    std::string uriPath;
 };
 
 #endif //PROXY_REQUEST_HANDLER_H
