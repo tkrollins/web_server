@@ -100,10 +100,17 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     boost::asio::read_until(socket, response, "\r\n\r\n");
 
     // Process the response headers.
+    std::map<std::string,std::string> headers;
     std::string header;
-    while (std::getline(response_stream, header) && header != "\r")
-        std::cout << "header: " <<  header << "\n";
+    while (std::getline(response_stream, header) && header != "\r"){
+      std::string token = header.substr(0, header.find(":"));
+      headers[token] = header.substr(header.find(":")+2);
+      // std::cout << token << ":" << header.substr(header.find(":")+2) << std::endl;
+      // std::cout << "header: " <<  header << "\n";
+    }
+
     std::cout << "\n";
+
 
     std::string body;
     // Write whatever content we already have to output.
@@ -127,8 +134,8 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
 
     status = status_code;
     std::string contentLengthStr = std::to_string(body.length());
-    std::map<std::string,std::string> headers {{"Content-Type", "text/html"},
-                                                {"Content-Length", contentLengthStr}};
+    // std::map<std::string,std::string> headers {{"Content-Type", "text/html"},
+    //                                             {"Content-Length", contentLengthStr}};
     HttpResponse res;
     res.setHttpResponse(status, headers, body);
     return std::make_unique<HttpResponse>(res);

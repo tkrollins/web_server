@@ -28,7 +28,7 @@ class session
 public:
     session(boost::asio::io_service& io_service) : socket_(io_service) {};
     tcp::socket& socket();
-    
+
     void start(HandlerManager* manager, RequestHandlerDispatcher* dispatcher, NginxConfig* config);
 private:
     friend class SessionTest;
@@ -41,12 +41,12 @@ private:
     RequestHandlerDispatcher* sessionDispatcher;
     HandlerManager* sessionManager;
     NginxConfig* sessionConfig;
-    
+
     void handleRead(const boost::system::error_code& error,
                     size_t bytes_transferred);
     void handleWrite(const boost::system::error_code& error);
     void finishRead(const boost::system::error_code& error, HttpRequest request);
     tcp::socket socket_;
-    enum { max_length = 1024 };
+    enum { max_length = 102400 };
     char data_[max_length];
 };
