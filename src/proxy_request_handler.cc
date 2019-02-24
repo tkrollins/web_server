@@ -124,9 +124,13 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     // Read until EOF, writing data to output as we go.
     boost::system::error_code error;
     while (boost::asio::read(socket, response,
-           boost::asio::transfer_at_least(1), error)){
-            std::cout << &response;
-           }
+           boost::asio::transfer_at_least(1), error)) {
+        // std::cout << &response;
+        auto bufs = response.data();
+        std::string content_string(buffers_begin(bufs), buffers_begin(bufs) + response.size());
+        body += content_string;
+    }
+    std::cout << body;
 
     if (error != boost::asio::error::eof)
        //modify here to log later
