@@ -3,6 +3,8 @@
 
 #include "proxy_request_handler.h"
 
+using boost::asio::buffers_begin;
+
 ProxyRequestHandler::ProxyRequestHandler(
     const std::unordered_map<std::string, std::string> proxyPathMap, std::string destPath):
     RequestHandler()
@@ -100,35 +102,34 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     // Process the response headers.
     std::string header;
     while (std::getline(response_stream, header) && header != "\r")
-        std::cout << header << "\n";
+        std::cout << "header: " <<  header << "\n";
     std::cout << "\n";
 
-    std::string content;
-    while (std::getline(response_stream, content) && content != "\r")
-        std::cout << content << "\n";
-
+    std::string body;
     // Write whatever content we already have to output.
-    if (response.size() > 0)
-        std::cout << &response;
+    if (response.size() > 0){
+        //write the reponse content to string
+        auto bufs = response.data();
+        std::string content_string(buffers_begin(bufs), buffers_begin(bufs) + response.size());
+        body = content_string;
+    }
 
     // Read until EOF, writing data to output as we go.
     boost::system::error_code error;
     while (boost::asio::read(socket, response,
-           boost::asio::transfer_at_least(1), error))
-       std::cout << &response;
+           boost::asio::transfer_at_least(1), error)){
+            std::cout << &response;
+           }
+
     if (error != boost::asio::error::eof)
        //modify here to log later
        throw boost::system::system_error(error);
 
-
-    //currently return 200, do nothing
-    status = 200;
-    std::string body = "Proxy Test\r\n";
+    status = status_code;
     std::string contentLengthStr = std::to_string(body.length());
-    std::map<std::string,std::string> headers { {"Content-Type", "text/plain"},
+    std::map<std::string,std::string> headers {{"Content-Type", "text/html"},
                                                 {"Content-Length", contentLengthStr}};
     HttpResponse res;
     res.setHttpResponse(status, headers, body);
-    std::unique_ptr<HttpResponse> resPtr = std::make_unique<HttpResponse>(res);
-    return resPtr;
+    return std::make_unique<HttpResponse>(res);
 }
