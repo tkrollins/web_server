@@ -83,7 +83,6 @@ std::string RequestHandlerDispatcher::removeChildPath(std::string path)
 
 std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestURI)
 {
-    std::cout << requestURI << std::endl;
     // Remove trailing slashes
     while (requestURI.length() > 1 && requestURI.back() == '/')
         requestURI.pop_back();
@@ -95,7 +94,6 @@ std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestU
     {
         requestURI = removeChildPath(requestURI);
     }
-    std::cout << requestURI << std::endl;
     // std::cout << "rGLM URI: " << requestURI << std::endl;
     // edge case: request URI is longer than the longest server endpoint
 
@@ -108,7 +106,7 @@ std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestU
     for (auto &serverEndpointURI : sortedURIs_)
     {
         // std::cout << "rURI: " << requestURI << "|" << std::endl;
-        std::cout << "serverEp: " << serverEndpointURI << "|" << std::endl;
+        // std::cout << "serverEp: " << serverEndpointURI << "|" << std::endl;
         int tmp = isPrefix(serverEndpointURI, requestURI);
         if ( tmp > ans.first)
         {
@@ -117,7 +115,6 @@ std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestU
             ans.second = serverEndpointURI;
         }
     }
-    std::cout << ans.first << " " << ans.second << std::endl;
     return ans.second;
 }
 
@@ -142,7 +139,6 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
 {
     // handlerName ex) "echo123"
     std::string handlerName = getHandlerName(request);
-    std::cout << "handler Name: " << handlerName << std::endl;
     std::size_t locationOfNumericChars = handlerName.find_first_of("1234567890");
 
     if (handlerName.substr(0, locationOfNumericChars).compare("status") == 0)
@@ -150,7 +146,6 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
         config.getNestedParameters()[handlerName]->addFlatParam(std::string("statusInfo"), renderStatusInfo(config));
     }
 
-    std::cout << "name: " << handlerName.substr(0, locationOfNumericChars) << std::endl;
     // Locks access to handler manager and statusCounter
     std::lock_guard<std::mutex> lock(mtx_1);
 

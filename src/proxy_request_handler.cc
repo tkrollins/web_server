@@ -10,7 +10,7 @@ ProxyRequestHandler::ProxyRequestHandler(
     RequestHandler()
 {
     dest = config_params["dest"];
-    std::cout << "destinated proxy address: " +  dest << std::endl;
+    // std::cout << "destinated proxy address: " +  dest << std::endl;
     // uri = "";
     // filePath = "";
 }
@@ -35,7 +35,7 @@ void ProxyRequestHandler::setURI(std::string request_uri)
             }
         }
     }
-    std::cout << "uriPath: " +  uriPath << std::endl;
+    // std::cout << "uriPath: " +  uriPath << std::endl;
 }
 
 std::unique_ptr<RequestHandler> ProxyRequestHandler::create(const NginxConfig& config, const std::string& destPath){
@@ -107,8 +107,8 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
       // std::cout << token << ":" << header.substr(header.find(":")+2) << std::endl;
       // std::cout << "header: " <<  header << "\n";
     }
-
-    std::cout << "\n";
+    //
+    // std::cout << "\n";
 
     std::string body;
     // Write whatever content we already have to output.
@@ -128,7 +128,7 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
         std::string content_string(buffers_begin(bufs), buffers_begin(bufs) + response.size());
         body += content_string;
     }
-    std::cout << body;
+    // std::cout << body;
 
     if (error != boost::asio::error::eof)
        //modify here to log later
