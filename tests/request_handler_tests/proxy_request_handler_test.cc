@@ -9,7 +9,7 @@ using namespace std;
 
 class ProxyRequestHandlerTest : public ::testing::Test {
 protected:
-    unordered_map<string, string> pathMap { {"dest", "www.ucla.edu"} };
+    unordered_map<string, string> pathMap { {"dest", "www.rubberducks.cs130.org"} };
 
     HttpRequest req;
 
@@ -27,7 +27,16 @@ protected:
 TEST_F(ProxyRequestHandlerTest, ProxyNotFound) {
 
     ProxyRequestHandler proxyHandler(pathMap, "../..");
-    req.requestURI = "/proxydoesnotexist";
+    req.requestURI = "/rubberducks/pathnotexist";
     std::unique_ptr<HttpResponse> res = proxyHandler.HandleRequest(req);
     EXPECT_TRUE(res->errorCode == 404);
+}
+
+TEST_F(ProxyRequestHandlerTest, ProxySuccessful) {
+
+    ProxyRequestHandler proxyHandler(pathMap, "../..");
+    req.requestURI = "/rub/echo";
+    std::unique_ptr<HttpResponse> res = proxyHandler.HandleRequest(req);
+    cout << res -> errorCode << endl;
+    EXPECT_TRUE(res->errorCode == 200);
 }

@@ -45,7 +45,9 @@ std::unique_ptr<RequestHandler> ProxyRequestHandler::create(const NginxConfig& c
 
 std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpRequest &request){
     //
+    std::cout << "Request URI before set: " << request.requestURI << "\n";
     setURI(request.requestURI);
+    std::cout << "Request URI after set: " << uriPath << "\n";
 
     //test for sending request to dest server
     boost::asio::io_service io_service;
