@@ -28,4 +28,9 @@ server {
         location /ucla;
         dest www.ucla.edu;
     }
+
+    handler proxy {
+        location /jonny;
+        dest www.cs.ucla.edu;
+    }
 }

@@ -6,11 +6,10 @@
 using boost::asio::buffers_begin;
 
 ProxyRequestHandler::ProxyRequestHandler(
-    const std::unordered_map<std::string, std::string> proxyPathMap, std::string destPath):
+    std::unordered_map<std::string, std::string> config_params, std::string destPath):
     RequestHandler()
 {
-    validURIMap = proxyPathMap;
-    dest = validURIMap["dest"];
+    dest = config_params["dest"];
     std::cout << "destinated proxy address: " +  dest << std::endl;
     // uri = "";
     // filePath = "";
@@ -24,7 +23,7 @@ void ProxyRequestHandler::setURI(std::string request_uri)
         if (*it == '/')
         {
             ++it;
-            // uri.push_back('/');
+            uriPath.push_back('/');
             for (; *it != '/' && it != request_uri.end(); ++it);
             if (it != request_uri.end())
             {
@@ -65,7 +64,7 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     // allow us to treat all data up until the EOF as the content.
     boost::asio::streambuf req;
     std::ostream request_stream(&req);
-    request_stream << "GET " << "/" + uriPath << " HTTP/1.0\r\n";
+    request_stream << "GET " << uriPath << " HTTP/1.0\r\n";
     request_stream << "Host: " << dest << "\r\n";
     request_stream << "Accept: */*\r\n";
     request_stream << "Connection: close\r\n\r\n";
@@ -110,7 +109,6 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     }
 
     std::cout << "\n";
-
 
     std::string body;
     // Write whatever content we already have to output.

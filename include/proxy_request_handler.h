@@ -16,7 +16,7 @@ using boost::asio::ip::tcp;
 class ProxyRequestHandler : public RequestHandler
 {
 public:
-    ProxyRequestHandler(const std::unordered_map<std::string, std::string> staticPathMap, std::string destPath);
+    ProxyRequestHandler(const std::unordered_map<std::string, std::string> config_params, std::string destPath);
     virtual ~ProxyRequestHandler() {};
     static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
     std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request);
@@ -26,7 +26,6 @@ public:
 private:
     void setURI(std::string request_uri);
 
-    std::unordered_map<std::string, std::string> validURIMap;
     std::string dest;
     std::string uriPath;
 };
