@@ -76,6 +76,9 @@ target_link_libraries(static_file_request_handler_test request_handler_lib http_
 add_executable(action_request_handler_test tests/request_handler_tests/action_request_handler_test.cc)
 target_link_libraries(action_request_handler_test request_handler_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
 
+add_executable(proxy_request_handler_test tests/request_handler_tests/proxy_request_handler_test.cc)
+target_link_libraries(proxy_request_handler_test request_handler_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
+
 add_executable(request_manager_test tests/request_handler_tests/request_manager_test.cc)
 target_link_libraries(request_manager_test request_handler_lib config_parser_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
 
@@ -91,6 +94,7 @@ gtest_discover_tests(session_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/server_tests)
 gtest_discover_tests(static_file_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(action_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
+gtest_discover_tests(proxy_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(request_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(dispatcher_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/dispatcher_tests)
 gtest_discover_tests(http_request_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/http_request_object_tests)
