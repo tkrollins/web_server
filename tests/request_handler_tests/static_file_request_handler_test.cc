@@ -33,6 +33,8 @@ TEST_F(StaticFileRequestHandlerTest, FileFound) {
 
     StaticFileRequestHandler fileHandler(pathMap, "../..");
     req.requestURI = "/static/home.html";
+
+    fileHandler.setURIAndFileName(req.requestURI);
     fileHandler.setFileType();
     fileHandler.setPathToFile();
     bool fileExists = fileHandler.doesFileExist();

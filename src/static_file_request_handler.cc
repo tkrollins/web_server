@@ -79,6 +79,7 @@ void StaticFileRequestHandler::setPathToFile()
 
 bool StaticFileRequestHandler::doesFileExist()
 {
+    if(fileName.empty()) { return false; }
     ifstream fileToServe(pathToFile);
     return fileToServe.good();
 }
