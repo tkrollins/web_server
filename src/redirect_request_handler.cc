@@ -15,8 +15,6 @@ RedirectRequestHandler::RedirectRequestHandler(
 
 void RedirectRequestHandler::setResponse(HttpResponse& response, const HttpRequest& request)
 {
-    // should it return the raw request back or an http response containing the request in the body?
-    // I assume we do the latter
     body = "Redirected to " + redirect_url;
     std::string contentLengthStr = std::to_string(body.length());
     std::map<std::string,std::string> headers { {"Content-Length", contentLengthStr},
