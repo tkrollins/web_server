@@ -127,13 +127,15 @@ void ProxyRequestHandler::sendRequestToDest(std::string dest, std::string port, 
 
       // Read until EOF, writing data to output as we go.
       boost::system::error_code error;
+      std::string rest_response;
       while (boost::asio::read(socket, response,
              boost::asio::transfer_at_least(1), error)) {
           // std::cout << &response;
           auto bufs = response.data();
           std::string content_string(buffers_begin(bufs), buffers_begin(bufs) + response.size());
-          body += content_string;
+          rest_response = content_string;
       }
+      body += rest_response;
 
 }
 
