@@ -25,4 +25,4 @@ public:
 };
 
 
-#endif //ACTION_REQUEST_HANDLER_H
+#endif //REDIRECT_REQUEST_HANDLER_H

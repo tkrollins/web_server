@@ -25,9 +25,11 @@ public:
 
 private:
     void setURI(std::string request_uri);
+    void sendRequestToDest(std::string dest, std::string port, std::string uriPath, unsigned int &status, std::map<std::string,std::string> &headers,std::string &body );
 
     std::string dest;
     std::string uriPath;
+    std::string port;
 };
 
 #endif //PROXY_REQUEST_HANDLER_H

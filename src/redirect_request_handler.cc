@@ -35,4 +35,3 @@ std::unique_ptr<HttpResponse> RedirectRequestHandler::HandleRequest(const HttpRe
     setResponse(response, request);
     return std::make_unique<HttpResponse>(response);
 }
-
