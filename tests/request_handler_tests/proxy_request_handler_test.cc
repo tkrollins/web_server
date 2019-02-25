@@ -35,15 +35,15 @@ TEST_F(ProxyRequestHandlerTest, ProxyRedirect) {
     // The test will only pass after the server has been redeployed to incorporate redirect handler.
     // TODO: Change "redirectMap" to the fisrt definition when server deployment is successful
 
-    // unordered_map<string, string> redirectMap { {"dest", "static.bigbear.cs130.org/redirect"} };
-    unordered_map<string, string> redirectMap { {"dest", "live.com"} };
-    
+    unordered_map<string, string> redirectMap { {"dest", "static.bigbear.cs130.org/redirect"} };
+    //unordered_map<string, string> redirectMap { {"dest", "live.com"} };
+
     ProxyRequestHandler proxyHandler(redirectMap, "../..");
     req.requestURI = "/moved_echo";
     std::unique_ptr<HttpResponse> res = proxyHandler.HandleRequest(req);
     cout << "Status Code" <<res -> errorCode << endl;
-    
-    EXPECT_TRUE(res->errorCode == 301);
-    // TODO: Change errorCode assertion to 200 when server deployment is successful 
+
+    EXPECT_TRUE(res->errorCode == 200);
+    // TODO: Change errorCode assertion to 200 when server deployment is successful
     // EXPECT_TRUE(res->errorCode == 200);
 }
