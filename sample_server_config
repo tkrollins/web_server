@@ -33,4 +33,14 @@ server {
         location /jonny;
         dest www.cs.ucla.edu;
     }
+
+    handler proxy {
+        location /moved_echo;
+        dest static.bigbear.cs130.org/redirect;
+    }
+
+    handler redirect {
+        location /redirect;
+        dest static.bigbear.cs130.org/echo;
+    }
 }

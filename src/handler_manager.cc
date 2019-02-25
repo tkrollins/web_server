@@ -8,6 +8,7 @@
 #include "status_request_handler.h"
 #include "action_request_handler.h"
 #include "proxy_request_handler.h"
+#include "redirect_request_handler.h"
 #include <boost/log/trivial.hpp>
 
 std::unique_ptr<RequestHandler> HandlerManager::createByName(const std::string& name, const NginxConfig& config, const std::string& root_path)
@@ -27,6 +28,10 @@ std::unique_ptr<RequestHandler> HandlerManager::createByName(const std::string& 
     else if (name == "proxy")
     {
         return ProxyRequestHandler::create(config, root_path);
+    }
+    else if (name == "redirect")
+    {
+        return RedirectRequestHandler::create(config, root_path);
     }
     else
     {
