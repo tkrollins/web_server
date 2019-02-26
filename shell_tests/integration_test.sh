@@ -40,5 +40,12 @@ expected_response=$'<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset
 test_response $SERVER_PID $URI "$expected_response"
 echo "404 error response is correct"
 
+# test proxy
+URI="/moved_echo"
+expected_response="Hello Node.js Server!"
+test_response $SERVER_PID $URI "$expected_response"
+echo "reverse proxy is correct"
+
+
 kill $SERVER_PID
 exit 0

@@ -12,4 +12,8 @@ server {
     handler echo {
         location /echo;
     }
+    handler proxy {
+        location /moved_echo;
+        dest 35.247.29.163/redirect;
+    }
 }
