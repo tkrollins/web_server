@@ -22,7 +22,6 @@ server {
     handler proxy {
         location /rubberducks;
         dest www.rubberducks.cs130.org;
-        port 8080;
     }
 
     handler proxy {
@@ -32,11 +31,11 @@ server {
 
     handler proxy {
         location /moved_echo;
-        dest static.bigbear.cs130.org/redirect/;
+        dest 127.0.0.1/redirect/;
     }
 
     handler redirect {
         location /redirect;
-        dest http://static.bigbear.cs130.org/echo;
+        dest 127.0.0.1/echo;
     }
 }
