@@ -31,7 +31,7 @@ server {
 
     handler proxy {
         location /moved_echo;
-        dest static.bigbear.cs130.org/redirect/;
+        dest 35.247.29.163/redirect;
     }
 
     handler redirect {

@@ -151,14 +151,24 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     //handle 301 and 302 redirection
     if(status == 301 || status == 302){
         std::string location = headers["Location"];
-        size_t cursor = location.find_first_of("/");
-        if (cursor != std::string::npos){
-            uriPath = "/" + location.substr(cursor+1);
+        if (location.substr(0, 8) == std::string("https://"))
+            location = location.substr(8, location.size() - 8);
+        else if (location.substr(0, 7) == std::string("http://"))
+            location = location.substr(7, location.size() - 7);
+        
+        size_t cursor = location.find_first_of("/");    
+        if (cursor != std::string::npos) {
+            uriPath = "/" + location.substr(cursor + 1);
             // for some reason, you have to get rid of the last character
             uriPath = uriPath.substr(0, uriPath.length() - 1);
-            dest = location.substr(0,cursor);
+            dest = location.substr(0, cursor);
+            size_t cursor_port = dest.find_first_of(":");
+            if (cursor_port != std::string::npos) {
+                port = dest.substr(cursor_port + 1);
+                dest = dest.substr(0, cursor_port);
+            }
         }
-        sendRequestToDest(dest,port,uriPath, status,headers, body);
+        sendRequestToDest(dest, port, uriPath, status,headers, body);
     }
     std::cout << "status_code: " << status << std::endl;
     for(auto it = headers.begin(); it!=headers.end(); it++){
