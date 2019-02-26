@@ -117,6 +117,7 @@ void ProxyRequestHandler::sendRequestToDest(std::string dest, std::string port, 
       // std::cout << "\n";
 
       body = "";
+      std::string content;
       // Write whatever content we already have to output.
       if (response.size() > 0){
           //write the reponse content to string
@@ -149,6 +150,7 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     std::string body;
 
     sendRequestToDest(dest,port,uriPath, status,headers, body);
+    // sendRequestToDest(dest,port,uriPath, status,headers, body);
 
     //handle 301 and 302 redirection
     if(status == 301 || status == 302){
@@ -159,8 +161,8 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
             dest = location.substr(0,cursor);
         }
         std::cout << "location: " << location << std::endl;
-        std::string dest = "static.bigbear.cs130.org";
-        std::string uriPath = "/echo";
+        std::string dest = "www.rubberducks.cs130.org";
+        std::string uriPath = "/static/index.html";
         sendRequestToDest(dest,port,uriPath, status,headers, body);
     }
     std::cout << "status_code: " << status << std::endl;

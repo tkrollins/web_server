@@ -31,11 +31,11 @@ server {
 
     handler proxy {
         location /moved_echo;
-        dest 127.0.0.1/redirect/;
+        dest static.bigbear.cs130.org/redirect/;
     }
 
     handler redirect {
         location /redirect;
-        dest 127.0.0.1/echo;
+        dest www.rubberducks.cs130.org/static/index.html;
     }
 }
