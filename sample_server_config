@@ -21,7 +21,7 @@ server {
 
     handler proxy {
         location /rubberducks;
-        dest www.rubberducks.cs130.org;
+        dest www.rubberducks.cs130.org/status;
     }
 
     handler proxy {
