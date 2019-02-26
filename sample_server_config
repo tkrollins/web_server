@@ -37,6 +37,6 @@ server {
 
     handler redirect {
         location /redirect;
-        dest static.bigbear.cs130.org/echo;
+        dest http://static.bigbear.cs130.org/echo;
     }
 }
