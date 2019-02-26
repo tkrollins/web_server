@@ -121,23 +121,20 @@ void ProxyRequestHandler::sendRequestToDest(std::string dest, std::string port, 
       // Write whatever content we already have to output.
       if (response.size() > 0){
           //write the reponse content to string
-          auto bufs = response.data();
-          std::string content_string(buffers_begin(bufs), buffers_begin(bufs) + response.size());
-          body = content_string;
+          std::getline(response_stream, content);
       }
+      body += content;
 
       // Read until EOF, writing data to output as we go.
       boost::system::error_code error;
       std::string rest_response;
       while (boost::asio::read(socket, response,
              boost::asio::transfer_at_least(1), error)) {
-          // std::cout << &response;
           auto bufs = response.data();
           std::string content_string(buffers_begin(bufs), buffers_begin(bufs) + response.size());
           rest_response = content_string;
       }
       body += rest_response;
-
 }
 
 std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpRequest &request){
