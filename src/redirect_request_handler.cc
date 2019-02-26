@@ -19,6 +19,7 @@ void RedirectRequestHandler::setResponse(HttpResponse& response, const HttpReque
     std::string contentLengthStr = std::to_string(body.length());
     std::map<std::string,std::string> headers { {"Content-Length", contentLengthStr},
                                                 {"Location", redirect_url}};
+    BOOST_LOG_TRIVIAL(info) << "Redirect hanlder has been invoked redirected to: " << redirect_url;
 
     response.setHttpResponse(status, headers, body);
 }
