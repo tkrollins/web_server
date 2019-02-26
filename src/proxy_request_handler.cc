@@ -60,7 +60,7 @@ void ProxyRequestHandler::sendRequestToDest(std::string dest, std::string port, 
 
       // Get a list of endpoints corresponding to the server name.
       tcp::resolver resolver(io_service);
-      tcp::resolver::query query(dest, port);
+    tcp::resolver::query query(dest, port);
       tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
 
       // Try each endpoint until we successfully establish a connection.
@@ -149,13 +149,12 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
     sendRequestToDest(dest,port,uriPath, status,headers, body);
 
     //handle 301 and 302 redirection
-    if(status == 301 || status == 302){
+    if (status == 301 || status == 302){
         std::string location = headers["Location"];
         if (location.substr(0, 8) == std::string("https://"))
             location = location.substr(8, location.size() - 8);
         else if (location.substr(0, 7) == std::string("http://"))
             location = location.substr(7, location.size() - 7);
-        
         size_t cursor = location.find_first_of("/");    
         if (cursor != std::string::npos) {
             uriPath = "/" + location.substr(cursor + 1);
@@ -167,7 +166,15 @@ std::unique_ptr<HttpResponse> ProxyRequestHandler::HandleRequest(const HttpReque
                 port = dest.substr(cursor_port + 1);
                 dest = dest.substr(0, cursor_port);
             }
-        }
+        } else {
+            dest = location;
+            uriPath = "/";
+            size_t cursor_port = dest.find_first_of(":");
+            if (cursor_port != std::string::npos) {
+                port = dest.substr(cursor_port + 1);
+                dest = dest.substr(0, cursor_port);
+            }
+        }]
         sendRequestToDest(dest, port, uriPath, status,headers, body);
     }
     std::cout << "status_code: " << status << std::endl;

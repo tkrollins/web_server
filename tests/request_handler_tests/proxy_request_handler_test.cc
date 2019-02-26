@@ -35,8 +35,7 @@ TEST_F(ProxyRequestHandlerTest, ProxyRedirect) {
     // The test will only pass after the server has been redeployed to incorporate redirect handler.
     // TODO: Change "redirectMap" to the fisrt definition when server deployment is successful
 
-    unordered_map<string, string> redirectMap { {"dest", "static.bigbear.cs130.org/redirect"} };
-    //unordered_map<string, string> redirectMap { {"dest", "live.com"} };
+    unordered_map<string, string> redirectMap { {"dest", "35.247.29.163/redirect"} };
 
     ProxyRequestHandler proxyHandler(redirectMap, "../..");
     req.requestURI = "/moved_echo";
