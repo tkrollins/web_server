@@ -9,7 +9,7 @@ RedirectRequestHandler::RedirectRequestHandler(
         RequestHandler()
 {
     // validURIMap = actionMap;
-    redirect_url = config_params["dest"];
+    redirect_url = string("http://") + config_params["dest"];
     status = 302;
 }
 
