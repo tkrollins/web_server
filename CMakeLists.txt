@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10.0)
-project(bigbear)
+project(bigbear CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -32,6 +32,16 @@ add_subdirectory(/usr/src/googletest googletest)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+#find_library(LEVELDB_LIB leveldb
+#        HINTS ${CMAKE_SOURCE_DIR}/lib
+#        REQUIRED)
+#if(NOT LEVELDB_LIB)
+#    message(FATAL_ERROR "LevelDB not found.")
+#endif()
+
+add_library(leveldb SHARED IMPORTED)
+set_target_properties(leveldb PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/libleveldb.so)
+
 # Enable Boost
 # Use static libraries so binaries can be deployed without a full boost install
 set(Boost_USE_STATIC_LIBS ON)
@@ -50,7 +60,7 @@ add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http
 add_library(request_handler_lib src/proxy_request_handler.cc src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/status_request_handler.cc src/redirect_request_handler.cc src/handler_manager.cc src/request_handler_dispatcher.cc)
 add_library(http_response src/http_response.cc)
 add_library(http_request src/http_request.cc)
-target_link_libraries(request_handler_lib config_parser_lib)
+target_link_libraries(request_handler_lib config_parser_lib leveldb)
 
 # TODO(!): Update executable name, srcs, and deps
 add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
