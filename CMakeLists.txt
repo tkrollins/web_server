@@ -32,13 +32,6 @@ add_subdirectory(/usr/src/googletest googletest)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-#find_library(LEVELDB_LIB leveldb
-#        HINTS ${CMAKE_SOURCE_DIR}/lib
-#        REQUIRED)
-#if(NOT LEVELDB_LIB)
-#    message(FATAL_ERROR "LevelDB not found.")
-#endif()
-
 add_library(leveldb SHARED IMPORTED)
 set_target_properties(leveldb PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/libleveldb.so)
 
@@ -60,7 +53,8 @@ add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http
 add_library(request_handler_lib src/proxy_request_handler.cc src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/status_request_handler.cc src/redirect_request_handler.cc src/handler_manager.cc src/request_handler_dispatcher.cc)
 add_library(http_response src/http_response.cc)
 add_library(http_request src/http_request.cc)
-target_link_libraries(request_handler_lib config_parser_lib leveldb)
+add_library(meme_db src/meme_db.cc)
+target_link_libraries(request_handler_lib config_parser_lib meme_db leveldb)
 
 # TODO(!): Update executable name, srcs, and deps
 add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
@@ -98,6 +92,9 @@ target_link_libraries(dispatcher_test request_handler_lib config_parser_lib http
 add_executable(http_request_test tests/http_request_object_tests/http_request_test.cc)
 target_link_libraries(http_request_test http_request gtest_main Boost::system Boost::log Boost::regex)
 
+add_executable(meme_db_test tests/meme_db_test.cc)
+target_link_libraries(meme_db_test meme_db leveldb gtest_main)
+
 # TODO(!): Update with tests binary
 gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/config_parser_tests)
 gtest_discover_tests(session_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/server_tests)
@@ -108,6 +105,7 @@ gtest_discover_tests(proxy_request_handler_test WORKING_DIRECTORY ${CMAKE_CURREN
 gtest_discover_tests(request_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(dispatcher_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/dispatcher_tests)
 gtest_discover_tests(http_request_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/http_request_object_tests)
+gtest_discover_tests(meme_db_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
  add_test(NAME server_integration_test
          COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/integration_test.sh "./test_config"
@@ -120,5 +118,7 @@ add_test(NAME threadedness_test
 # TODO(!): Update with target/tests targets
 if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
     include(cmake/CodeCoverageReportConfig.cmake)
-    generate_coverage_report(TARGETS server server_lib config_parser_lib request_handler_lib TESTS config_parser_test session_test server_test static_file_request_handler_test action_request_handler_test proxy_request_handler_test request_manager_test dispatcher_test http_request_test)
+    generate_coverage_report(TARGETS server server_lib config_parser_lib request_handler_lib meme_db
+            TESTS config_parser_test session_test server_test static_file_request_handler_test action_request_handler_test
+            proxy_request_handler_test request_manager_test dispatcher_test http_request_test meme_db_test)
 endif()
