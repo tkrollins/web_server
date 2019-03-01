@@ -39,7 +39,7 @@ set_target_properties(leveldb PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/l
 # Use static libraries so binaries can be deployed without a full boost install
 set(Boost_USE_STATIC_LIBS ON)
 
-find_package(Boost 1.50 REQUIRED COMPONENTS system log regex)
+find_package(Boost 1.50 REQUIRED COMPONENTS system filesystem log regex)
 message(STATUS "Boost version: ${Boost_VERSION}")
 message("Boost VERSION: ${Boost_VERSION}")
 message("Boost INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
@@ -54,7 +54,7 @@ add_library(request_handler_lib src/proxy_request_handler.cc src/static_file_req
 add_library(http_response src/http_response.cc)
 add_library(http_request src/http_request.cc)
 add_library(meme_db src/meme_db.cc)
-target_link_libraries(request_handler_lib config_parser_lib meme_db leveldb)
+target_link_libraries(request_handler_lib config_parser_lib meme_db Boost::filesystem leveldb)
 
 # TODO(!): Update executable name, srcs, and deps
 add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
@@ -93,7 +93,7 @@ add_executable(http_request_test tests/http_request_object_tests/http_request_te
 target_link_libraries(http_request_test http_request gtest_main Boost::system Boost::log Boost::regex)
 
 add_executable(meme_db_test tests/meme_db_test.cc)
-target_link_libraries(meme_db_test meme_db leveldb gtest_main)
+target_link_libraries(meme_db_test meme_db Boost::filesystem leveldb gtest_main)
 
 # TODO(!): Update with tests binary
 gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/config_parser_tests)

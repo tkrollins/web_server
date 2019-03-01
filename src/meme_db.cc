@@ -1,8 +1,10 @@
 #include "meme_db.h"
 #include <assert.h>
 #include <iostream>
+#include <boost/filesystem.hpp>
 
 leveldb::DB* MemeDB::db = nullptr;
+std::string MemeDB::dir = "";
 
 // Inits only if first instance
 MemeDB::MemeDB(std::string dir)
@@ -16,9 +18,10 @@ MemeDB::MemeDB(std::string dir)
 // Creates connection to leveldb, using dir specified
 void MemeDB::init(std::string dir)
 {
+    MemeDB::dir = dir;
     leveldb::Options options;
     options.create_if_missing = true;
-    leveldb::Status status = leveldb::DB::Open(options, dir, &db);
+    leveldb::Status status = leveldb::DB::Open(options, dir, &MemeDB::db);
     // TODO: add logging
     assert(status.ok());
 }
@@ -45,15 +48,30 @@ void MemeDB::appendTypeToID(std::string &id, MemeDB::ValueType type)
     }
 }
 
-// Removes value type from key
-void MemeDB::removeTypeFromID(std::string &id, MemeDB::ValueType type)
+// Removes value type from id
+void MemeDB::removeTypeFromID(std::string &id)
 {
-    const int idLength = 3;
-    const int topLength = 4;
-    const int bottomLength = 7;
-    const int urlLength = 4;
+    const int ID_LEN = 3;
+    const int TOP_LEN = 4;
+    const int BOTTOM_LEN = 7;
+    const int URL_LEN = 4;
 
-    // TODO: implement
+    if(id.find("_id") != std::string::npos)
+    {
+        id = id.substr(0, (id.size()-ID_LEN));
+    }
+    else if(id.find("_top") != std::string::npos)
+    {
+        id = id.substr(0, (id.size()-TOP_LEN));
+    }
+    else if(id.find("_bottom") != std::string::npos)
+    {
+        id = id.substr(0, (id.size()-BOTTOM_LEN));
+    }
+    else if(id.find("_url") != std::string::npos)
+    {
+        id = id.substr(0, (id.size()-URL_LEN));
+    }
 }
 
 // Closes connection to leveldb
@@ -68,7 +86,9 @@ void MemeDB::close()
 // This will clear the database info
 void MemeDB::clear()
 {
-    // TODO: rm leveldb dir
+    close();
+    boost::filesystem::remove_all(MemeDB::dir);
+    MemeDB::dir = "";
 }
 
 // Adds id:parameter pair to db. Must specify type
@@ -113,7 +133,16 @@ bool MemeDB::isConnected()
 
 
 // Returns set of all IDs in db
-//std::set<std::string> MemeDB::getKeys()
-//{
-//
-//}
+std::set<std::string> MemeDB::getIDs()
+{
+    std::set<std::string> IDs;
+    leveldb::Iterator* it = MemeDB::db->NewIterator(leveldb::ReadOptions());
+    for(it->SeekToFirst(); it->Valid(); it->Next())
+    {
+        std::string id = it->key().ToString();
+        removeTypeFromID(id);
+        IDs.insert(id);
+    }
+    delete it;
+    return IDs;
+}

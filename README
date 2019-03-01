@@ -224,3 +224,34 @@ if(parser.Parse("config_file_name", &config))
     // on to relevant handlers by dispatcher
     server svr(io_service, &config)
 }
+
+
+*********************
+MEME DB DOCUMENTATION
+*********************
+
+FIRST INSTANTIATION (DB not connected):
+--------------------------------------
+
+// If directory is not provided, "./leveldb_dir" will be used by default
+MemeDB database("directory_to_use");
+
+SUBSEQUENT INSTANTIATIONS (DB already connected):
+-------------------------------------------------
+
+MemeDB database;
+
+DATA RETRIEVAL / STORAGE:
+-------------------------
+
+// adds id : parameter pair to database
+database.Put("ID", "parameter", MemeDB::ValueType);
+
+// gets parameter string given id, returns "" if not found
+database.Get("ID", MemeDB::ValueType);
+
+// delets id : parameter pair from database
+database.Delete("ID", MemeDB::ValueType);
+
+// returns set of all IDs in database
+database.getIDs();
