@@ -15,12 +15,14 @@
 #include "server.h"
 #include "config_parser.h"
 #include <boost/log/trivial.hpp>
-
+#include "meme_db.h"
 using boost::asio::ip::tcp;
 
 void termination_handler(int param)
 {
     BOOST_LOG_TRIVIAL(fatal) << "Received the termination signal, shutting down the server...";
+    MemeDB database;
+    database.close();
     exit(0);
 }
 
@@ -28,6 +30,7 @@ void termination_handler(int param)
 // TODO: THis code definitely needs to be refactored
 int main(int argc, char* argv[])
 {
+    MemeDB database("/usr/src/projects/bigbear/meme_database");
     try
     {
         if (argc != 2)
@@ -82,6 +85,6 @@ int main(int argc, char* argv[])
       {
             BOOST_LOG_TRIVIAL(fatal) << "Exception: " << e.what() << "\n";
       }
-
+      database.close();
       return 0;
 }
