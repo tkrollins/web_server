@@ -38,4 +38,8 @@ server {
         location /redirect;
         dest www.rubberducks.cs130.org/static/index.html;
     }
+
+    handler createMeme {
+        location /meme/create;
+    }
 }

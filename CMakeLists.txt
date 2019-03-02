@@ -47,14 +47,17 @@ message("Boost Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
 message("Boost LIBRARIES: ${Boost_LIBRARIES}")
 include_directories(include)
 
+# Enable libcurl
+find_package(CURL REQUIRED)
+
 # TODO(!): Update name and srcs
 add_library(config_parser_lib src/config_parser/config_parser.cc src/config_parser/nginx_config_tokens.cc src/config_parser/nginx_config.cc)
 add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/static_file_request_handler.cc src/action_request_handler.cc)
-add_library(request_handler_lib src/proxy_request_handler.cc src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/status_request_handler.cc src/redirect_request_handler.cc src/handler_manager.cc src/request_handler_dispatcher.cc)
+add_library(request_handler_lib src/proxy_request_handler.cc src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/status_request_handler.cc src/redirect_request_handler.cc src/create_meme_handler.cc src/handler_manager.cc src/request_handler_dispatcher.cc)
 add_library(http_response src/http_response.cc)
 add_library(http_request src/http_request.cc)
 add_library(meme_db src/meme_db.cc)
-target_link_libraries(request_handler_lib config_parser_lib meme_db Boost::filesystem leveldb)
+target_link_libraries(request_handler_lib config_parser_lib meme_db Boost::filesystem leveldb ${CURL_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/base64.a)
 
 # TODO(!): Update executable name, srcs, and deps
 add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
@@ -83,6 +86,9 @@ target_link_libraries(action_request_handler_test request_handler_lib http_respo
 add_executable(proxy_request_handler_test tests/request_handler_tests/proxy_request_handler_test.cc)
 target_link_libraries(proxy_request_handler_test request_handler_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
 
+add_executable(create_meme_handler_test tests/request_handler_tests/create_meme_handler_test.cc)
+target_link_libraries(create_meme_handler_test request_handler_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
+
 add_executable(request_manager_test tests/request_handler_tests/request_manager_test.cc)
 target_link_libraries(request_manager_test request_handler_lib config_parser_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
 
@@ -102,6 +108,7 @@ gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/t
 gtest_discover_tests(static_file_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(action_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(proxy_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
+gtest_discover_tests(create_meme_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(request_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(dispatcher_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/dispatcher_tests)
 gtest_discover_tests(http_request_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/http_request_object_tests)
@@ -120,5 +127,5 @@ if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
     include(cmake/CodeCoverageReportConfig.cmake)
     generate_coverage_report(TARGETS server server_lib config_parser_lib request_handler_lib meme_db
             TESTS config_parser_test session_test server_test static_file_request_handler_test action_request_handler_test
-            proxy_request_handler_test request_manager_test dispatcher_test http_request_test meme_db_test)
+            proxy_request_handler_test request_manager_test dispatcher_test http_request_test meme_db_test create_meme_handler_test)
 endif()

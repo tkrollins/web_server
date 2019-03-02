@@ -12,4 +12,5 @@ RUN apt-get update && apt-get install -y \
     libboost-signals-dev \
     libboost-system-dev \
     libboost-regex-dev \
-    libgtest-dev
+    libgtest-dev \
+    libcurl4-openssl-dev --fix-missing\

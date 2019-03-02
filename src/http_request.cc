@@ -187,12 +187,19 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
     // TODO: sometimes, the content length isn't a numerical value (like in the readme)??
     // need to handle that case 
     // a body will exist if there is a specified content length in the headers (is this true?)
-    // if (this->headerFields.find(CONTENT_LENGTH) != this->headerFields.end())
-    // {
+    if (this->headerFields.find(CONTENT_LENGTH) != this->headerFields.end())
+    {
     //     // sorry about this line -- will clean it up. Just supposed to set the http body
     //     // attribute based on the content length
-    //     bodyFound = setBody(requestString.substr(requestBodyStart, std::stoi(this->headerFields[CONTENT_LENGTH])));
-    // }
+        try
+        {
+            bodyFound = setBody(requestString.substr(requestBodyStart, std::stoi(this->headerFields[CONTENT_LENGTH])));
+        }
+        catch(std::invalid_argument& e)
+        {
+            
+        }
+    }
 
     if (methodFound && targetFound && versionFound && headersFound && isComplete)
         return true;
