@@ -12,6 +12,28 @@ $ printf "whatever message here" | nc localhost 8080
 There might be a better way of doing this, but this is all I know so far
 *******************************************************************
 
+How to Meme?
+
+To Add Meme:
+In Browser, go:
+localhost/meme/submit/submit_meme.html
+or use terminal (directly call create API)
+$ curl -X POST localhost/meme/create -d "image=angry_lebron.jpg&top=asdf&bottom=blahblahblah"
+
+To See Meme List:
+In Browser, go:
+localhost/meme
+or use terminal (directly call create API)
+$ curl -X GET localhost/meme
+
+To See a meme:
+In Browser, go:
+localhost/meme/view?id=$meme.id
+or use terminal (directly call create API)
+$ curl -X GET localhost/meme/view?id=$meme.id
+
+*******************************************************************
+
 Request Static Files
 
 In Browser, go:

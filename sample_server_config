@@ -11,7 +11,7 @@ server {
     }
 
     handler static{
-        location /meme;
+        location /meme/submit;
         root static_files/memes;
     }
     handler echo {
@@ -46,5 +46,9 @@ server {
 
     handler createMeme {
         location /meme/create;
+    }
+
+    handler listMeme {
+        location /meme;
     }
 }

@@ -7,6 +7,7 @@ cmake-build-debug
 *.log
 .idea/
 /include/gtest
+meme_database
 # output file of integration test
 /shell_tests/expected.txt
 /shell_tests/response.txt
