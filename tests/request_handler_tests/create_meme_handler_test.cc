@@ -4,13 +4,14 @@
 #include "meme_db.h"
 #include "handler_manager.h"
 
-TEST(CreateMemeHandlerTest, CreateDBEntry) {
+TEST(CreateMemeHandlerTest, CreateWithPostRequest) {
     NginxConfig config;
     HandlerManager manager;
     std::unique_ptr<RequestHandler> createMemeHandler = manager.createByName("createMeme", config, "");
     MemeDB database("/usr/src/projects/bigbear/build/tmp_db");
 
     HttpRequest request;
+    request.requestMethod = httpRequestEnum::POST;
     request.requestBody = "image=1&top=2&bottom=3";
     std::string generatedID = "MXRvcDoyYm90dG9tOjM="; // base64 encoding of "1top:2bottom:3"
     std::unique_ptr<HttpResponse> response = createMemeHandler -> HandleRequest(request);
@@ -26,6 +27,25 @@ TEST(CreateMemeHandlerTest, CreateDBEntry) {
     EXPECT_TRUE(successPic);
     EXPECT_TRUE(successTop);
     EXPECT_TRUE(successBottom);
+
+}
+
+TEST(CreateMemeHandlerTest, CreateWithGetRequest) {
+    NginxConfig config;
+    HandlerManager manager;
+    std::unique_ptr<RequestHandler> createMemeHandler = manager.createByName("createMeme", config, "");
+    MemeDB database("/usr/src/projects/bigbear/build/tmp_db");
+
+    HttpRequest request;
+    request.requestMethod = httpRequestEnum::GET;
+    request.requestBody = "image=1&top=2&bottom=3";
+    std::string generatedID = "MXRvcDoyYm90dG9tOjM="; // base64 encoding of "1top:2bottom:3"
+    std::unique_ptr<HttpResponse> response = createMemeHandler -> HandleRequest(request);
+
+    EXPECT_FALSE(database.Get(generatedID, MemeDB::IMAGE) == "1");
+    EXPECT_FALSE(database.Get(generatedID, MemeDB::TOP_TEXT) == "2");
+    EXPECT_FALSE(database.Get(generatedID, MemeDB::BOTTOM_TEXT) == "3");
+    EXPECT_FALSE(response -> body.find(generatedID) != std::string::npos);
 
 }
 

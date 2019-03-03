@@ -10,7 +10,7 @@ bool HttpRequest::setMethod(std::string method)
     {
       // handle null pointer exception
     }
-
+    std::cout << "method" << method << std::endl;
     // TODO: implement function
     if (method.compare("GET") == 0)
     {
@@ -18,19 +18,24 @@ bool HttpRequest::setMethod(std::string method)
         // std::cout << method << std::endl;
         return true;
     }
+    else if (method.compare("POST") == 0)
+    {
+        this->requestMethod = POST;
+        return true;
+    }
     return false;
 }
 
 bool HttpRequest::setURI(std::string requestTarget)
 {
-    // std::cout << requestTarget << std::endl;
+    std::cout << "target: " << requestTarget << std::endl;
     this->requestURI = requestTarget;
     return true;
 }
 
 bool HttpRequest::setVersion(std::string version)
 {
-    // std::cout << version << std::endl;
+    std::cout << version << std::endl;
     this->httpVersion = version;
     return true;
 }
@@ -95,7 +100,7 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
     unparsedRequestString = requestString;
 
     BOOST_LOG_TRIVIAL(trace) << "Parsing HTTP request";
-
+    std::cout << requestString << std::endl;
     // divide up the requestString into lines
     std::vector<std::string> requestLines; // requestLines contains all parts of the request before the \r\n\r\n sequence
     int lineBeginning = 0; // index of the char at the beginning of each line

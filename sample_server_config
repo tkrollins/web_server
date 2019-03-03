@@ -9,6 +9,11 @@ server {
         location /fun;
         root static_files/more_files;
     }
+
+    handler static{
+        location /meme;
+        root static_files/memes;
+    }
     handler echo {
         location /echo;
     }

@@ -1,8 +1,8 @@
 # include "create_meme_handler.h"
-# include "curl/curl.h"
 # include "http_response.h"
 # include "base64.h"
 # include "meme_db.h"
+# include <algorithm>
 
 std::unique_ptr<RequestHandler> CreateMemeHandler::create(const NginxConfig& config, const std::string& root_path)
 {
@@ -28,9 +28,13 @@ std::string CreateMemeHandler::escape(const std::string& data) {
 
 bool CreateMemeHandler::parseRequestBody(const HttpRequest &request)
 {
+    if(request.requestMethod != httpRequestEnum::POST)
+    {
+        return false;
+    }
     int andSignPos = 0;
-    CURL* curl;
-    std::string urlParams = curl_easy_unescape(curl, request.requestBody.c_str(), 0, NULL);
+    std::string urlParams = request.requestBody;
+    std::replace(urlParams.begin(), urlParams.end(), '+', ' ');
     urlParams += "&"; // in order to successfully parse the last parameter
     andSignPos = urlParams.find("&");
     while(andSignPos != std::string::npos)
