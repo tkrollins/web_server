@@ -1,5 +1,5 @@
-#ifndef LIST_MEME_HANDLER_H
-#define LIST_MEME_HANDLER_H
+#ifndef LIST_MEME_REQUEST_HANDLER_H
+#define LIST_MEME_REQUEST_HANDLER_H
 
 #include "request_handler.h"
 #include "config_parser.h"
@@ -16,4 +16,4 @@ public:
 };
 
 
-#endif //LIST_MEME_HANDLER_H
+#endif //LIST_MEME_REQUEST_HANDLER_H

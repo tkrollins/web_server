@@ -8,6 +8,7 @@ cmake-build-debug
 .idea/
 /include/gtest
 meme_database
+tests/request_handler_tests/leveldb_dir
 # output file of integration test
 /shell_tests/expected.txt
 /shell_tests/response.txt

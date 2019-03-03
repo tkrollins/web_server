@@ -1,4 +1,4 @@
-#include "list_meme_handler.h"
+#include "list_meme_request_handler.h"
 #include "http_response.h"
 #include <boost/log/trivial.hpp>
 #include "meme_db.h"
@@ -30,7 +30,7 @@ std::unique_ptr<HttpResponse> ListMemeHandler::HandleRequest(const HttpRequest &
     }
     body += "</body>\r\n</html>";
     std::string contentLengthStr = std::to_string(body.length());
-    std::map<std::string,std::string> headers { {"Content-Type", "text/plain"},
+    std::map<std::string,std::string> headers { {"Content-Type", "text/html"},
                                                 {"Content-Length", contentLengthStr}};
     HttpResponse res;
     res.setHttpResponse(status, headers, body);

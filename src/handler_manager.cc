@@ -10,7 +10,7 @@
 #include "proxy_request_handler.h"
 #include "redirect_request_handler.h"
 #include "create_meme_handler.h"
-#include "list_meme_handler.h"
+#include "list_meme_request_handler.h"
 #include <boost/log/trivial.hpp>
 
 std::unique_ptr<RequestHandler> HandlerManager::createByName(const std::string& name, const NginxConfig& config, const std::string& root_path)
