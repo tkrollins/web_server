@@ -24,6 +24,9 @@ public:
     // set the handler's memeID attribute by parsing the URI attribute
     void setMemeID();
 
+    // sets the location of the handler that will serve the requested meme image
+    void setMemeURI();
+
     // Looks up the meme id in the db and retrieves the meme information (path and text)
     void setFileName();
     void setMemeText();
@@ -32,6 +35,7 @@ public:
     void buildMemeHTML();
 
     std::string memeID;
+    std::string memeURI;
     std::string memeTextTop;
     std::string memeTextBottom;
     std::string memeAsHTML;

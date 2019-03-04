@@ -38,6 +38,11 @@ void ViewMemeHandler::setFileName()
 	fileName = database.Get(memeID, MemeDB::IMAGE); // todo
 }
 
+void ViewMemeHandler::setMemeURI()
+{
+	memeURI = validURIMap["memeURI"] + '/' + fileName;
+}
+
 // Looks up the meme id in the db and retrieves the meme information (path and text)
 void ViewMemeHandler::setMemeText()
 {
@@ -50,7 +55,7 @@ void ViewMemeHandler::setMemeText()
 void ViewMemeHandler::buildMemeHTML()
 {
 	std::string styleElement = "<style>\n  body { display: inline-block; position: relative; }\n  span { color: white; font: 2em bold Impact, sans-serif; position: absolute; text-align: center; width: 100%; }\n  #top { top: 0; }\n  #bottom { bottom: 0; }\n</style>\n";
-	std::string bodyElement = "<body>\n  <img src=\"" + pathToFile + "\">\n  <span id=\"top\">\"" + memeTextTop + "\"</span>\n  <span id=\"bottom\">\"" + memeTextBottom + "\"</span>\n</body>";
+	std::string bodyElement = "<body>\n  <img src=\"" + memeURI + "\">\n  <span id=\"top\">" + memeTextTop + "</span>\n  <span id=\"bottom\">" + memeTextBottom + "</span>\n</body>";
 	memeAsHTML = styleElement + bodyElement;
 }
 
@@ -75,6 +80,7 @@ std::unique_ptr<HttpResponse> ViewMemeHandler::HandleRequest(const HttpRequest &
 	if (doesFileExist() && !fileName.empty())
 	{
 		fileType = HTML;
+		setMemeURI();
 		setMemeText();
 		buildMemeHTML();
 	    setResponse(response, memeAsHTML);

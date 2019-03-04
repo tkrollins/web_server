@@ -9,7 +9,10 @@ server {
         location /fun;
         root static_files/more_files;
     }
-
+    handler static{
+        location /memes;
+        root static_files/memes/images;
+    }
     handler static{
         location /meme/submit;
         root static_files/memes;
@@ -55,5 +58,6 @@ server {
     handler viewMeme {
         location /meme/view;
         root static_files/memes/images;
+        memeURI /memes;
     }
 }
