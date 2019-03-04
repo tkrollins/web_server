@@ -13,4 +13,5 @@ private:
     bool parseRequestBody(const HttpRequest &request);
     std::unordered_map<std::string, std::string> params;
     std::string escape(const std::string& data);
+    std::string urlDecode(const std::string &SRC);
 };

@@ -2,7 +2,6 @@
 # include "http_response.h"
 # include "base64.h"
 # include "meme_db.h"
-# include "curl/curl.h"
 # include <algorithm>
 
 std::unique_ptr<RequestHandler> CreateMemeHandler::create(const NginxConfig& config, const std::string& root_path)
@@ -27,6 +26,25 @@ std::string CreateMemeHandler::escape(const std::string& data) {
     return res;
 }
 
+//https://stackoverflow.com/questions/154536/encode-decode-urls-in-c
+std::string CreateMemeHandler::urlDecode(const std::string &SRC)
+{
+    std::string ret;
+    char ch;
+    int i, ii;
+    for (i=0; i<SRC.length(); i++) {
+        if (int(SRC[i])==37) {
+            sscanf(SRC.substr(i+1,2).c_str(), "%x", &ii);
+            ch=static_cast<char>(ii);
+            ret+=ch;
+            i=i+2;
+        } else {
+            ret+=SRC[i];
+        }
+    }
+    return (ret);
+}
+
 bool CreateMemeHandler::parseRequestBody(const HttpRequest &request)
 {
     if(request.requestMethod != httpRequestEnum::POST)
@@ -34,8 +52,7 @@ bool CreateMemeHandler::parseRequestBody(const HttpRequest &request)
         return false;
     }
     int andSignPos = 0;
-    CURL *curl = curl_easy_init();
-    std::string urlParams = curl_easy_unescape(curl, request.requestBody.c_str(), request.requestBody.length(), NULL);
+    std::string urlParams = urlDecode(request.requestBody);
     std::replace(urlParams.begin(), urlParams.end(), '+', ' ');
     urlParams += "&"; // in order to successfully parse the last parameter
     andSignPos = urlParams.find("&");
