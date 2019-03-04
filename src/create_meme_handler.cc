@@ -2,6 +2,7 @@
 # include "http_response.h"
 # include "base64.h"
 # include "meme_db.h"
+# include "curl/curl.h"
 # include <algorithm>
 
 std::unique_ptr<RequestHandler> CreateMemeHandler::create(const NginxConfig& config, const std::string& root_path)
@@ -33,7 +34,8 @@ bool CreateMemeHandler::parseRequestBody(const HttpRequest &request)
         return false;
     }
     int andSignPos = 0;
-    std::string urlParams = request.requestBody;
+    CURL *curl = curl_easy_init();
+    std::string urlParams = curl_easy_unescape(curl, request.requestBody.c_str(), request.requestBody.length(), NULL);
     std::replace(urlParams.begin(), urlParams.end(), '+', ' ');
     urlParams += "&"; // in order to successfully parse the last parameter
     andSignPos = urlParams.find("&");
@@ -53,6 +55,10 @@ bool CreateMemeHandler::parseRequestBody(const HttpRequest &request)
         }
         urlParams.erase(0, andSignPos+1);
         andSignPos = urlParams.find("&");
+    }
+    if(params.find("image") != params.end() && params["image"] == "Select a template...")
+    {
+        return false;
     }
     return params.find("image") != params.end()  && params.find("top") != params.end() && params.find("bottom") != params.end();
 }
