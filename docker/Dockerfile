@@ -9,6 +9,7 @@ WORKDIR /usr/src/projects/bigbear/build
 # Build and test
 RUN cmake ..
 RUN make
+RUN ldconfig
 RUN ctest --output-on_failure
 
 

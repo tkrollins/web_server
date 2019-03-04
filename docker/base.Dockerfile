@@ -13,4 +13,4 @@ RUN apt-get update && apt-get install -y \
     libboost-system-dev \
     libboost-regex-dev \
     libgtest-dev \
-    libcurl4-openssl-dev --fix-missing && ldconfig\
+    libcurl4-openssl-dev --fix-missing \
