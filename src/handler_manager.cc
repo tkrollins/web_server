@@ -11,6 +11,7 @@
 #include "redirect_request_handler.h"
 #include "create_meme_handler.h"
 #include "list_meme_request_handler.h"
+#include "view_meme_handler.h"
 #include <boost/log/trivial.hpp>
 
 std::unique_ptr<RequestHandler> HandlerManager::createByName(const std::string& name, const NginxConfig& config, const std::string& root_path)
@@ -42,6 +43,10 @@ std::unique_ptr<RequestHandler> HandlerManager::createByName(const std::string& 
     else if (name == "listMeme")
     {
         return ListMemeHandler::create(config, root_path);
+    }
+    else if(name == "viewMeme")
+    {
+        return ViewMemeHandler::create(config, root_path);
     }
     else
     {

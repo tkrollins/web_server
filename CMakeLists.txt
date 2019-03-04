@@ -50,15 +50,15 @@ include_directories(include)
 # TODO(!): Update name and srcs
 add_library(config_parser_lib src/config_parser/config_parser.cc src/config_parser/nginx_config_tokens.cc src/config_parser/nginx_config.cc)
 add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/static_file_request_handler.cc src/action_request_handler.cc)
-add_library(request_handler_lib src/proxy_request_handler.cc src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/status_request_handler.cc src/redirect_request_handler.cc src/create_meme_handler.cc src/handler_manager.cc src/request_handler_dispatcher.cc src/list_meme_request_handler.cc)
+add_library(request_handler_lib src/proxy_request_handler.cc src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/status_request_handler.cc src/redirect_request_handler.cc src/create_meme_handler.cc src/handler_manager.cc src/request_handler_dispatcher.cc src/list_meme_request_handler.cc src/view_meme_handler.cc)
 add_library(http_response src/http_response.cc)
 add_library(http_request src/http_request.cc)
 add_library(meme_db src/meme_db.cc)
 target_link_libraries(request_handler_lib config_parser_lib meme_db Boost::filesystem leveldb ${CMAKE_SOURCE_DIR}/lib/base64.a)
 
 # TODO(!): Update executable name, srcs, and deps
-add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc)
-target_link_libraries(server server_lib config_parser_lib request_handler_lib Boost::system)
+add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/config_parser/config_parser.cc src/config_parser/nginx_config_tokens.cc src/config_parser/nginx_config.cc)
+target_link_libraries(server server_lib request_handler_lib Boost::system)
 target_link_libraries(server Boost::log_setup Boost::log Boost::regex)
 target_link_libraries(server Threads::Threads)
 
@@ -89,6 +89,9 @@ target_link_libraries(create_meme_handler_test request_handler_lib http_response
 add_executable(list_meme_request_handler_test tests/request_handler_tests/list_meme_request_handler_test.cc)
 target_link_libraries(list_meme_request_handler_test request_handler_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
 
+add_executable(view_meme_handler_test tests/request_handler_tests/view_meme_handler_test.cc)
+target_link_libraries(view_meme_handler_test request_handler_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
+
 add_executable(request_manager_test tests/request_handler_tests/request_manager_test.cc)
 target_link_libraries(request_manager_test request_handler_lib config_parser_lib http_response http_request gtest_main Boost::system Boost::log Boost::regex)
 
@@ -110,6 +113,7 @@ gtest_discover_tests(action_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRE
 gtest_discover_tests(proxy_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(create_meme_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(list_meme_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
+gtest_discover_tests(view_meme_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(request_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/request_handler_tests)
 gtest_discover_tests(dispatcher_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/dispatcher_tests)
 gtest_discover_tests(http_request_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests/http_request_object_tests)
@@ -127,6 +131,5 @@ add_test(NAME threadedness_test
 if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
     include(cmake/CodeCoverageReportConfig.cmake)
     generate_coverage_report(TARGETS server server_lib config_parser_lib request_handler_lib meme_db
-            TESTS config_parser_test session_test server_test static_file_request_handler_test action_request_handler_test
-            proxy_request_handler_test request_manager_test dispatcher_test http_request_test meme_db_test create_meme_handler_test list_meme_request_handler_test)
+            TESTS config_parser_test session_test server_test static_file_request_handler_test action_request_handler_test proxy_request_handler_test request_manager_test dispatcher_test http_request_test meme_db_test create_meme_handler_test list_meme_request_handler_test view_meme_handler_test)
 endif()

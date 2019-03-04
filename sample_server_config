@@ -51,4 +51,9 @@ server {
     handler listMeme {
         location /meme;
     }
+
+    handler viewMeme {
+        location /meme/view;
+        root static_files/memes/images;
+    }
 }
