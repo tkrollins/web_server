@@ -19,15 +19,18 @@ std::unique_ptr<HttpResponse> ListMemeHandler::HandleRequest(const HttpRequest &
 
     status = 200;
     std::string body = "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <title>Meme List</title>\r\n</head>\r\n<body>\r\n<h1>Meme List</h1>\r\n";
-    int count = 0;
+    body += "<table style=\"width:100%\" border=\"1\">\r\n";
+    body += "<tr>\r\n<th>Meme ID</th>\r\n<th>IMAGE</th>\r\n<th>TOP_TEXT</th>\r\n<th>BOTTOM_TEXT</th>\r\n</tr>\r\n";
     for (std::string id: ids)
     {
-        body += "<a href=\"/meme/view?id=";
-        body += id;
-        body += "\">";
-        body += id + ": " + database.Get(id, MemeDB::IMAGE) + ", " + database.Get(id, MemeDB::TOP_TEXT) + ", " + database.Get(id, MemeDB::BOTTOM_TEXT);
-        body += "</a><br>\r\n";
+        body += "<tr>\r\n";
+        body += "<td><a href=\"/meme/view?id=" + id + "\">" + id + "</a>" + "</td>\r\n";
+        body += "<td>" + database.Get(id, MemeDB::IMAGE) + "</td>\r\n";
+        body += "<td>" + database.Get(id, MemeDB::TOP_TEXT) + "</td>\r\n";
+        body += "<td>" + database.Get(id, MemeDB::BOTTOM_TEXT) + "</td>\r\n";
+        body += "</tr>\r\n";
     }
+    body += "</table>\r\n";
     body += "</body>\r\n</html>";
     std::string contentLengthStr = std::to_string(body.length());
     std::map<std::string,std::string> headers { {"Content-Type", "text/html"},
@@ -37,3 +40,4 @@ std::unique_ptr<HttpResponse> ListMemeHandler::HandleRequest(const HttpRequest &
     std::unique_ptr<HttpResponse> resPtr = std::make_unique<HttpResponse>(res);
     return resPtr;
 }
+
