@@ -18,7 +18,7 @@ std::unique_ptr<HttpResponse> ListMemeHandler::HandleRequest(const HttpRequest &
     std::set<std::string> ids = database.getIDs();
 
     status = 200;
-    std::string body = "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <title>Meme List</title>\r\n</head>\r\n<body>\r\n<h1>Meme List</h1>\r\n";
+    std::string body = "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <title>Meme List</title>\r\n    <style>tr:nth-child(even) {background: #CCC}</style>\r\n</head>\r\n<body>\r\n<h1>Meme List</h1>\r\n";
     body += "<table style=\"width:100%\" border=\"1\">\r\n";
     body += "<tr>\r\n<th>Meme ID</th>\r\n<th>IMAGE</th>\r\n<th>TOP_TEXT</th>\r\n<th>BOTTOM_TEXT</th>\r\n</tr>\r\n";
     for (std::string id: ids)
