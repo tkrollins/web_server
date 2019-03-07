@@ -1,8 +1,10 @@
 # include "create_meme_handler.h"
 # include "http_response.h"
-# include "base64.h"
 # include "meme_db.h"
 # include <algorithm>
+# include <boost/uuid/uuid.hpp>
+# include <boost/uuid/uuid_generators.hpp>
+# include <boost/uuid/uuid_io.hpp>
 
 std::unique_ptr<RequestHandler> CreateMemeHandler::create(const NginxConfig& config, const std::string& root_path)
 {
@@ -83,14 +85,11 @@ bool CreateMemeHandler::parseRequestBody(const HttpRequest &request)
 std::unique_ptr<HttpResponse> CreateMemeHandler::HandleRequest(const HttpRequest &request)
 {
     // parse the request path
-    std::cout << "URI: " << request.requestURI << std::endl;
-    std::cout << "BODY: " << request.requestBody << std::endl;
     bool successfullyParsed = parseRequestBody(request);
     if(successfullyParsed)
     {
-        // generate a parameter string that avoids duplication
-        std::string paramsString = params["image"] + "top:" + params["top"] + "bottom:" + params["bottom"];
-        std::string id = base64_encode(reinterpret_cast<const unsigned char*>(paramsString.c_str()), paramsString.length());
+        // randomly generate 128 bit, the probability of duplication can be neglected
+        std::string id = boost::uuids::to_string(boost::uuids::random_generator()());
 
         // save the stuff into database
         MemeDB database;

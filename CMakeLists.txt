@@ -54,7 +54,7 @@ add_library(request_handler_lib src/proxy_request_handler.cc src/static_file_req
 add_library(http_response src/http_response.cc)
 add_library(http_request src/http_request.cc)
 add_library(meme_db src/meme_db.cc)
-target_link_libraries(request_handler_lib config_parser_lib meme_db Boost::filesystem leveldb ${CMAKE_SOURCE_DIR}/lib/base64.a)
+target_link_libraries(request_handler_lib config_parser_lib meme_db Boost::filesystem leveldb)
 
 # TODO(!): Update executable name, srcs, and deps
 add_executable(server src/server_main.cc src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/config_parser/config_parser.cc src/config_parser/nginx_config_tokens.cc src/config_parser/nginx_config.cc)
