@@ -43,7 +43,7 @@ TEST_F(DispatcherTest, dispatchStaticHandler2)
 
     // init and call the dispatcher and expect the static 2 handler to be dispatched
     RequestHandlerDispatcher dispatcher(topLevelConfig);
-    std::string dispatcherOutput = dispatcher.dispatchHandler(request, &handlerManager, topLevelConfig);
+    std::string dispatcherOutput = dispatcher.dispatchHandler(request, &handlerManager, topLevelConfig) -> buildHttpResponse();
 
     EXPECT_STREQ(dispatcherOutput.c_str(), expectedOutput.c_str());
 }
@@ -86,7 +86,7 @@ TEST_F(DispatcherTest, defaultToError)
 
     // init and call the dispatcher and expect the static 2 handler to be dispatched
     RequestHandlerDispatcher dispatcher(topLevelConfig);
-    std::string dispatcherOutput = dispatcher.dispatchHandler(request, &handlerManager, topLevelConfig);
+    std::string dispatcherOutput = dispatcher.dispatchHandler(request, &handlerManager, topLevelConfig) -> buildHttpResponse();
 
 
     EXPECT_STREQ(dispatcherOutput.c_str(), expectedOutput.c_str());

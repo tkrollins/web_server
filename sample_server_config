@@ -60,4 +60,13 @@ server {
         root static_files/memes/images;
         memeURI /memes;
     }
+
+    handler health {
+        location /health;
+    }
+
+    handler malformed {
+        location /malformed;
+    }
+
 }

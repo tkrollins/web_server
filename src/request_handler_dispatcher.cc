@@ -121,6 +121,10 @@ std::string RequestHandlerDispatcher::getLongestMatchingURI(std::string requestU
 
 std::string RequestHandlerDispatcher::getHandlerName(HttpRequest request)
 {
+    if(request.isMalformed)
+    {
+        return "malformed";
+    }
     std::string handlerName;
     std::string longestMatchingURI = getLongestMatchingURI(request.requestURI);
 
@@ -135,7 +139,7 @@ std::string RequestHandlerDispatcher::getHandlerName(HttpRequest request)
     return handlerName;
 }
 
-std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
+std::unique_ptr<HttpResponse> RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
     HandlerManager* handlerManager, NginxConfig& config)
 {
     // handlerName ex) "echo123"
@@ -157,16 +161,13 @@ std::string RequestHandlerDispatcher::dispatchHandler(HttpRequest request,
 
     std::unique_ptr<HttpResponse> response = handler->HandleRequest(request);
 
-    std:string responseString = response->buildHttpResponse();
-
-    // renew status counter
     statusCounter[response->errorCode] += 1;
 
     // c++ question: we don't need to explicitly delete a unique ptr, correct? Will
     // it delete itself when we go out of the scope of the function?
     // handler.reset();
     // printf("response string: %s\n", responseString.c_str());
-    return responseString;
+    return response;
 }
 
 std::string RequestHandlerDispatcher::renderStatusInfo(NginxConfig& config)

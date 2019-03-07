@@ -23,7 +23,11 @@ bool HttpRequest::setMethod(std::string method)
         this->requestMethod = POST;
         return true;
     }
-    return false;
+    else
+    {
+        isMalformed = true;
+        return false;
+    }
 }
 
 bool HttpRequest::setURI(std::string requestTarget)
@@ -128,11 +132,19 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
         }
     }
     isComplete = requestEndFound;
+    isMalformed = false;
     bool methodFound = false;
     bool targetFound = false;
     bool versionFound = false;
     bool headersFound = false;
 
+    if(requestLines.size() == 0)
+    {
+        // If the request is malformed, count it as successfully parsed.
+        // The only possible fail case is that the request is not complete.
+        isMalformed = true;
+        return true;
+    }
     for (int lineNumber = 0; lineNumber < requestLines.size(); ++lineNumber)
     {
         printf("parse this line: %s\n", requestLines[lineNumber].c_str());
@@ -155,6 +167,11 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
                     {
                         int nCharsInRequestMethod = characterPtr - requestLines[lineNumber].begin();
                         methodFound = setMethod(requestLines[lineNumber].substr(methodBegin, nCharsInRequestMethod));
+                        std::cout << "Method Found = " << methodFound << std::endl;
+                        if(isMalformed)
+                        {
+                            return true;
+                        }
                         targetBegin = methodBegin + nCharsInRequestMethod + 1;
                     }
                     else if (!targetFound)
@@ -206,12 +223,7 @@ bool HttpRequest::parseHttpRequest(std::string requestString)
         }
     }
 
-    if (methodFound && targetFound && versionFound && headersFound && isComplete)
-        return true;
-    else
-    {
-        return false;
-    }
+    return isComplete;
 }
 
 bool HttpRequest::finishParsingRequest(std::string partialRequest)

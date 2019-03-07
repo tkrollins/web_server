@@ -14,7 +14,7 @@ public:
 
     // called during a session to construct, use, and finally destroy a request handler. Returns
     // raw string to write back to socket
-    std::string dispatchHandler(HttpRequest request, HandlerManager* handlerManager, NginxConfig& config);
+    std::unique_ptr<HttpResponse> dispatchHandler(HttpRequest request, HandlerManager* handlerManager, NginxConfig& config);
 
 private:
     // maps endpoints to proper handler names

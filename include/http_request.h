@@ -18,6 +18,7 @@ public:
     std::string requestURI;
     std::string requestBody;
     bool isComplete;
+    bool isMalformed;
 
     // Map of header field and its corresponding value
     std::unordered_map<httpHeaderFields, std::string> headerFields;
