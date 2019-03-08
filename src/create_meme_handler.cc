@@ -19,7 +19,7 @@ std::string CreateMemeHandler::escape(const std::string& data) {
         switch(data[pos]) {
             case '&':  res.append("&amp;");       break;
             case '\"': res.append("&quot;");      break;
-            case '\'': res.append("&apos;");      break;
+            case '\'': res.append("&#39;");       break;
             case '<':  res.append("&lt;");        break;
             case '>':  res.append("&gt;");        break;
             default:   res.append(data, pos, 1);  break;
