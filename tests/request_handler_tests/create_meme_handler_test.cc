@@ -28,14 +28,14 @@ TEST(CreateMemeHandlerTest, TestThreadSafety)
 
     // Each thread will add 5000 memes to database
     // Idea is they should be storing memes simultaneously
-    std::thread thread1(createMemes, 5000);
-    std::thread thread2(createMemes, 5000);
+    std::thread thread1(createMemes, 500);
+    std::thread thread2(createMemes, 500);
 
     thread1.join();
     thread2.join();
 
     // No IDs should have gotten lost or overwritten
-    EXPECT_TRUE(database.getIDs().size() == 10000);
+    EXPECT_TRUE(database.getIDs().size() == 1000);
     database.clear();
 }
 
@@ -93,4 +93,5 @@ TEST(CreateMemeHandlerTest, MissingTopText) {
     std::unique_ptr<HttpResponse> response = createMemeHandler -> HandleRequest(request);
 
     EXPECT_TRUE(response -> body.find("404 not found") != std::string::npos);
+    database.clear();
 }

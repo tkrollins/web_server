@@ -12,6 +12,8 @@ public:
         IMAGE = 0,
         TOP_TEXT,
         BOTTOM_TEXT,
+        TIMESTAMP,
+        ACCESS_TOKEN,
         URL,
         NONE
     };

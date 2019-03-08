@@ -5,6 +5,9 @@
 # include <boost/uuid/uuid.hpp>
 # include <boost/uuid/uuid_generators.hpp>
 # include <boost/uuid/uuid_io.hpp>
+# include <chrono>
+
+namespace TIME = std::chrono;
 
 std::unique_ptr<RequestHandler> CreateMemeHandler::create(const NginxConfig& config, const std::string& root_path)
 {
@@ -90,12 +93,14 @@ std::unique_ptr<HttpResponse> CreateMemeHandler::HandleRequest(const HttpRequest
     {
         // randomly generate 128 bit, the probability of duplication can be neglected
         std::string id = boost::uuids::to_string(boost::uuids::random_generator()());
+        std::string timestamp = std::to_string(TIME::duration_cast<TIME::milliseconds>(TIME::system_clock::now().time_since_epoch()).count());
 
         // save the stuff into database
         MemeDB database;
         database.Put(id, params["image"], MemeDB::IMAGE);
         database.Put(id, params["top"], MemeDB::TOP_TEXT);
         database.Put(id, params["bottom"], MemeDB::BOTTOM_TEXT);
+        database.Put(id, timestamp, MemeDB::TIMESTAMP);
 
         // return value
         std::string body = "Created meme! <a href=\"/meme/view?id=" + id + "\">" + id + "</a>";
