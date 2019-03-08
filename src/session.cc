@@ -25,9 +25,9 @@ tcp::socket& session::socket()
     return socket_;
 }
 
-void session::start(HandlerManager* manager, RequestHandlerDispatcher* dispatcher, NginxConfig* config)
+void session::start(HandlerManager* manager, NginxConfig* config)
 {
-    sessionDispatcher = dispatcher;
+    sessionDispatcher = std::make_unique<RequestHandlerDispatcher>(RequestHandlerDispatcher(*config));
     sessionManager = manager;
     sessionConfig = config;
     socket_.async_read_some(boost::asio::buffer(data_, max_length),
@@ -77,7 +77,6 @@ void session::handleRead(const boost::system::error_code& error,
     }
     else
     {
-        delete sessionDispatcher;
         delete this;
     }
 }
@@ -94,7 +93,6 @@ void session::handleWrite(const boost::system::error_code& error)
     }
     else
     {
-        delete sessionDispatcher;
         delete this;
     }
 }
@@ -124,7 +122,6 @@ void session::finishRead(const boost::system::error_code& error, HttpRequest req
     }
     else
     {
-        delete sessionDispatcher;
         delete this;
     }
 }

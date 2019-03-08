@@ -42,7 +42,7 @@ public:
     {
         return clientConnectionEstablished_;
     }
-
+    ~server() { delete manager; }
 private:
     bool start_accept();
     void startThread(session* new_session);

@@ -29,7 +29,7 @@ public:
     session(boost::asio::io_service& io_service) : socket_(io_service) {};
     tcp::socket& socket();
 
-    void start(HandlerManager* manager, RequestHandlerDispatcher* dispatcher, NginxConfig* config);
+    void start(HandlerManager* manager, NginxConfig* config);
 private:
     friend class SessionTest;
     FRIEND_TEST(SessionTest, NonHTTPRequestTest);
@@ -38,7 +38,7 @@ private:
 
     void writeToSocket(std::string response);
 
-    RequestHandlerDispatcher* sessionDispatcher;
+    std::unique_ptr<RequestHandlerDispatcher> sessionDispatcher;
     HandlerManager* sessionManager;
     NginxConfig* sessionConfig;
 

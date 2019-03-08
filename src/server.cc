@@ -64,8 +64,7 @@ bool server::handle_accept(session* new_session,
 
 void server::startThread(session *new_session)
 {
-    auto dispatcher = new RequestHandlerDispatcher(*serverConfig);
-    new_session->start(manager, dispatcher, serverConfig);
+    new_session->start(manager, serverConfig);
 }
 
 // Sets up request handler objects

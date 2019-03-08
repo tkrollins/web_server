@@ -52,17 +52,8 @@ int main(int argc, char* argv[])
             listenPort = config.getFlatParameters()["listen"];
         }
 
-//        // TODO: replace all of the below with new config parser
-//        NginxConfigParser_old parser;
-
         // Enable Boost Logs
         initLogging();
-
-
-//        if(parser.Parse(argv[1]))
-//        {
-//            listenPort = parser.config->parameters[ConfigParameter::LISTEN_PORT];
-//        }
 
         for (int i = 0; i < listenPort.length(); i++)
         {
