@@ -13,7 +13,7 @@ server {
         location /memes;
         root static_files/memes/images;
     }
-    handler submitMeme {
+    handler submit {
         location /meme/submit;
         root static_files/memes;
     }
