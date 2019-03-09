@@ -41,7 +41,9 @@ void session::writeToSocket(std::string response)
     boost::asio::async_write(socket_, // socket_ is the destination in which read data is to be written to
                              boost::asio::buffer(response), // the read data that will be written to socket_
                              boost::bind(&session::handleWrite, this, // call session::handleWrite() once done writing
-                                         boost::asio::placeholders::error));
+                                         boost::asio::placeholders::error,
+                                         response,
+                                         boost::asio::placeholders::bytes_transferred));
 }
 
 void session::handleRead(const boost::system::error_code& error,
@@ -81,10 +83,17 @@ void session::handleRead(const boost::system::error_code& error,
     }
 }
 
-void session::handleWrite(const boost::system::error_code& error)
+void session::handleWrite(const boost::system::error_code& error, std::string response, size_t bytes_transferred)
 {
-    if (!error)
+    if(!error && (bytes_transferred < response.size()))
     {
+        BOOST_LOG_TRIVIAL(debug) << "Bytes written:  " << bytes_transferred << " / " << response.size();
+        response = response.substr(bytes_transferred, std::string::npos);
+        writeToSocket(response);
+    }
+    else if (!error)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Bytes written:  " << bytes_transferred << " / " << response.size();
         socket_.async_read_some(boost::asio::buffer(data_, max_length), // read more data out of the buffer
                           boost::bind(&session::handleRead, this, // call handleRead again once you are done reading
                                       boost::asio::placeholders::error,

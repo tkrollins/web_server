@@ -44,7 +44,7 @@ private:
 
     void handleRead(const boost::system::error_code& error,
                     size_t bytes_transferred);
-    void handleWrite(const boost::system::error_code& error);
+    void handleWrite(const boost::system::error_code& error, std::string response, size_t bytes_transferred);
     void finishRead(const boost::system::error_code& error, HttpRequest request);
     tcp::socket socket_;
     enum { max_length = 102400 };
