@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <iostream>
 #include <boost/filesystem.hpp>
+#include <map>
+#include <sstream>
 
 leveldb::DB* MemeDB::db = nullptr;
 std::string MemeDB::dir = "";
@@ -43,6 +45,12 @@ void MemeDB::appendTypeToID(std::string &id, MemeDB::ValueType type)
         case URL:
             id = id + "_url";
             break;
+        case TIMESTAMP:
+            id = id + "_time";
+            break;
+        case ACCESS_TOKEN:
+            id = id + "_tok";
+            break;
         default:
             break;
     }
@@ -55,6 +63,8 @@ void MemeDB::removeTypeFromID(std::string &id)
     const int TOP_LEN = 4;
     const int BOTTOM_LEN = 7;
     const int URL_LEN = 4;
+    const int TIME_LEN = 5;
+    const int TOK_LEN = 4;
 
     if(id.find("_id") != std::string::npos)
     {
@@ -71,6 +81,14 @@ void MemeDB::removeTypeFromID(std::string &id)
     else if(id.find("_url") != std::string::npos)
     {
         id = id.substr(0, (id.size()-URL_LEN));
+    }
+    else if(id.find("_time") != std::string::npos)
+    {
+        id = id.substr(0, (id.size()-TIME_LEN));
+    }
+    else if(id.find("_tok") != std::string::npos)
+    {
+        id = id.substr(0, (id.size()-TOK_LEN));
     }
 }
 
@@ -145,4 +163,39 @@ std::set<std::string> MemeDB::getIDs()
     }
     delete it;
     return IDs;
+}
+
+std::vector<std::string> MemeDB::getSortedIDs()
+{
+    std::set<std::string> IDs = this->getIDs();
+    std::map<std::string, std::string> mapIDTimestamp;
+    std::vector<std::string> sortedIDs;
+
+    // Create a comparator function to sort memes based on timestamp
+    std::function<bool(std::pair<std::string,std::string>, std::pair<std::string, std::string>)> comparator =
+            [](std::pair<std::string,std::string> meme1 ,std::pair<std::string,std::string> meme2)
+            {
+                int time1;
+                int time2;
+                std::istringstream(meme1.second) >> time1;
+                std::istringstream(meme2.second) >> time2;
+                return time1 > time2;
+            };
+
+    // Get all id : timestamp pairs from database
+    for(const auto& id : IDs)
+    {
+        mapIDTimestamp.insert({id, this->Get(id, TIMESTAMP)});
+    }
+
+    // Create a set that sorts the pairs based on the comparator function
+    std::set<std::pair<std::string,std::string>, std::function<bool(std::pair<std::string,std::string>, std::pair<std::string, std::string>)>>
+        sortedMemes(mapIDTimestamp.begin(), mapIDTimestamp.end(), comparator);
+
+    // Added sorted IDs to a vector
+    for(const auto& meme : sortedMemes)
+    {
+        sortedIDs.push_back(meme.first);
+    }
+    return sortedIDs;
 }

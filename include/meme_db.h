@@ -1,5 +1,6 @@
 #include "leveldb/db.h"
 #include <set>
+#include <vector>
 
 class MemeDB
 {
@@ -21,6 +22,7 @@ public:
     bool Put(std::string key, std::string value, ValueType type);
     bool Delete(std::string key, ValueType type);
     std::string Get(std::string key, ValueType type);
+    std::vector<std::string> getSortedIDs();
     std::set<std::string> getIDs();
     bool isConnected();
     void close();

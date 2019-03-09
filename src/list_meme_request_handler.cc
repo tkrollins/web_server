@@ -3,6 +3,7 @@
 #include <boost/log/trivial.hpp>
 #include "meme_db.h"
 #include <memory>
+#include <vector>
 
 std::unique_ptr<RequestHandler> ListMemeHandler::create(const NginxConfig& config, const std::string& root_path)
 {
@@ -18,7 +19,7 @@ std::unique_ptr<HttpResponse> ListMemeHandler::HandleRequest(const HttpRequest &
     status = 200;
     bool searchMode = false;
     // std::cout << "here01: " << request.requestURI << std::endl;
-    std::set<std::string> ids = database.getIDs();
+    std::vector<std::string> ids = database.getSortedIDs();
     std::string searchTarget;
     if (request.requestURI.find("q=") != std::string::npos) searchMode = true;
     if (searchMode)
