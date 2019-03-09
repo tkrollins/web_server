@@ -15,7 +15,7 @@ public:
     static std::unique_ptr<RequestHandler> create(const NginxConfig& config, const std::string& root_path);
     std::unique_ptr<HttpResponse> HandleRequest(const HttpRequest &request);
 
-    // ViewMemeHandler() {}; // for testing
+    ViewMemeHandler() = default; // for testing
     ViewMemeHandler(const std::unordered_map<std::string, std::string> staticPathMap, std::string rootPath);
     
     // stores the HttpRequest URI in URI attribute

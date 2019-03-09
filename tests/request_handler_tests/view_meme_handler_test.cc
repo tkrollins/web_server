@@ -17,7 +17,7 @@ protected:
     std::string expectedPathToFile = root_path + '/' + pathMap["root"] + "/angry_lebron.jpg";
 
     std::string styleElement = "<style>\n  body { display: inline-block; position: relative; }\n  span { color: white; font: 2em bold Impact, sans-serif; position: absolute; text-align: center; width: 100%; }\n  #top { top: 0; }\n  #bottom { bottom: 0; }\n</style>\n";
-	std::string bodyElement = "<body>\n  <img src=\"/memes/angry_lebron.jpg\">\n  <span id=\"top\">top</span>\n  <span id=\"bottom\">bottom</span>\n</body>";
+	std::string bodyElement = "<body>\n  <img src=\"/memes/angry_lebron.jpg\">\n  <span id=\"top\">top</span>\n  <span id=\"bottom\">bottom</span>\n</body>\n<a href=\"/meme/submit?update=test_id\">Edit</a>";
 	std::string expectedResponseBody = styleElement + bodyElement;
 };
 

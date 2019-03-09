@@ -91,9 +91,20 @@ std::unique_ptr<HttpResponse> CreateMemeHandler::HandleRequest(const HttpRequest
     bool successfullyParsed = parseRequestBody(request);
     if(successfullyParsed)
     {
-        // randomly generate 128 bit, the probability of duplication can be neglected
-        std::string id = boost::uuids::to_string(boost::uuids::random_generator()());
         std::string timestamp = std::to_string(TIME::duration_cast<TIME::milliseconds>(TIME::system_clock::now().time_since_epoch()).count());
+
+        std::string id;
+        // if we are updating an existing meme, the post request body will contain an update param with an 
+        // existing meme's ID. Set the database key value to this id
+        if (params.count("update")) 
+        {
+            id = params["update"];
+        }
+        else
+        {
+            // randomly generate 128 bit, the probability of duplication can be neglected
+            id = boost::uuids::to_string(boost::uuids::random_generator()());
+        }
 
         // save the stuff into database
         MemeDB database;

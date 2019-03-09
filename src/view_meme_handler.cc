@@ -55,7 +55,7 @@ void ViewMemeHandler::setMemeText()
 void ViewMemeHandler::buildMemeHTML()
 {
 	std::string styleElement = "<style>\n  body { display: inline-block; position: relative; }\n  span { color: white; font: 2em bold Impact, sans-serif; position: absolute; text-align: center; width: 100%; }\n  #top { top: 0; }\n  #bottom { bottom: 0; }\n</style>\n";
-	std::string bodyElement = "<body>\n  <img src=\"" + memeURI + "\">\n  <span id=\"top\">" + memeTextTop + "</span>\n  <span id=\"bottom\">" + memeTextBottom + "</span>\n</body>";
+	std::string bodyElement = "<body>\n  <img src=\"" + memeURI + "\">\n  <span id=\"top\">" + memeTextTop + "</span>\n  <span id=\"bottom\">" + memeTextBottom + "</span>\n</body>\n<a href=\"/meme/submit?update=" + memeID + "\">Edit</a>";
 	memeAsHTML = styleElement + bodyElement;
 }
 
