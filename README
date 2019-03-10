@@ -32,6 +32,9 @@ localhost/meme/view?id=$meme.id
 or use terminal (directly call create API)
 $ curl -X GET localhost/meme/view?id=$meme.id
 
+To delete a meme (API):
+$ curl -X POST localhost/meme/delete?id=<id>
+
 *******************************************************************
 
 Request Static Files
