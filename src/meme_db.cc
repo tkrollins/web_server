@@ -4,6 +4,7 @@
 #include <boost/filesystem.hpp>
 #include <map>
 #include <sstream>
+#include <vector>
 
 leveldb::DB* MemeDB::db = nullptr;
 std::string MemeDB::dir = "";
@@ -107,6 +108,16 @@ void MemeDB::clear()
     close();
     boost::filesystem::remove_all(MemeDB::dir);
     MemeDB::dir = "";
+}
+
+void MemeDB::deleteByID(std::string id){
+    Delete(id, ValueType::IMAGE);
+    Delete(id, ValueType::TOP_TEXT);
+    Delete(id, ValueType::BOTTOM_TEXT);
+    Delete(id, ValueType::TIMESTAMP);
+    Delete(id, ValueType::ACCESS_TOKEN);
+    Delete(id, ValueType::URL);
+    Delete(id, ValueType::NONE);
 }
 
 // Adds id:parameter pair to db. Must specify type

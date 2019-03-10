@@ -11,6 +11,7 @@
 #include "redirect_request_handler.h"
 #include "create_meme_handler.h"
 #include "list_meme_request_handler.h"
+#include "delete_meme_request_handler.h"
 #include "view_meme_handler.h"
 #include "health_request_handler.h"
 #include "malformed_request_handler.h"
@@ -50,6 +51,10 @@ std::unique_ptr<RequestHandler> HandlerManager::createByName(const std::string& 
     else if(name == "viewMeme")
     {
         return ViewMemeHandler::create(config, root_path);
+    }
+    else if (name == "deleteMeme")
+    {
+        return DeleteMemeHandler::create(config, root_path);
     }
     else if (name == "health")
     {

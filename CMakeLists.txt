@@ -50,7 +50,7 @@ include_directories(include)
 # TODO(!): Update name and srcs
 add_library(config_parser_lib src/config_parser/config_parser.cc src/config_parser/nginx_config_tokens.cc src/config_parser/nginx_config.cc)
 add_library(server_lib src/server.cc src/session.cc src/http_request.cc src/http_response.cc src/static_file_request_handler.cc src/action_request_handler.cc)
-add_library(request_handler_lib src/proxy_request_handler.cc src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/status_request_handler.cc src/redirect_request_handler.cc src/create_meme_handler.cc src/handler_manager.cc src/request_handler_dispatcher.cc src/list_meme_request_handler.cc src/view_meme_handler.cc src/health_request_handler.cc src/malformed_request_handler.cc src/submit_meme_handler.cc)
+add_library(request_handler_lib src/proxy_request_handler.cc src/static_file_request_handler.cc src/action_request_handler.cc src/error_request_handler.cc src/status_request_handler.cc src/redirect_request_handler.cc src/create_meme_handler.cc src/handler_manager.cc src/request_handler_dispatcher.cc src/list_meme_request_handler.cc src/delete_meme_request_handler.cc src/view_meme_handler.cc src/health_request_handler.cc src/malformed_request_handler.cc src/submit_meme_handler.cc)
 add_library(http_response src/http_response.cc)
 add_library(http_request src/http_request.cc)
 add_library(meme_db src/meme_db.cc)

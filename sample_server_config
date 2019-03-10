@@ -68,5 +68,8 @@ server {
     handler malformed {
         location /malformed;
     }
+    handler deleteMeme {
+        location /meme/delete;
+    }
 
 }
