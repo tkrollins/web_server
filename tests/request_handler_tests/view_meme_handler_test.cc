@@ -16,9 +16,25 @@ protected:
 
     std::string expectedPathToFile = root_path + '/' + pathMap["root"] + "/angry_lebron.jpg";
 
-    std::string styleElement = "<style>\n  body { display: inline-block; position: relative; }\n  span { color: white; font: 2em bold Impact, sans-serif; position: absolute; text-align: center; width: 100%; }\n  #top { top: 0; }\n  #bottom { bottom: 0; }\n</style>\n";
-	std::string bodyElement = "<body>\n  <img src=\"/memes/angry_lebron.jpg\">\n  <span id=\"top\">top</span>\n  <span id=\"bottom\">bottom</span>\n</body>\n<a href=\"/meme/submit?update=test_id\">Edit</a>";
-	std::string expectedResponseBody = styleElement + bodyElement;
+    std::string styleElement = "<style>\n  "
+                                    "body { display: inline-block; position: relative; }\n  "
+                                    "span { color: white; font: 2em bold Impact, sans-serif; position: absolute; text-align: center; width: 100%; }\n  "
+                                    "#top { top: 0; }\n  "
+                                    "#bottom { bottom: 10; }\n"
+                               "</style>\n";
+
+    std::string bodyElement = "<body>\n  "
+                                    "<img src=\"/memes/angry_lebron.jpg\">\n  "
+                                    "<span id=\"top\">top</span>\n  "
+                                    "<span id=\"bottom\">bottom</span>\n"
+                                    "<span>\n"
+                                        "<form action=\"/meme/submit?update=test_id\">\n"
+                                            "<input type=\"submit\" value=\"Edit\" />\n"
+                                        "</form>\n"
+                                     "</span>\n"
+                              "</body>\n";
+
+    std::string expectedResponseBody = styleElement + bodyElement;
 };
 
 TEST_F(ViewMemeHandlerTest, validViewMemeRequest)
@@ -30,24 +46,23 @@ TEST_F(ViewMemeHandlerTest, validViewMemeRequest)
     MemeDB database("/usr/src/projects/bigbear/build/tmp_db");
 
     std::string testID = "test_id";
-    
+
     database.Put(testID, "angry_lebron.jpg", MemeDB::IMAGE);
     database.Put(testID, "top", MemeDB::TOP_TEXT);
     database.Put(testID, "bottom", MemeDB::BOTTOM_TEXT);
-	
-	viewMemeHandler.HandleRequest(request);
 
-	database.Delete(testID, MemeDB::IMAGE);
-	database.Delete(testID, MemeDB::TOP_TEXT);
-	database.Delete(testID, MemeDB::BOTTOM_TEXT);
+    viewMemeHandler.HandleRequest(request);
 
-	EXPECT_STREQ(viewMemeHandler.URI.c_str(), request.requestURI.c_str());
-	EXPECT_STREQ(viewMemeHandler.memeID.c_str(), testID.c_str());
-	EXPECT_STREQ(viewMemeHandler.fileName.c_str(), "angry_lebron.jpg");
-	EXPECT_EQ(viewMemeHandler.fileType, StaticFileRequestHandler::HTML);
-	EXPECT_STREQ(viewMemeHandler.memeTextTop.c_str(), "top");
-	EXPECT_STREQ(viewMemeHandler.memeTextBottom.c_str(), "bottom");
-	EXPECT_STREQ(viewMemeHandler.pathToFile.c_str(), expectedPathToFile.c_str());
-	EXPECT_STREQ(viewMemeHandler.memeAsHTML.c_str(), expectedResponseBody.c_str());
+    database.Delete(testID, MemeDB::IMAGE);
+    database.Delete(testID, MemeDB::TOP_TEXT);
+    database.Delete(testID, MemeDB::BOTTOM_TEXT);
 
+    EXPECT_STREQ(viewMemeHandler.URI.c_str(), request.requestURI.c_str());
+    EXPECT_STREQ(viewMemeHandler.memeID.c_str(), testID.c_str());
+    EXPECT_STREQ(viewMemeHandler.fileName.c_str(), "angry_lebron.jpg");
+    EXPECT_EQ(viewMemeHandler.fileType, StaticFileRequestHandler::HTML);
+    EXPECT_STREQ(viewMemeHandler.memeTextTop.c_str(), "top");
+    EXPECT_STREQ(viewMemeHandler.memeTextBottom.c_str(), "bottom");
+    EXPECT_STREQ(viewMemeHandler.pathToFile.c_str(), expectedPathToFile.c_str());
+    EXPECT_STREQ(viewMemeHandler.memeAsHTML.c_str(), expectedResponseBody.c_str());
 }

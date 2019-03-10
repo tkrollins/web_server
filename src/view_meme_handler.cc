@@ -22,78 +22,94 @@ std::unique_ptr<RequestHandler> ViewMemeHandler::create(const NginxConfig& confi
 
 void ViewMemeHandler::setURI(const HttpRequest &request)
 {
-	URI = request.requestURI;
+    URI = request.requestURI;
 }
 
 // Parses the HttpRequest target to set the handler's meme id attribute
 void ViewMemeHandler::setMemeID()
 {
-	int idStartPos = URI.find("?id=") + 4; // the meme id begins 4 characters after the '?'
-	memeID = URI.substr(idStartPos, URI.length() - idStartPos);
+    int idStartPos = URI.find("?id=") + 4; // the meme id begins 4 characters after the '?'
+    memeID = URI.substr(idStartPos, URI.length() - idStartPos);
 }
 
 void ViewMemeHandler::setFileName()
 {
-	MemeDB database;
-	fileName = database.Get(memeID, MemeDB::IMAGE); // todo
+    MemeDB database;
+    fileName = database.Get(memeID, MemeDB::IMAGE); // todo
 }
 
 void ViewMemeHandler::setMemeURI()
 {
-	memeURI = validURIMap["memeURI"] + '/' + fileName;
+    memeURI = validURIMap["memeURI"] + '/' + fileName;
 }
 
 // Looks up the meme id in the db and retrieves the meme information (path and text)
 void ViewMemeHandler::setMemeText()
 {
-	MemeDB database;
+    MemeDB database;
     memeTextTop = database.Get(memeID, MemeDB::TOP_TEXT);
     memeTextBottom = database.Get(memeID, MemeDB::BOTTOM_TEXT);
 }
 
-// uses the the request handler's public attributes to construct an HTML containing the meme 
+// uses the the request handler's public attributes to construct an HTML containing the meme
 void ViewMemeHandler::buildMemeHTML()
 {
-	std::string styleElement = "<style>\n  body { display: inline-block; position: relative; }\n  span { color: white; font: 2em bold Impact, sans-serif; position: absolute; text-align: center; width: 100%; }\n  #top { top: 0; }\n  #bottom { bottom: 0; }\n</style>\n";
-	std::string bodyElement = "<body>\n  <img src=\"" + memeURI + "\">\n  <span id=\"top\">" + memeTextTop + "</span>\n  <span id=\"bottom\">" + memeTextBottom + "</span>\n</body>\n<a href=\"/meme/submit?update=" + memeID + "\">Edit</a>";
-	memeAsHTML = styleElement + bodyElement;
+    std::string styleElement = "<style>\n  "
+                                    "body { display: inline-block; position: relative; }\n  "
+                                    "span { color: white; font: 2em bold Impact, sans-serif; position: absolute; text-align: center; width: 100%; }\n  "
+                                    "#top { top: 0; }\n  "
+                                    "#bottom { bottom: 10; }\n"
+                               "</style>\n";
+
+    std::string bodyElement = "<body>\n  "
+                                    "<img src=\"" + memeURI + "\">\n  "
+                                    "<span id=\"top\">" + memeTextTop + "</span>\n  "
+                                    "<span id=\"bottom\">" + memeTextBottom + "</span>\n"
+                                    "<span>\n"
+                                        "<form action=\"/meme/submit?update=" + memeID + "\">\n"
+                                            "<input type=\"submit\" value=\"Edit\" />\n"
+                                        "</form>\n"
+                                    "</span>\n"
+                              "</body>\n";
+
+    memeAsHTML = styleElement + bodyElement;
 }
 
 std::unique_ptr<HttpResponse> ViewMemeHandler::HandleRequest(const HttpRequest &request)
 {
-	HttpResponse response;
-	if (request.requestMethod != GET)
-	{
-		// handle non-get request by returning 400 error message
-		status = 400;
-		fileType = TXT;
-		std::string body = "400 Error: Bad Request";
-		setResponse(response, body);
-		return std::make_unique<HttpResponse>(response);
-	}
-	
-	setURI(request);
-	setMemeID();
-	setFileName();
-	setPathToFile();
+    HttpResponse response;
+    if (request.requestMethod != GET)
+    {
+        // handle non-get request by returning 400 error message
+        status = 400;
+        fileType = TXT;
+        std::string body = "400 Error: Bad Request";
+        setResponse(response, body);
+        return std::make_unique<HttpResponse>(response);
+    }
 
-	if (doesFileExist() && !fileName.empty())
-	{
-		fileType = HTML;
-		setMemeURI();
-		setMemeText();
-		buildMemeHTML();
-	    setResponse(response, memeAsHTML);
-	}
-	else
-	{
-	    BOOST_LOG_TRIVIAL(debug) << "Invalid File Request:" << pathToFile;
-	    status = 404;
-	    fileName = "404error.html";
-	    pathToFile = root + "/static_files/404error.html";
-	    std::string fileStr = fileToString(pathToFile);
-	    setResponse(response, fileStr);
-	}
+    setURI(request);
+    setMemeID();
+    setFileName();
+    setPathToFile();
+
+    if (doesFileExist() && !fileName.empty())
+    {
+        fileType = HTML;
+        setMemeURI();
+        setMemeText();
+        buildMemeHTML();
+        setResponse(response, memeAsHTML);
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Invalid File Request:" << pathToFile;
+        status = 404;
+        fileName = "404error.html";
+        pathToFile = root + "/static_files/404error.html";
+        std::string fileStr = fileToString(pathToFile);
+        setResponse(response, fileStr);
+    }
 
     return std::make_unique<HttpResponse>(response);
 }
