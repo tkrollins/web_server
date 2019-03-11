@@ -35,6 +35,9 @@ $ curl -X GET localhost/meme/view?id=$meme.id
 To delete a meme (API):
 $ curl -X POST localhost/meme/delete?id=<id>
 
+To edit a meme (API):
+$ curl -X POST localhost/meme/submit?update=<id>
+
 *******************************************************************
 
 Request Static Files
