@@ -16,7 +16,7 @@ How to Meme?
 
 To Add Meme:
 In Browser, go:
-localhost/meme/submit/submit_meme.html
+localhost/meme/submit
 or use terminal (directly call create API)
 $ curl -X POST localhost/meme/create -d "image=angry_lebron.jpg&top=asdf&bottom=blahblahblah"
 

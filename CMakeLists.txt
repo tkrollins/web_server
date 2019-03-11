@@ -139,6 +139,10 @@ add_test(NAME threadedness_test
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/test_threads.sh "./test_config"
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
 
+add_test(NAME meme_test
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/meme_test.sh "./meme_config"
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
+
 # TODO(!): Update with target/tests targets
 if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
     include(cmake/CodeCoverageReportConfig.cmake)
