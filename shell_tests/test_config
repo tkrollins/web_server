@@ -16,4 +16,33 @@ server {
         location /moved_echo;
         dest 35.247.29.163/redirect;
     }
+    handler static{
+        location /memes;
+        root static_files/memes/images;
+    }
+    handler submit {
+        location /meme/submit;
+        root static_files/memes;
+    }
+    handler status {
+        location /status;
+    }
+    handler error {
+        location /;
+    }
+    handler createMeme {
+        location /meme/create;
+    }
+    handler deleteMeme {
+        location /meme/delete;
+    }
+    handler listMeme {
+        location /meme;
+    }
+    handler viewMeme {
+        location /meme/view;
+        root static_files/memes/images;
+        memeURI /memes;
+    }
 }
+

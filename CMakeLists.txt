@@ -127,6 +127,10 @@ add_test(NAME server_integration_test
          COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/integration_test.sh "./test_config"
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
 
+add_test(NAME delete_integration_test
+         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/delete_integration_test.sh "./test_config"
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
+
 add_test(NAME threadedness_test
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests/test_threads.sh "./test_config"
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shell_tests)
