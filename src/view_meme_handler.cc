@@ -70,8 +70,6 @@ void ViewMemeHandler::buildMemeHTML()
                                             "<input type=\"submit\" value=\"Edit\" />\n"
                                             "<input type=\"hidden\" name=\"update\" value=\"" + memeID + "\" />"
                                         "</form>\n"
-                                    "</span>\n"
-                                    "<span>\n"
                                         "<form action=\"/meme/delete\">\n"
                                             "<input type=\"submit\" value=\"Delete\" />\n"
                                             "<input type=\"hidden\" name=\"id\" value=\"" + memeID + "\" />"
