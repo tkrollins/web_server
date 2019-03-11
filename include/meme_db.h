@@ -27,7 +27,7 @@ public:
     bool isConnected();
     void close();
     void clear();
-    void deleteByID(std::string id);
+    bool deleteByID(std::string id);
 
 private:
     static std::string dir;

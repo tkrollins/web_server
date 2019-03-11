@@ -19,9 +19,21 @@ std::unique_ptr<HttpResponse> ListMemeHandler::HandleRequest(const HttpRequest &
     status = 200;
     bool searchMode = false;
     // std::cout << "here01: " << request.requestURI << std::endl;
-    std::vector<std::string> ids = database.getSortedIDs();
+    std::vector<std::string> idsAll = database.getSortedIDs();
+    std::cout << "LIST HANDLER ID SIZE: " << idsAll.size() << std::endl;
+    for(auto id : idsAll)
+    {
+        std::cout << "ID: " << id << std::endl;
+    }
+    std::vector<std::string> idsToDisplay;
     std::string searchTarget;
-    if (request.requestURI.find("q=") != std::string::npos) searchMode = true;
+    if (request.requestURI.find("q=") != std::string::npos)
+    {
+        searchMode = true;
+    } else
+    {
+        idsToDisplay = idsAll;
+    }
     if (searchMode)
     {
         searchTarget = request.requestURI.substr(request.requestURI.find("q=")+2);
@@ -30,19 +42,14 @@ std::unique_ptr<HttpResponse> ListMemeHandler::HandleRequest(const HttpRequest &
         }
         // std::cout << "here02: " << searchTarget << std::endl;
         bool findFlag;
-        for (auto it = ids.begin(); it != ids.end();)
+        for (auto& id : idsAll)
         {
-            std::string id = *it;
-            findFlag = false;
             if (
                 id.find(searchTarget) != std::string::npos ||
                 database.Get(id, MemeDB::IMAGE).find(searchTarget) != std::string::npos ||
                 database.Get(id, MemeDB::TOP_TEXT).find(searchTarget) != std::string::npos ||
                 database.Get(id, MemeDB::BOTTOM_TEXT).find(searchTarget) != std::string::npos
-            )findFlag = true;
-            // std::cout << "here03: " << *it << ", ff = " << findFlag << std::endl;
-            if (!findFlag) it = ids.erase(it++);
-            else it++;
+            ) { idsToDisplay.push_back(id); }
         }
     }
 
@@ -50,10 +57,10 @@ std::unique_ptr<HttpResponse> ListMemeHandler::HandleRequest(const HttpRequest &
     body += "<form method=\"get\">\r\n <input type=\"text\" name=\"q\" value=\"";
     if (searchMode) body += searchTarget;
     body += "\">\r\n <input type=\"submit\" value=\"Search\">\r\n</form>\r\n";
-    if (searchMode && ids.size() != 0)
+    if (searchMode && !idsToDisplay.empty())
     {
         body += "Found ";
-        body += std::to_string(ids.size());
+        body += std::to_string(idsToDisplay.size());
         body += " results for <b>";
         body += searchTarget;
         body += "</b><br>\r\n";
@@ -66,7 +73,7 @@ std::unique_ptr<HttpResponse> ListMemeHandler::HandleRequest(const HttpRequest &
     }
     body += "<table style=\"width:100%\" border=\"1\">\r\n";
     body += "<tr>\r\n<th>Meme ID</th>\r\n<th>IMAGE</th>\r\n<th>TOP_TEXT</th>\r\n<th>BOTTOM_TEXT</th>\r\n</tr>\r\n";
-    for (std::string id: ids)
+    for (std::string& id : idsToDisplay)
     {
         body += "<tr>\r\n";
         body += "<td><a href=\"/meme/view?id=" + id + "\">" + id + "</a>" + "</td>\r\n";

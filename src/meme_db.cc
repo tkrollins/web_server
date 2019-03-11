@@ -110,14 +110,19 @@ void MemeDB::clear()
     MemeDB::dir = "";
 }
 
-void MemeDB::deleteByID(std::string id){
-    Delete(id, ValueType::IMAGE);
-    Delete(id, ValueType::TOP_TEXT);
-    Delete(id, ValueType::BOTTOM_TEXT);
-    Delete(id, ValueType::TIMESTAMP);
-    Delete(id, ValueType::ACCESS_TOKEN);
-    Delete(id, ValueType::URL);
-    Delete(id, ValueType::NONE);
+bool MemeDB::deleteByID(std::string id){
+    if(getIDs().count(id))
+    {
+        Delete(id, ValueType::IMAGE);
+        Delete(id, ValueType::TOP_TEXT);
+        Delete(id, ValueType::BOTTOM_TEXT);
+        Delete(id, ValueType::TIMESTAMP);
+//        Delete(id, ValueType::ACCESS_TOKEN);
+//        Delete(id, ValueType::URL);
+//        Delete(id, ValueType::NONE);
+        return true;
+    }
+    return false;
 }
 
 // Adds id:parameter pair to db. Must specify type
@@ -182,31 +187,29 @@ std::vector<std::string> MemeDB::getSortedIDs()
     std::map<std::string, std::string> mapIDTimestamp;
     std::vector<std::string> sortedIDs;
 
-    // Create a comparator function to sort memes based on timestamp
-    std::function<bool(std::pair<std::string,std::string>, std::pair<std::string, std::string>)> comparator =
-            [](std::pair<std::string,std::string> meme1 ,std::pair<std::string,std::string> meme2)
-            {
-                int time1;
-                int time2;
-                std::istringstream(meme1.second) >> time1;
-                std::istringstream(meme2.second) >> time2;
-                return time1 > time2;
-            };
-
     // Get all id : timestamp pairs from database
     for(const auto& id : IDs)
     {
         mapIDTimestamp.insert({id, this->Get(id, TIMESTAMP)});
     }
 
-    // Create a set that sorts the pairs based on the comparator function
-    std::set<std::pair<std::string,std::string>, std::function<bool(std::pair<std::string,std::string>, std::pair<std::string, std::string>)>>
-        sortedMemes(mapIDTimestamp.begin(), mapIDTimestamp.end(), comparator);
-
     // Added sorted IDs to a vector
-    for(const auto& meme : sortedMemes)
+    while(!mapIDTimestamp.empty())
     {
-        sortedIDs.push_back(meme.first);
+        int mostRecentTime = 0;
+        std::string mostRecentID;
+        for (const auto &meme : mapIDTimestamp)
+        {
+            int time;
+            std::istringstream(meme.second) >> time;
+            if(time > mostRecentTime)
+            {
+                mostRecentTime = time;
+                mostRecentID = meme.first;
+            }
+        }
+        mapIDTimestamp.erase(mostRecentID);
+        sortedIDs.push_back(mostRecentID);
     }
     return sortedIDs;
 }

@@ -14,7 +14,7 @@ std::unique_ptr<RequestHandler> DeleteMemeHandler::create(const NginxConfig& con
 std::unique_ptr<HttpResponse> DeleteMemeHandler::HandleRequest(const HttpRequest &request)
 {
     MemeDB database;
-    std::string body = "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <title>Delet Meme</title>\r\n</head>\r\n";
+    std::string body = "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <title>Delete Meme</title>\r\n</head>\r\n";
     if (request.requestURI.find("id=") != std::string::npos)
     {
         std::string deleteTarget;
@@ -22,8 +22,15 @@ std::unique_ptr<HttpResponse> DeleteMemeHandler::HandleRequest(const HttpRequest
         if (deleteTarget.find("&") != std::string::npos){
             deleteTarget = deleteTarget.substr(0, deleteTarget.find("&"));
         }
-        database.deleteByID(deleteTarget);
-        body += "<body>Delete Success</body>";
+        if(database.deleteByID(deleteTarget))
+        {
+            body += "<body>Delete Success</body>";
+        }
+        else
+        {
+            body += "<body>ID not found</body>";
+        }
+
     }
     else
     {
